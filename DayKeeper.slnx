@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DayKeeper.Api/DayKeeper.Api.csproj" />
+    <Project Path="src/DayKeeper.Application/DayKeeper.Application.csproj" />
+    <Project Path="src/DayKeeper.Domain/DayKeeper.Domain.csproj" />
+    <Project Path="src/DayKeeper.Infrastructure/DayKeeper.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DayKeeper.Api.Tests/DayKeeper.Api.Tests.csproj" />
+  </Folder>
+</Solution>
