@@ -1,4 +1,5 @@
 using DayKeeper.Infrastructure.Persistence;
+using DayKeeper.Infrastructure.Persistence.Interceptors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -41,8 +42,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             _connection = new SqliteConnection("DataSource=:memory:");
             _connection.Open();
 
-            services.AddDbContext<DayKeeperDbContext>(options =>
-                options.UseSqlite(_connection));
+            services.AddDbContext<DayKeeperDbContext>((serviceProvider, options) =>
+            {
+                options.UseSqlite(_connection);
+                options.AddInterceptors(
+                    serviceProvider.GetRequiredService<AuditFieldsInterceptor>());
+            });
         });
     }
 
