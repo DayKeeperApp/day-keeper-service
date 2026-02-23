@@ -32,6 +32,19 @@ jobs:
       - name: Build
         run: dotnet build DayKeeper.slnx --no-restore -c Release
 
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      - name: Validate migrations
+        run: >
+          dotnet ef migrations script
+          --project src/DayKeeper.Infrastructure/DayKeeper.Infrastructure.csproj
+          --startup-project src/DayKeeper.Api/DayKeeper.Api.csproj
+          --idempotent
+          --no-build
+          -c Release
+          --output /dev/null
+
       - name: Test with coverage
         run: >
           dotnet test DayKeeper.slnx
