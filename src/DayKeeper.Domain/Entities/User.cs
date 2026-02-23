@@ -27,4 +27,7 @@ public class User : BaseEntity
 
     /// <summary>Navigation to the owning tenant.</summary>
     public Tenant Tenant { get; set; } = null!;
+
+    /// <summary>Space memberships for this user.</summary>
+    public ICollection<SpaceMembership> SpaceMemberships { get; set; } = [];
 }

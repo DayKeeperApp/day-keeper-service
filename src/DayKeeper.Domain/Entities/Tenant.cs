@@ -13,4 +13,7 @@ public class Tenant : BaseEntity
 
     /// <summary>Users belonging to this tenant.</summary>
     public ICollection<User> Users { get; set; } = [];
+
+    /// <summary>Spaces belonging to this tenant.</summary>
+    public ICollection<Space> Spaces { get; set; } = [];
 }
