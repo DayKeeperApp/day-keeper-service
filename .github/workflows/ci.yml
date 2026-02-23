@@ -26,7 +26,7 @@ jobs:
           cache: true
 
       - name: Restore
-        run: dotnet restore DayKeeper.slnx
+        run: dotnet restore DayKeeper.slnx --locked-mode
 
       - name: Build
         run: dotnet build DayKeeper.slnx --no-restore -c Release
@@ -41,7 +41,7 @@ jobs:
 
       - name: Coverage report
         uses: k1LoW/octocov-action@v1
-        if: always()
+        if: success() || failure()
 
   docker-build:
     name: Docker Build

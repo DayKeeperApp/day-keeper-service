@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net10.0": {
+      "Meziantou.Analyzer": {
+        "type": "Direct",
+        "requested": "[2.0.154, )",
+        "resolved": "2.0.154",
+        "contentHash": "NjDQa71s1CTC15vFLusGPVDLtGCwLMU5TufYz7dPWU/duXurLyN/cUGjMW53uDz286Z7WyI9SWV/tDNzzTjceg=="
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Direct",
+        "requested": "[10.0.3, )",
+        "resolved": "10.0.3",
+        "contentHash": "bwGMrRcAMWx2s/RDgja97p27rxSz2pEQW0+rX5cWAUWVETVJ/eyxGfjAl8vuG5a+lckWmPIE+vcuaZNVB5YDdw=="
+      },
+      "daykeeper.domain": {
+        "type": "Project"
+      }
+    }
+  }
+}
