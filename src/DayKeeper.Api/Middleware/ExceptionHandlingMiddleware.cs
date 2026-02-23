@@ -5,7 +5,7 @@ namespace DayKeeper.Api.Middleware;
 
 public sealed partial class ExceptionHandlingMiddleware
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
@@ -23,7 +23,7 @@ public sealed partial class ExceptionHandlingMiddleware
     {
         try
         {
-            await _next(context);
+            await _next(context).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -39,9 +39,9 @@ public sealed partial class ExceptionHandlingMiddleware
                 traceId = context.TraceIdentifier
             };
 
-            var json = JsonSerializer.Serialize(response, JsonOptions);
+            var json = JsonSerializer.Serialize(response, _jsonOptions);
 
-            await context.Response.WriteAsync(json);
+            await context.Response.WriteAsync(json).ConfigureAwait(false);
         }
     }
 

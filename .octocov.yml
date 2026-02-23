@@ -1,0 +1,11 @@
+coverage:
+  paths:
+    - "**/coverage.cobertura.xml"
+
+comment:
+  enable: true
+  hideFooterLink: false
+
+diff:
+  datastores:
+    - artifact://${GITHUB_REPOSITORY}

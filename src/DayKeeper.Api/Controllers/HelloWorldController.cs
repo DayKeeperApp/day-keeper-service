@@ -29,9 +29,3 @@ public sealed partial class HelloWorldController : ControllerBase
     [LoggerMessage(Level = LogLevel.Information, Message = "HelloWorld endpoint hit")]
     private static partial void LogHelloWorldHit(ILogger logger);
 }
-
-public sealed record HelloWorldResponse(
-    string Message,
-    DateTime Timestamp,
-    string Version
-);

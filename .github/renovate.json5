@@ -1,0 +1,41 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "schedule": ["before 6am on monday"],
+  "enabledManagers": [
+    "nuget",
+    "dockerfile",
+    "github-actions",
+    "regex"
+  ],
+  "packageRules": [
+    {
+      "description": "Auto-merge patch updates",
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
+    },
+    {
+      "description": "Group .NET SDK updates",
+      "matchManagers": ["dockerfile"],
+      "matchPackageNames": ["mcr.microsoft.com/dotnet/sdk", "mcr.microsoft.com/dotnet/aspnet"],
+      "groupName": ".NET Docker images"
+    },
+    {
+      "description": "Group test framework updates",
+      "matchPackageNames": [
+        "xunit",
+        "xunit.runner.visualstudio",
+        "Microsoft.NET.Test.Sdk",
+        "coverlet.collector"
+      ],
+      "groupName": "Test framework"
+    },
+    {
+      "description": "Group GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    }
+  ]
+}

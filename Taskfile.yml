@@ -1,0 +1,114 @@
+version: "3"
+
+vars:
+  SLN: DayKeeper.slnx
+  API_PROJECT: src/DayKeeper.Api/DayKeeper.Api.csproj
+  DOCKER_IMAGE: daykeeper-api
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list-all
+
+  # ── Build ────────────────────────────────────────────
+
+  restore:
+    desc: Restore NuGet packages
+    cmds:
+      - dotnet restore {{.SLN}}
+
+  build:
+    desc: Build the solution (Debug)
+    cmds:
+      - dotnet build {{.SLN}} --verbosity quiet
+
+  build:release:
+    desc: Build the solution (Release)
+    cmds:
+      - dotnet build {{.SLN}} -c Release --verbosity quiet
+
+  publish:
+    desc: Publish the API project (Release)
+    cmds:
+      - dotnet publish {{.API_PROJECT}} -c Release --verbosity quiet
+
+  clean:
+    desc: Clean build outputs and test results
+    cmds:
+      - dotnet clean {{.SLN}} --verbosity quiet
+      - rm -rf TestResults
+
+  # ── Run ──────────────────────────────────────────────
+
+  run:
+    desc: Run the API locally
+    cmds:
+      - dotnet run --project {{.API_PROJECT}}
+
+  watch:
+    desc: Run the API with hot reload
+    cmds:
+      - dotnet watch run --project {{.API_PROJECT}}
+
+  # ── Test ─────────────────────────────────────────────
+
+  test:
+    desc: Run all tests
+    cmds:
+      - dotnet test {{.SLN}} --verbosity quiet
+
+  test:coverage:
+    desc: Run tests with code coverage (Cobertura XML)
+    cmds:
+      - dotnet test {{.SLN}} --collect:"XPlat Code Coverage"
+        --results-directory ./TestResults --verbosity quiet
+
+  # ── Code Quality ─────────────────────────────────────
+
+  format:
+    desc: Auto-format all C# files
+    cmds:
+      - dotnet format {{.SLN}} --verbosity quiet
+
+  format:check:
+    desc: Verify formatting without changes
+    cmds:
+      - dotnet format {{.SLN}} --verify-no-changes --verbosity quiet
+
+  lint:
+    desc: Run all lefthook pre-commit checks
+    cmds:
+      - lefthook run pre-commit
+
+  vuln:
+    desc: Check for vulnerable packages
+    cmds:
+      - dotnet list {{.SLN}} package --vulnerable --include-transitive
+
+  outdated:
+    desc: List outdated packages
+    cmds:
+      - dotnet list {{.SLN}} package --outdated
+
+  # ── Docker ───────────────────────────────────────────
+
+  docker:build:
+    desc: Build Docker image
+    cmds:
+      - docker build -t {{.DOCKER_IMAGE}} .
+
+  docker:run:
+    desc: Run Docker container
+    deps: [docker:build]
+    cmds:
+      - docker run -p 8080:8080 {{.DOCKER_IMAGE}}
+
+  # ── Setup ────────────────────────────────────────────
+
+  setup:
+    desc: Set up local development environment
+    cmds:
+      - task: restore
+      - lefthook install
+      - echo "Done! Run 'task run' to start the API."

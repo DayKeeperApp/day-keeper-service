@@ -11,6 +11,7 @@ COPY src/DayKeeper.Domain/DayKeeper.Domain.csproj src/DayKeeper.Domain/
 COPY src/DayKeeper.Application/DayKeeper.Application.csproj src/DayKeeper.Application/
 COPY src/DayKeeper.Infrastructure/DayKeeper.Infrastructure.csproj src/DayKeeper.Infrastructure/
 COPY src/DayKeeper.Api/DayKeeper.Api.csproj src/DayKeeper.Api/
+COPY tests/DayKeeper.Api.Tests/DayKeeper.Api.Tests.csproj tests/DayKeeper.Api.Tests/
 
 RUN dotnet restore DayKeeper.slnx
 
@@ -26,15 +27,10 @@ RUN dotnet publish src/DayKeeper.Api/DayKeeper.Api.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-# Create non-root user for security
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
-
 COPY --from=build /app/publish .
 
-# Create logs directory owned by appuser
-RUN mkdir -p /app/logs && chown -R appuser:appgroup /app/logs
-
-USER appuser
+# Use the built-in non-root user from Microsoft's base image
+USER $APP_UID
 
 EXPOSE 8080
 

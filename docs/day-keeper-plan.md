@@ -1,31 +1,32 @@
 # Day Keeper App — Architecture & Data Model Plan (v1)
 
-**Status:** Draft Baseline  
-**Audience:** Personal project (single operator, multi-user capable)  
-**Goal:** Scalable, offline-first, self-hosted life management platform with Android client
+**Status:** Draft Baseline
+**Audience:** Personal project (single operator, multi-user capable)
+**Goal:** Scalable, offline-first, self-hosted life management
+platform with Android client
 
 ---
 
-# Table of Contents
+## Table of Contents
 
-1. Vision & Scope  
-2. High-Level Architecture  
-3. Technology Stack  
-4. Security Model  
-5. Sync Strategy  
-6. Notifications Strategy  
-7. Storage Strategy (Attachments)  
-8. Sharing & Authorization Model  
-9. Feature Specification (Locked v1)  
-10. Database Design Principles  
-11. Database Schema (Detailed)  
-12. Indexing & Performance  
-13. Future-Proofing Notes  
-14. Open Questions / Future Enhancements  
+1. Vision & Scope
+2. High-Level Architecture
+3. Technology Stack
+4. Security Model
+5. Sync Strategy
+6. Notifications Strategy
+7. Storage Strategy (Attachments)
+8. Sharing & Authorization Model
+9. Feature Specification (Locked v1)
+10. Database Design Principles
+11. Database Schema (Detailed)
+12. Indexing & Performance
+13. Future-Proofing Notes
+14. Open Questions / Future Enhancements
 
 ---
 
-# 1. Vision & Scope
+## 1. Vision & Scope
 
 ## Primary Goals
 
@@ -48,19 +49,19 @@
 
 ---
 
-# 2. High-Level Architecture
+## 2. High-Level Architecture
 
 Android App (Kotlin, Compose)
-        │
-        │ GraphQL (normal operations)
-        │ REST (sync)
-        ▼
+│
+│ GraphQL (normal operations)
+│ REST (sync)
+▼
 Kong Gateway
-        ▼
+▼
 Backend Service (C# / ASP.NET Core)
-        ├── Quartz/Hangfire Scheduler
-        ├── Attachment File Store (PVC)
-        └── PostgreSQL
+├── Quartz/Hangfire Scheduler
+├── Attachment File Store (PVC)
+└── PostgreSQL
 
 ## Deployment Environment
 
@@ -70,7 +71,7 @@ Backend Service (C# / ASP.NET Core)
 
 ---
 
-# 3. Technology Stack
+## 3. Technology Stack
 
 ## Backend
 
@@ -101,7 +102,7 @@ Backend Service (C# / ASP.NET Core)
 
 ---
 
-# 4. Security Model (Balanced)
+## 4. Security Model (Balanced)
 
 ## Included
 
@@ -120,7 +121,7 @@ Backend Service (C# / ASP.NET Core)
 
 ---
 
-# 5. Sync Strategy (Offline-First)
+## 5. Sync Strategy (Offline-First)
 
 ## Protocol Split
 
@@ -152,11 +153,11 @@ All syncable tables include:
 
 ---
 
-# 6. Notifications Strategy
+## 6. Notifications Strategy
 
 ## Model
 
-**Server-driven push (FCM)**
+### Server-driven push (FCM)
 
 ### Flow
 
@@ -173,7 +174,7 @@ All syncable tables include:
 
 ---
 
-# 7. Storage Strategy — Attachments
+## 7. Storage Strategy — Attachments
 
 ## Approach: PVC-backed filesystem
 
@@ -188,9 +189,9 @@ All syncable tables include:
 
 ### Images
 
-- image/jpeg  
-- image/png  
-- image/webp  
+- image/jpeg
+- image/png
+- image/webp
 - image/heic (optional)
 
 ### Documents
@@ -211,7 +212,7 @@ All syncable tables include:
 
 ---
 
-# 8. Sharing & Authorization Model
+## 8. Sharing & Authorization Model
 
 ## Core Concept: Spaces
 
@@ -240,7 +241,7 @@ Permissions enforced at space level (v1).
 
 ---
 
-# 9. Feature Specification (Locked v1)
+## 9. Feature Specification (Locked v1)
 
 ## Accounts & Devices
 
@@ -292,7 +293,7 @@ Supported on:
 - tasks
 - people
 
-## Sync
+## Sync (v1)
 
 - REST push/pull
 - Tombstones
@@ -306,7 +307,7 @@ Supported on:
 
 ---
 
-# 10. Database Design Principles
+## 10. Database Design Principles
 
 ## IDs
 
@@ -321,7 +322,7 @@ Supported on:
 
 Use normalized column:
 
-```
+```sql
 lower(regexp_replace(trim(name), '\s+', ' ', 'g'))
 ```
 
@@ -339,13 +340,13 @@ All major entities include:
 
 ---
 
-# 11. Database Schema (Detailed)
+## 11. Database Schema (Detailed)
 
 (See earlier planning discussion for full field-level detail.)
 
 ---
 
-# 12. Indexing & Performance (Minimum Set)
+## 12. Indexing & Performance (Minimum Set)
 
 Recommended indexes:
 
@@ -374,7 +375,7 @@ Recommended indexes:
 
 ---
 
-# 13. Future-Proofing Notes
+## 13. Future-Proofing Notes
 
 This design intentionally supports:
 
@@ -389,7 +390,7 @@ This design intentionally supports:
 
 ---
 
-# 14. Open Questions / Future Enhancements
+## 14. Open Questions / Future Enhancements
 
 Potential future work:
 
@@ -406,4 +407,4 @@ Potential future work:
 
 ---
 
-**End of Baseline Plan**
+## End of Baseline Plan

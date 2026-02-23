@@ -1,0 +1,102 @@
+# Lefthook configuration for git hooks
+# Install: brew install lefthook && lefthook install
+# Run manually: lefthook run pre-commit
+#
+# Pre-commit runs 3 sequential jobs: format → lint → security
+# Commands within each job run in parallel.
+
+pre-commit:
+  jobs:
+    # === Job 1: Format ===
+    # Auto-fix formatting issues before linting sees the code
+    - name: format
+      group:
+        parallel: true
+        jobs:
+          - name: dotnet-format
+            glob: "*.cs"
+            run: dotnet format DayKeeper.slnx --include {staged_files} --verbosity quiet
+            stage_fixed: true
+
+          - name: prettier
+            glob: "*.{yaml,yml,json,md}"
+            exclude: "^(\\.github/.*|\\.beads/.*)$"
+            run: npx --yes --quiet prettier --list-different --write {staged_files}
+            stage_fixed: true
+
+    # === Job 2: Lint ===
+    # Check formatted code for issues
+    - name: lint
+      group:
+        parallel: true
+        jobs:
+          - name: dotnet-build
+            glob: "*.cs"
+            run: dotnet build DayKeeper.slnx -warnaserror --no-restore --verbosity quiet
+
+          - name: actionlint
+            glob: ".github/workflows/*.{yaml,yml}"
+            run: uvx --from actionlint-py actionlint {staged_files}
+
+          - name: markdownlint
+            glob: "*.md"
+            exclude: "^(\\.beads/.*)$"
+            run: npx --yes --quiet markdownlint-cli {staged_files}
+
+          - name: shellcheck
+            glob: "*.sh"
+            run: uvx shellcheck-py {staged_files}
+
+          - name: hadolint
+            glob: "Dockerfile*"
+            run: uvx hadolintw {staged_files}
+
+          - name: jsonlint
+            glob: "*.json"
+            exclude: "^(\\.beads/.*)$"
+            run: npx --yes --quiet jsonlint-cli {staged_files}
+
+          - name: yamllint
+            glob: "*.{yml,yaml}"
+            exclude: "^(\\.beads/.*)$"
+            run: uvx yamllint {staged_files}
+
+          - name: editorconfig-check
+            run: npx --yes --quiet editorconfig-checker
+
+    # === Job 3: Security ===
+    # Scan for secrets and credentials
+    - name: security
+      group:
+        parallel: true
+        jobs:
+          - name: gitleaks
+            run: npx --yes --quiet @ziul285/gitleaks detect --source . -v
+
+commit-msg:
+  commands:
+    commitlint:
+      run: npx --yes --quiet @commitlint/cli --edit {1}
+
+pre-push:
+  parallel: true
+  commands:
+    dotnet-verify-format:
+      run: dotnet format DayKeeper.slnx --verify-no-changes --verbosity quiet
+
+    dotnet-build-release:
+      run: dotnet build DayKeeper.slnx -c Release --no-restore --verbosity quiet
+
+    dotnet-test:
+      run: dotnet test DayKeeper.slnx --no-build --verbosity quiet
+
+    dotnet-publish:
+      run: >
+        dotnet publish src/DayKeeper.Api/DayKeeper.Api.csproj
+        -c Release --no-build --no-restore --verbosity quiet
+
+    dotnet-vuln:
+      run: dotnet list DayKeeper.slnx package --vulnerable --include-transitive
+
+    dotnet-outdated:
+      run: dotnet list DayKeeper.slnx package --outdated
