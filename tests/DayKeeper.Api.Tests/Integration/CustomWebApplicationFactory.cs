@@ -29,7 +29,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                     d.ServiceType == typeof(DbContextOptions<DayKeeperDbContext>) ||
                     d.ServiceType == typeof(DbContextOptions) ||
                     (d.ServiceType.IsGenericType &&
-                     d.ServiceType.GetGenericTypeDefinition().FullName?.Contains("IDbContextOptionsConfiguration") == true))
+                        d.ServiceType.GetGenericTypeDefinition().FullName?.Contains("IDbContextOptionsConfiguration") == true))
                 .ToList();
 
             foreach (var descriptor in descriptorsToRemove)
