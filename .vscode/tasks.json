@@ -1,0 +1,140 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "task",
+      "args": ["build"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build:release",
+      "type": "shell",
+      "command": "task",
+      "args": ["build:release"],
+      "group": "build",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "restore",
+      "type": "shell",
+      "command": "task",
+      "args": ["restore"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "publish",
+      "type": "shell",
+      "command": "task",
+      "args": ["publish"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "clean",
+      "type": "shell",
+      "command": "task",
+      "args": ["clean"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "run",
+      "type": "shell",
+      "command": "task",
+      "args": ["run"],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "watch",
+      "type": "shell",
+      "command": "task",
+      "args": ["watch"],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "test",
+      "type": "shell",
+      "command": "task",
+      "args": ["test"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test:coverage",
+      "type": "shell",
+      "command": "task",
+      "args": ["test:coverage"],
+      "group": "test",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "format",
+      "type": "shell",
+      "command": "task",
+      "args": ["format"],
+      "problemMatcher": []
+    },
+    {
+      "label": "format:check",
+      "type": "shell",
+      "command": "task",
+      "args": ["format:check"],
+      "problemMatcher": []
+    },
+    {
+      "label": "lint",
+      "type": "shell",
+      "command": "task",
+      "args": ["lint"],
+      "problemMatcher": []
+    },
+    {
+      "label": "vuln",
+      "type": "shell",
+      "command": "task",
+      "args": ["vuln"],
+      "problemMatcher": []
+    },
+    {
+      "label": "outdated",
+      "type": "shell",
+      "command": "task",
+      "args": ["outdated"],
+      "problemMatcher": []
+    },
+    {
+      "label": "docker:build",
+      "type": "shell",
+      "command": "task",
+      "args": ["docker:build"],
+      "problemMatcher": []
+    },
+    {
+      "label": "docker:run",
+      "type": "shell",
+      "command": "task",
+      "args": ["docker:run"],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "setup",
+      "type": "shell",
+      "command": "task",
+      "args": ["setup"],
+      "problemMatcher": []
+    }
+  ]
+}

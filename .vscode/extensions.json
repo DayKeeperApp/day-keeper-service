@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "ms-dotnettools.csdevkit",
+    "ms-dotnettools.csharp",
+    "ms-azuretools.vscode-docker",
+    "redhat.vscode-yaml",
+    "davidanson.vscode-markdownlint",
+    "editorconfig.editorconfig",
+    "esbenp.prettier-vscode",
+    "humao.rest-client",
+    "eamodio.gitlens",
+    "task.vscode-task"
+  ]
+}

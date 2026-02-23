@@ -1,0 +1,32 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
+  },
+  "dotnet.defaultSolution": "DayKeeper.slnx",
+  "dotnet.testWindow.useTestingPlatform": true,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.csproj": "$(capture).csproj.user",
+    "appsettings.json": "appsettings.*.json",
+    ".editorconfig": ".editorconfig-checker.json",
+    "Dockerfile": ".dockerignore",
+    "Taskfile.yml": "lefthook.yml"
+  },
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "**/TestResults": true,
+    "**/.beads": true,
+    "**/node_modules": true
+  },
+  "search.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "**/TestResults": true,
+    "**/node_modules": true,
+    "**/logs": true
+  },
+  "terminal.integrated.defaultProfile.linux": "zsh"
+}

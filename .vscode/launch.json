@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch DayKeeper.Api",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/src/DayKeeper.Api/DayKeeper.Api.csproj"
+    },
+    {
+      "name": "Attach to Process",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
+    }
+  ]
+}
