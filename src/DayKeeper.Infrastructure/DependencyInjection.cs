@@ -1,5 +1,7 @@
 using DayKeeper.Application.Interfaces;
+using DayKeeper.Infrastructure.Persistence;
 using DayKeeper.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,9 +18,11 @@ public static class DependencyInjection
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
-        // Future: register EF Core DbContext, repositories, etc.
-        // services.AddDbContext<ApplicationDbContext>(options =>
-        //     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        services.AddDbContext<DayKeeperDbContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddHealthChecks()
+            .AddDbContextCheck<DayKeeperDbContext>();
 
         return services;
     }
