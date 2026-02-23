@@ -3,6 +3,7 @@ version: "3"
 vars:
   SLN: DayKeeper.slnx
   API_PROJECT: src/DayKeeper.Api/DayKeeper.Api.csproj
+  INFRA_PROJECT: src/DayKeeper.Infrastructure/DayKeeper.Infrastructure.csproj
   DOCKER_IMAGE: daykeeper-api
 
 tasks:
@@ -104,11 +105,55 @@ tasks:
     cmds:
       - docker run -p 8080:8080 {{.DOCKER_IMAGE}}
 
+  # ── Database ────────────────────────────────────────────
+
+  db:migrate:add:
+    desc: "Create a new migration (usage: task db:migrate:add -- MigrationName)"
+    requires:
+      vars: [CLI_ARGS]
+    cmds:
+      - >
+        dotnet ef migrations add {{.CLI_ARGS}}
+        --project {{.INFRA_PROJECT}}
+        --startup-project {{.API_PROJECT}}
+        --output-dir Persistence/Migrations
+
+  db:migrate:apply:
+    desc: Apply pending migrations to the database
+    cmds:
+      - >
+        dotnet ef database update
+        --project {{.INFRA_PROJECT}}
+        --startup-project {{.API_PROJECT}}
+
+  db:migrate:script:
+    desc: Generate idempotent SQL migration script
+    cmds:
+      - >
+        dotnet ef migrations script
+        --project {{.INFRA_PROJECT}}
+        --startup-project {{.API_PROJECT}}
+        --idempotent
+        --output migrations.sql
+      - echo "Script written to migrations.sql"
+
+  db:migrate:bundle:
+    desc: Create self-contained migration bundle for production
+    cmds:
+      - >
+        dotnet ef migrations bundle
+        --project {{.INFRA_PROJECT}}
+        --startup-project {{.API_PROJECT}}
+        --force
+        --self-contained
+      - echo "Bundle created at ./efbundle"
+
   # ── Setup ────────────────────────────────────────────
 
   setup:
     desc: Set up local development environment
     cmds:
       - task: restore
+      - dotnet tool restore
       - lefthook install
       - echo "Done! Run 'task run' to start the API."

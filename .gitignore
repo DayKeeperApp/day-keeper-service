@@ -418,3 +418,8 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# EF Core migration artifacts
+migrations.sql
+efbundle
+efbundle.exe

@@ -31,6 +31,7 @@ below it. Domain has zero dependencies.
 - [Task](https://taskfile.dev/) (task runner)
 - [Docker](https://docs.docker.com/get-docker/) (optional, for container builds)
 - [Lefthook](https://github.com/evilmartians/lefthook) (git hooks)
+- EF Core CLI tools (installed via `dotnet tool restore` / `task setup`)
 
 ## Getting Started
 
@@ -94,6 +95,18 @@ The build treats all warnings as errors (`TreatWarningsAsErrors`),
 so code analysis violations fail the build.
 Run `task format:check` to verify without modifying files.
 
+### Database Migrations
+
+Migrations are managed via EF Core CLI, wrapped in Taskfile commands:
+
+```bash
+task db:migrate:add -- AddSpacesTable   # Create migration
+task db:migrate:apply                    # Apply to local DB
+task db:migrate:script                   # Generate SQL script
+```
+
+See [docs/MIGRATIONS.md](docs/MIGRATIONS.md) for the full workflow.
+
 ## Docker
 
 ```bash
@@ -126,6 +139,7 @@ day-keeper-service/
 │   ├── DayKeeper.Domain/           # Entities, domain logic
 │   │   └── Entities/
 │   └── DayKeeper.Infrastructure/   # Implementations, data access
+│       ├── Persistence/Migrations/ # EF Core migrations
 │       └── Services/
 ├── tests/
 │   └── DayKeeper.Api.Tests/        # Unit + integration tests
