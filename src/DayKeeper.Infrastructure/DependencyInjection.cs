@@ -1,5 +1,6 @@
 using DayKeeper.Application.Interfaces;
 using DayKeeper.Infrastructure.Persistence;
+using DayKeeper.Infrastructure.Persistence.Interceptors;
 using DayKeeper.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,9 +18,14 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddSingleton<AuditFieldsInterceptor>();
 
-        services.AddDbContext<DayKeeperDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        services.AddDbContext<DayKeeperDbContext>((serviceProvider, options) =>
+        {
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            options.AddInterceptors(
+                serviceProvider.GetRequiredService<AuditFieldsInterceptor>());
+        });
 
         services.AddHealthChecks()
             .AddDbContextCheck<DayKeeperDbContext>();
