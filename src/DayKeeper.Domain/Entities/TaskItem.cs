@@ -67,4 +67,7 @@ public class TaskItem : BaseEntity
 
     /// <summary>Task-category associations for this task.</summary>
     public ICollection<TaskCategory> TaskCategories { get; set; } = [];
+
+    /// <summary>File attachments associated with this task.</summary>
+    public ICollection<Attachment> Attachments { get; set; } = [];
 }

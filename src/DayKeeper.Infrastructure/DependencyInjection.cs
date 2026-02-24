@@ -19,6 +19,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddSingleton<IAttachmentStorageService, AttachmentStorageService>();
         services.AddSingleton<AuditFieldsInterceptor>();
 
         services.AddDbContext<DayKeeperDbContext>((serviceProvider, options) =>

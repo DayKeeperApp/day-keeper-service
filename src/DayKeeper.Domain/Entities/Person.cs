@@ -35,4 +35,7 @@ public class Person : BaseEntity
 
     /// <summary>Important dates associated with this person.</summary>
     public ICollection<ImportantDate> ImportantDates { get; set; } = [];
+
+    /// <summary>File attachments associated with this person.</summary>
+    public ICollection<Attachment> Attachments { get; set; } = [];
 }
