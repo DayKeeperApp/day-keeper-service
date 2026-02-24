@@ -1,6 +1,7 @@
 using DayKeeper.Application.Interfaces;
 using DayKeeper.Infrastructure.Persistence;
 using DayKeeper.Infrastructure.Persistence.Interceptors;
+using DayKeeper.Infrastructure.Persistence.Repositories;
 using DayKeeper.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -26,6 +27,9 @@ public static class DependencyInjection
             options.AddInterceptors(
                 serviceProvider.GetRequiredService<AuditFieldsInterceptor>());
         });
+
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<DayKeeperDbContext>());
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
         services.AddHealthChecks()
             .AddDbContextCheck<DayKeeperDbContext>();
