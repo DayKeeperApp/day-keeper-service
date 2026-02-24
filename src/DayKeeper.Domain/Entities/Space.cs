@@ -24,4 +24,7 @@ public class Space : BaseEntity
 
     /// <summary>Users who are members of this space.</summary>
     public ICollection<SpaceMembership> Memberships { get; set; } = [];
+
+    /// <summary>Calendars belonging to this space.</summary>
+    public ICollection<Calendar> Calendars { get; set; } = [];
 }
