@@ -16,4 +16,7 @@ public class Tenant : BaseEntity
 
     /// <summary>Spaces belonging to this tenant.</summary>
     public ICollection<Space> Spaces { get; set; } = [];
+
+    /// <summary>User-created event types belonging to this tenant.</summary>
+    public ICollection<EventType> EventTypes { get; set; } = [];
 }
