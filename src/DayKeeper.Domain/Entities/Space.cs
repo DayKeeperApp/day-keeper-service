@@ -30,4 +30,10 @@ public class Space : BaseEntity
 
     /// <summary>People (contacts) belonging to this space.</summary>
     public ICollection<Person> People { get; set; } = [];
+
+    /// <summary>Projects belonging to this space.</summary>
+    public ICollection<Project> Projects { get; set; } = [];
+
+    /// <summary>Tasks belonging to this space.</summary>
+    public ICollection<TaskItem> TaskItems { get; set; } = [];
 }
