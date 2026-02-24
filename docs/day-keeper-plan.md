@@ -258,6 +258,7 @@ Permissions enforced at space level (v1).
 - Holidays via system calendars
 - Single events
 - Recurring events
+- Event location support
 - Event reminders (multiple)
 
 ## People

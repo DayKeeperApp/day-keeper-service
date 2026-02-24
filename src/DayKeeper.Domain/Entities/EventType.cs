@@ -39,4 +39,7 @@ public class EventType : BaseEntity
     /// <c>null</c> for system-defined event types.
     /// </summary>
     public Tenant? Tenant { get; set; }
+
+    /// <summary>Events categorized with this event type.</summary>
+    public ICollection<CalendarEvent> Events { get; set; } = [];
 }

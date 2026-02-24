@@ -26,4 +26,7 @@ public class Calendar : BaseEntity
 
     /// <summary>Navigation to the owning space.</summary>
     public Space Space { get; set; } = null!;
+
+    /// <summary>Events belonging to this calendar.</summary>
+    public ICollection<CalendarEvent> Events { get; set; } = [];
 }
