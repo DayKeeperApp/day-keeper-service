@@ -36,4 +36,7 @@ public class Space : BaseEntity
 
     /// <summary>Tasks belonging to this space.</summary>
     public ICollection<TaskItem> TaskItems { get; set; } = [];
+
+    /// <summary>Shopping lists belonging to this space.</summary>
+    public ICollection<ShoppingList> ShoppingLists { get; set; } = [];
 }
