@@ -80,4 +80,7 @@ public class CalendarEvent : BaseEntity
 
     /// <summary>Reminders configured for this event.</summary>
     public ICollection<EventReminder> Reminders { get; set; } = [];
+
+    /// <summary>File attachments associated with this event.</summary>
+    public ICollection<Attachment> Attachments { get; set; } = [];
 }
