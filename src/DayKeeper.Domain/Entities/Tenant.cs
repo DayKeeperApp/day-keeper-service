@@ -19,4 +19,7 @@ public class Tenant : BaseEntity
 
     /// <summary>User-created event types belonging to this tenant.</summary>
     public ICollection<EventType> EventTypes { get; set; } = [];
+
+    /// <summary>User-created categories belonging to this tenant.</summary>
+    public ICollection<Category> Categories { get; set; } = [];
 }
