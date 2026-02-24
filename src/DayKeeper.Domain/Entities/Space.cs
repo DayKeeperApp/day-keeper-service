@@ -27,4 +27,7 @@ public class Space : BaseEntity
 
     /// <summary>Calendars belonging to this space.</summary>
     public ICollection<Calendar> Calendars { get; set; } = [];
+
+    /// <summary>People (contacts) belonging to this space.</summary>
+    public ICollection<Person> People { get; set; } = [];
 }
