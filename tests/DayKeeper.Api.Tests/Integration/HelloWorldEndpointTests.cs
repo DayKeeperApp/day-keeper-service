@@ -3,7 +3,8 @@ using System.Net.Http.Json;
 
 namespace DayKeeper.Api.Tests.Integration;
 
-public class HelloWorldEndpointTests : IClassFixture<CustomWebApplicationFactory>
+[Collection("Integration")]
+public class HelloWorldEndpointTests
 {
     private readonly HttpClient _client;
 
