@@ -26,6 +26,11 @@ public sealed class DayKeeperDbContext : DbContext
     /// </summary>
     public Guid? CurrentTenantId => _tenantContext.CurrentTenantId;
 
+    /// <summary>
+    /// Append-only change log used for incremental client sync.
+    /// </summary>
+    public DbSet<ChangeLog> ChangeLogs => Set<ChangeLog>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
