@@ -423,3 +423,6 @@ FodyWeavers.xsd
 migrations.sql
 efbundle
 efbundle.exe
+
+# Serena MCP plugin
+.serena/

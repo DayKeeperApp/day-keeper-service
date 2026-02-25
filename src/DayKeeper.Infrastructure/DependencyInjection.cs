@@ -31,6 +31,7 @@ public static class DependencyInjection
 
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<DayKeeperDbContext>());
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<ISpaceService, SpaceService>();
 
         services.AddHealthChecks()
             .AddDbContextCheck<DayKeeperDbContext>();
