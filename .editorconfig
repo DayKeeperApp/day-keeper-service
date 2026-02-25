@@ -63,4 +63,5 @@ dotnet_naming_style.underscore_camel_case.capitalization = camel_case
 # EF Core migrations are auto-generated; suppress style enforcement
 [**/Migrations/*.cs]
 generated_code = true
+charset = unset
 dotnet_analyzer_diagnostic.severity = none
