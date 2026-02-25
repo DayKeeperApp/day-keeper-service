@@ -64,6 +64,15 @@ public class CalendarEvent : BaseEntity
     public string? RecurrenceRule { get; set; }
 
     /// <summary>
+    /// Denormalized UTC end boundary of the recurrence series, computed from the
+    /// RRULE's UNTIL or COUNT parameter when saving. <c>null</c> for infinite
+    /// recurrence or non-recurring events. Used to optimize range queries by
+    /// filtering out expired series in SQL; the <see cref="RecurrenceRule"/> string
+    /// remains the source of truth.
+    /// </summary>
+    public DateTime? RecurrenceEndAt { get; set; }
+
+    /// <summary>
     /// Optional location or venue for the event.
     /// <c>null</c> if no location is specified.
     /// </summary>
@@ -80,6 +89,9 @@ public class CalendarEvent : BaseEntity
 
     /// <summary>Reminders configured for this event.</summary>
     public ICollection<EventReminder> Reminders { get; set; } = [];
+
+    /// <summary>Modifications or cancellations of individual occurrences in a recurring series.</summary>
+    public ICollection<RecurrenceException> RecurrenceExceptions { get; set; } = [];
 
     /// <summary>File attachments associated with this event.</summary>
     public ICollection<Attachment> Attachments { get; set; } = [];
