@@ -1,3 +1,5 @@
+using DayKeeper.Domain.Interfaces;
+
 namespace DayKeeper.Domain.Entities;
 
 /// <summary>
@@ -5,7 +7,7 @@ namespace DayKeeper.Domain.Entities;
 /// <see cref="TaskItem"/>, or <see cref="Person"/>.
 /// Exactly one of the parent foreign keys must be populated.
 /// </summary>
-public class Attachment : BaseEntity
+public class Attachment : BaseEntity, ITenantScoped
 {
     /// <summary>Foreign key to the owning <see cref="Tenant"/>.</summary>
     public Guid TenantId { get; set; }

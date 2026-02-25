@@ -1,11 +1,12 @@
 using DayKeeper.Domain.Enums;
+using DayKeeper.Domain.Interfaces;
 
 namespace DayKeeper.Domain.Entities;
 
 /// <summary>
 /// An organizational container that groups related data within a tenant.
 /// </summary>
-public class Space : BaseEntity
+public class Space : BaseEntity, ITenantScoped
 {
     /// <summary>Foreign key to the owning <see cref="Tenant"/>.</summary>
     public Guid TenantId { get; set; }

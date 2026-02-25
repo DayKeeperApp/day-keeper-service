@@ -1,3 +1,5 @@
+using DayKeeper.Domain.Interfaces;
+
 namespace DayKeeper.Domain.Entities;
 
 /// <summary>
@@ -5,7 +7,7 @@ namespace DayKeeper.Domain.Entities;
 /// System-defined categories have a <c>null</c> <see cref="TenantId"/> and are
 /// available to all tenants; user-created categories are scoped to a single tenant.
 /// </summary>
-public class Category : BaseEntity
+public class Category : BaseEntity, IOptionalTenantScoped
 {
     /// <summary>
     /// Foreign key to the owning <see cref="Tenant"/>.
