@@ -1,4 +1,5 @@
 using System.Globalization;
+using DayKeeper.Api.GraphQL;
 using DayKeeper.Api.Middleware;
 using DayKeeper.Api.Services;
 using DayKeeper.Application;
@@ -32,6 +33,14 @@ try
 
     // ── Controllers ──────────────────────────────────────────
     builder.Services.AddControllers();
+
+    // ── GraphQL ──────────────────────────────────────────────
+    builder.Services
+        .AddGraphQLServer()
+        .AddQueryType<Query>()
+        .AddFiltering()
+        .AddSorting()
+        .AddProjections();
 
     // ── OpenAPI / Scalar ─────────────────────────────────────
     builder.Services.AddOpenApi();
@@ -82,6 +91,7 @@ try
     app.UseHttpsRedirection();
     app.UseAuthorization();
     app.MapControllers();
+    app.MapGraphQL();
 
     app.Run();
 }
