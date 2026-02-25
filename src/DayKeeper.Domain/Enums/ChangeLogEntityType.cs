@@ -61,4 +61,7 @@ public enum ChangeLogEntityType
 
     /// <summary>A <see cref="Entities.Attachment"/> entity.</summary>
     Attachment = 18,
+
+    /// <summary>A <see cref="Entities.RecurrenceException"/> entity.</summary>
+    RecurrenceException = 19,
 }
