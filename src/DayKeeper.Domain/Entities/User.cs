@@ -1,11 +1,12 @@
 using DayKeeper.Domain.Enums;
+using DayKeeper.Domain.Interfaces;
 
 namespace DayKeeper.Domain.Entities;
 
 /// <summary>
 /// A person who interacts with the system, scoped to a single tenant.
 /// </summary>
-public class User : BaseEntity
+public class User : BaseEntity, ITenantScoped
 {
     /// <summary>Foreign key to the owning <see cref="Tenant"/>.</summary>
     public Guid TenantId { get; set; }

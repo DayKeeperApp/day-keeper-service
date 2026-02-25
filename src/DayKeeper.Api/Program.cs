@@ -1,6 +1,8 @@
 using System.Globalization;
 using DayKeeper.Api.Middleware;
+using DayKeeper.Api.Services;
 using DayKeeper.Application;
+using DayKeeper.Application.Interfaces;
 using DayKeeper.Infrastructure;
 using Scalar.AspNetCore;
 using Serilog;
@@ -19,6 +21,10 @@ try
     // ── Serilog ──────────────────────────────────────────────
     builder.Host.UseSerilog((context, loggerConfig) =>
         loggerConfig.ReadFrom.Configuration(context.Configuration));
+
+    // ── Tenant Context ──────────────────────────────────────
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddScoped<ITenantContext, HttpTenantContext>();
 
     // ── DI: Clean Architecture layers ────────────────────────
     builder.Services.AddApplicationServices();
