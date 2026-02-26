@@ -1,5 +1,6 @@
 using System.Globalization;
 using DayKeeper.Api.GraphQL;
+using DayKeeper.Api.GraphQL.Mutations;
 using DayKeeper.Api.GraphQL.Queries;
 using DayKeeper.Api.Middleware;
 using DayKeeper.Api.Services;
@@ -39,7 +40,19 @@ try
     builder.Services
         .AddGraphQLServer()
         .AddQueryType<Query>()
+        .AddMutationType<Mutation>()
+        .AddTypeExtension<TenantQueries>()
+        .AddTypeExtension<UserQueries>()
         .AddTypeExtension<SpaceQueries>()
+        .AddTypeExtension<SpaceMembershipQueries>()
+        .AddTypeExtension<TenantMutations>()
+        .AddTypeExtension<UserMutations>()
+        .AddTypeExtension<SpaceMutations>()
+        .AddTypeExtension<SpaceMembershipMutations>()
+        .AddMutationConventions(new MutationConventionOptions
+        {
+            ApplyToAllMutations = true,
+        })
         .AddFiltering()
         .AddSorting()
         .AddProjections()
