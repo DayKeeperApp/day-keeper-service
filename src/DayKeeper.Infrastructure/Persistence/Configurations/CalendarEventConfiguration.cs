@@ -14,6 +14,13 @@ public sealed class CalendarEventConfiguration : BaseEntityConfiguration<Calenda
 {
     protected override void ConfigureEntity(EntityTypeBuilder<CalendarEvent> builder)
     {
+        ConfigureProperties(builder);
+        ConfigureRelationships(builder);
+        ConfigureIndexes(builder);
+    }
+
+    private static void ConfigureProperties(EntityTypeBuilder<CalendarEvent> builder)
+    {
         builder.Property(e => e.CalendarId)
             .IsRequired();
 
@@ -50,10 +57,16 @@ public sealed class CalendarEventConfiguration : BaseEntityConfiguration<Calenda
             .IsRequired(false)
             .HasMaxLength(512);
 
+        builder.Property(e => e.RecurrenceEndAt)
+            .IsRequired(false);
+
         builder.Property(e => e.Location)
             .IsRequired(false)
             .HasMaxLength(512);
+    }
 
+    private static void ConfigureRelationships(EntityTypeBuilder<CalendarEvent> builder)
+    {
         builder.HasOne(e => e.Calendar)
             .WithMany(c => c.Events)
             .HasForeignKey(e => e.CalendarId)
@@ -63,11 +76,19 @@ public sealed class CalendarEventConfiguration : BaseEntityConfiguration<Calenda
             .WithMany(et => et.Events)
             .HasForeignKey(e => e.EventTypeId)
             .OnDelete(DeleteBehavior.SetNull);
+    }
 
-        builder.HasIndex(e => e.CalendarId);
+    private static void ConfigureIndexes(EntityTypeBuilder<CalendarEvent> builder)
+    {
+        builder.HasIndex(e => e.CalendarId)
+            .HasDatabaseName("IX_CalendarEvent_CalendarId");
 
         builder.HasIndex(e => e.EventTypeId);
 
         builder.HasIndex(e => new { e.CalendarId, e.StartAt });
+
+        builder.HasIndex("CalendarId")
+            .HasFilter("\"RecurrenceRule\" IS NOT NULL")
+            .HasDatabaseName("IX_CalendarEvent_CalendarId_Recurring");
     }
 }
