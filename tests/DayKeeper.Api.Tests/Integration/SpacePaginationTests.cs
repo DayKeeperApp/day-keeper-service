@@ -1,17 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace DayKeeper.Api.Tests.Integration;
 
 [Collection("Integration")]
 public class SpacePaginationTests
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
-
     private readonly HttpClient _client;
 
     public SpacePaginationTests(CustomWebApplicationFactory factory)
