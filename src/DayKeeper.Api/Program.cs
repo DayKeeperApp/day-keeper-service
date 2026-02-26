@@ -43,7 +43,6 @@ try
         .AddFiltering()
         .AddSorting()
         .AddProjections()
-        .AddGlobalObjectIdentification()
         .AddDbContextCursorPagingProvider()
         .ModifyPagingOptions(opt =>
         {
