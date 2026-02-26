@@ -1,5 +1,6 @@
 using System.Globalization;
 using DayKeeper.Api.GraphQL;
+using DayKeeper.Api.GraphQL.Queries;
 using DayKeeper.Api.Middleware;
 using DayKeeper.Api.Services;
 using DayKeeper.Application;
@@ -38,9 +39,18 @@ try
     builder.Services
         .AddGraphQLServer()
         .AddQueryType<Query>()
+        .AddTypeExtension<SpaceQueries>()
         .AddFiltering()
         .AddSorting()
-        .AddProjections();
+        .AddProjections()
+        .AddGlobalObjectIdentification()
+        .AddDbContextCursorPagingProvider()
+        .ModifyPagingOptions(opt =>
+        {
+            opt.DefaultPageSize = 25;
+            opt.MaxPageSize = 100;
+            opt.IncludeTotalCount = true;
+        });
 
     // ── OpenAPI / Scalar ─────────────────────────────────────
     builder.Services.AddOpenApi();
