@@ -6,6 +6,10 @@ namespace DayKeeper.Api.GraphQL.Validation;
 /// <summary>
 /// Type interceptor that automatically wires <see cref="ValidationMiddleware"/>
 /// into all mutation fields, ensuring every mutation is validated with no opt-out.
+/// The middleware is inserted just before the ArgumentMiddleware (which is the last
+/// middleware added by HC's mutation conventions), placing it inside ErrorMiddleware's
+/// try-catch scope so that <c>InputValidationException</c> is correctly mapped to the
+/// mutation error union, while the "input" argument is still accessible.
 /// </summary>
 public sealed class ValidationTypeInterceptor : TypeInterceptor
 {
@@ -25,13 +29,27 @@ public sealed class ValidationTypeInterceptor : TypeInterceptor
             if (field.IsIntrospectionField)
                 continue;
 
-            field.MiddlewareDefinitions.Insert(0,
-                new FieldMiddlewareDefinition(
-                    next => async context =>
-                    {
-                        var middleware = new ValidationMiddleware(next);
-                        await middleware.InvokeAsync(context).ConfigureAwait(false);
-                    }));
+            var middleware = new FieldMiddlewareDefinition(
+                next => async context =>
+                {
+                    var mw = new ValidationMiddleware(next);
+                    await mw.InvokeAsync(context).ConfigureAwait(false);
+                });
+
+            // HC's MutationConventionTypeInterceptor adds [Result, Error, Argument]
+            // at positions 0-2. We insert at the second-to-last position so we're
+            // inside ErrorMiddleware's scope but before ArgumentMiddleware unwraps the input.
+            var count = field.MiddlewareDefinitions.Count;
+            if (count >= 2)
+            {
+                // Insert before the last entry (ArgumentMiddleware)
+                field.MiddlewareDefinitions.Insert(count - 1, middleware);
+            }
+            else
+            {
+                // Fallback: no convention middleware; insert at end
+                field.MiddlewareDefinitions.Add(middleware);
+            }
         }
     }
 }

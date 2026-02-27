@@ -1,110 +1,71 @@
-using System.Reflection;
 using DayKeeper.Application.Validation.Commands;
 using DayKeeper.Domain.Enums;
+using HotChocolate.Resolvers;
 
 namespace DayKeeper.Api.GraphQL.Validation;
 
 /// <summary>
 /// Maps mutation field names to factory functions that construct the corresponding
-/// FluentValidation command record from the HC-generated input object.
-/// HC mutation conventions produce dictionary-like input objects at runtime,
-/// so we read values by key (camelCase) first, then fall back to reflection.
+/// FluentValidation command record from the HC middleware context.
+/// After HC's ArgumentMiddleware unpacks the <c>input</c> wrapper, individual
+/// scalar arguments are accessible directly via <see cref="IResolverContext.ArgumentValue{T}"/>.
 /// </summary>
 internal static class InputFactory
 {
-    internal static object? TryCreate(string fieldName, object hcInput)
+    internal static object? TryCreate(string fieldName, IMiddlewareContext context)
     {
-        if (!Factories.TryGetValue(fieldName, out var factory))
+        if (!_factories.TryGetValue(fieldName, out var factory))
             return null;
 
-        return factory(hcInput);
+        return factory(context);
     }
 
-    private static T? Get<T>(object obj, string name)
+    private static readonly Dictionary<string, Func<IMiddlewareContext, object>> _factories = new(StringComparer.Ordinal)
     {
-        // HC-generated input objects implement IReadOnlyDictionary with camelCase keys
-        if (obj is IReadOnlyDictionary<string, object?> dict)
-        {
-            var camelKey = char.ToLowerInvariant(name[0]) + name[1..];
-            if (dict.TryGetValue(camelKey, out var value) && value is not null)
-                return (T)value;
-            if (dict.TryGetValue(name, out value) && value is not null)
-                return (T)value;
-            return default;
-        }
+        ["createTenant"] = ctx => new CreateTenantCommand(
+            ctx.ArgumentValue<string>("name"),
+            ctx.ArgumentValue<string>("slug")),
 
-        // Fallback: CLR-backed input types
-        var prop = obj.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
-        if (prop is null)
-            return default;
-        var propValue = prop.GetValue(obj);
-        return propValue is null ? default : (T)propValue;
-    }
+        ["updateTenant"] = ctx => new UpdateTenantCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("name") is { HasValue: true, Value: var tn } ? tn : null,
+            ctx.ArgumentOptional<string?>("slug") is { HasValue: true, Value: var ts } ? ts : null),
 
-    private static T GetRequired<T>(object obj, string name)
-    {
-        if (obj is IReadOnlyDictionary<string, object?> dict)
-        {
-            var camelKey = char.ToLowerInvariant(name[0]) + name[1..];
-            if (dict.TryGetValue(camelKey, out var value) && value is not null)
-                return (T)value;
-            if (dict.TryGetValue(name, out value) && value is not null)
-                return (T)value;
-            throw new InvalidOperationException(
-                $"Required field '{name}' (or '{camelKey}') not found or null in input dictionary.");
-        }
+        ["createUser"] = ctx => new CreateUserCommand(
+            ctx.ArgumentValue<Guid>("tenantId"),
+            ctx.ArgumentValue<string>("displayName"),
+            ctx.ArgumentValue<string>("email"),
+            ctx.ArgumentValue<string>("timezone"),
+            ctx.ArgumentValue<WeekStart>("weekStart"),
+            ctx.ArgumentOptional<string?>("locale") is { HasValue: true, Value: var l } ? l : null),
 
-        var prop = obj.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.Instance)
-            ?? throw new InvalidOperationException($"Property '{name}' not found on {obj.GetType().Name}.");
-        return (T)prop.GetValue(obj)!;
-    }
+        ["updateUser"] = ctx => new UpdateUserCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("displayName") is { HasValue: true, Value: var dn } ? dn : null,
+            ctx.ArgumentOptional<string?>("email") is { HasValue: true, Value: var ue } ? ue : null,
+            ctx.ArgumentOptional<string?>("timezone") is { HasValue: true, Value: var ut } ? ut : null,
+            ctx.ArgumentOptional<WeekStart?>("weekStart") is { HasValue: true, Value: var uw } ? uw : null,
+            ctx.ArgumentOptional<string?>("locale") is { HasValue: true, Value: var ul } ? ul : null),
 
-    private static readonly Dictionary<string, Func<object, object>> Factories = new(StringComparer.Ordinal)
-    {
-        ["createTenant"] = input => new CreateTenantCommand(
-            GetRequired<string>(input, "Name"),
-            GetRequired<string>(input, "Slug")),
+        ["createSpace"] = ctx => new CreateSpaceCommand(
+            ctx.ArgumentValue<Guid>("tenantId"),
+            ctx.ArgumentValue<string>("name"),
+            ctx.ArgumentValue<SpaceType>("spaceType"),
+            ctx.ArgumentValue<Guid>("createdByUserId")),
 
-        ["updateTenant"] = input => new UpdateTenantCommand(
-            GetRequired<Guid>(input, "Id"),
-            Get<string>(input, "Name"),
-            Get<string>(input, "Slug")),
+        ["updateSpace"] = ctx => new UpdateSpaceCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("name") is { HasValue: true, Value: var sn } ? sn : null,
+            ctx.ArgumentOptional<SpaceType?>("spaceType") is { HasValue: true, Value: var st } ? st : null),
 
-        ["createUser"] = input => new CreateUserCommand(
-            GetRequired<Guid>(input, "TenantId"),
-            GetRequired<string>(input, "DisplayName"),
-            GetRequired<string>(input, "Email"),
-            GetRequired<string>(input, "Timezone"),
-            GetRequired<WeekStart>(input, "WeekStart"),
-            Get<string>(input, "Locale")),
+        ["addSpaceMember"] = ctx => new AddSpaceMemberCommand(
+            ctx.ArgumentValue<Guid>("spaceId"),
+            ctx.ArgumentValue<Guid>("userId"),
+            ctx.ArgumentValue<SpaceRole>("role")),
 
-        ["updateUser"] = input => new UpdateUserCommand(
-            GetRequired<Guid>(input, "Id"),
-            Get<string>(input, "DisplayName"),
-            Get<string>(input, "Email"),
-            Get<string>(input, "Timezone"),
-            Get<WeekStart?>(input, "WeekStart"),
-            Get<string>(input, "Locale")),
-
-        ["createSpace"] = input => new CreateSpaceCommand(
-            GetRequired<Guid>(input, "TenantId"),
-            GetRequired<string>(input, "Name"),
-            GetRequired<SpaceType>(input, "SpaceType"),
-            GetRequired<Guid>(input, "CreatedByUserId")),
-
-        ["updateSpace"] = input => new UpdateSpaceCommand(
-            GetRequired<Guid>(input, "Id"),
-            Get<string>(input, "Name"),
-            Get<SpaceType?>(input, "SpaceType")),
-
-        ["addSpaceMember"] = input => new AddSpaceMemberCommand(
-            GetRequired<Guid>(input, "SpaceId"),
-            GetRequired<Guid>(input, "UserId"),
-            GetRequired<SpaceRole>(input, "Role")),
-
-        ["updateSpaceMemberRole"] = input => new UpdateSpaceMemberRoleCommand(
-            GetRequired<Guid>(input, "SpaceId"),
-            GetRequired<Guid>(input, "UserId"),
-            GetRequired<SpaceRole>(input, "NewRole")),
+        ["updateSpaceMemberRole"] = ctx => new UpdateSpaceMemberRoleCommand(
+            ctx.ArgumentValue<Guid>("spaceId"),
+            ctx.ArgumentValue<Guid>("userId"),
+            ctx.ArgumentValue<SpaceRole>("newRole")),
     };
 }

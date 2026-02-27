@@ -35,6 +35,9 @@ public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCom
 
     private static bool BeValidIanaTimezone(string timezone)
     {
+        if (string.IsNullOrEmpty(timezone))
+            return false;
+
         try
         {
             TimeZoneInfo.FindSystemTimeZoneById(timezone);

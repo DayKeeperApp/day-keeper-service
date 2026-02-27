@@ -8,7 +8,7 @@ namespace DayKeeper.Api.GraphQL.Validation;
 /// <summary>
 /// Hot Chocolate field middleware that automatically runs FluentValidation
 /// on mutation fields before the resolver executes. Uses <see cref="InputFactory"/>
-/// to construct the appropriate command record from the HC-generated input object,
+/// to construct the appropriate command record from the resolved arguments,
 /// then validates it against the registered <see cref="IValidator{T}"/>.
 /// </summary>
 public sealed partial class ValidationMiddleware
@@ -23,37 +23,22 @@ public sealed partial class ValidationMiddleware
     public async Task InvokeAsync(IMiddlewareContext context)
     {
         var fieldName = context.Selection.Field.Name;
-        var argument = context.Selection.Field.Arguments.FirstOrDefault(
-            a => string.Equals(a.Name, "input", StringComparison.Ordinal));
 
-        if (argument is not null)
+        try
         {
-            try
+            var command = InputFactory.TryCreate(fieldName, context);
+            if (command is not null)
             {
-                var hcInput = context.ArgumentValue<object?>("input");
-                if (hcInput is not null)
-                {
-                    var command = InputFactory.TryCreate(fieldName, hcInput);
-                    if (command is not null)
-                    {
-                        await ValidateAsync(command, context).ConfigureAwait(false);
-                    }
-                }
+                await ValidateAsync(command, context).ConfigureAwait(false);
             }
-            catch (InputValidationException)
-            {
-                throw; // Let validation errors propagate to HC error handling
-            }
-            catch (Exception ex)
-            {
-                // Safety net: log but don't block the resolver if factory/reflection fails
-                var logger = context.Services.GetService<ILoggerFactory>()
-                    ?.CreateLogger<ValidationMiddleware>();
-                if (logger is not null)
-                {
-                    LogValidationMiddlewareFailed(logger, fieldName, ex);
-                }
-            }
+        }
+        catch (InputValidationException)
+        {
+            throw; // Propagate to HC ErrorMiddleware
+        }
+        catch (Exception ex)
+        {
+            LogIfPossible(context, fieldName, ex);
         }
 
         await _next(context).ConfigureAwait(false);
@@ -85,6 +70,16 @@ public sealed partial class ValidationMiddleware
                     StringComparer.Ordinal);
 
             throw new InputValidationException(errors);
+        }
+    }
+
+    private static void LogIfPossible(IMiddlewareContext context, string fieldName, Exception ex)
+    {
+        var logger = context.Services.GetService<ILoggerFactory>()
+            ?.CreateLogger<ValidationMiddleware>();
+        if (logger is not null)
+        {
+            LogValidationMiddlewareFailed(logger, fieldName, ex);
         }
     }
 
