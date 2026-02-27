@@ -2,6 +2,7 @@ using System.Globalization;
 using DayKeeper.Api.GraphQL;
 using DayKeeper.Api.GraphQL.Mutations;
 using DayKeeper.Api.GraphQL.Queries;
+using DayKeeper.Api.GraphQL.Validation;
 using DayKeeper.Api.Middleware;
 using DayKeeper.Api.Services;
 using DayKeeper.Application;
@@ -53,6 +54,7 @@ try
         {
             ApplyToAllMutations = true,
         })
+        .TryAddTypeInterceptor<ValidationTypeInterceptor>()
         .AddFiltering()
         .AddSorting()
         .AddProjections()

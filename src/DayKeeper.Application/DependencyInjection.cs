@@ -1,3 +1,5 @@
+using DayKeeper.Application.Validation.Validators;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DayKeeper.Application;
@@ -9,7 +11,8 @@ public static class DependencyInjection
     /// </summary>
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Future: register MediatR, AutoMapper, validators, etc.
+        services.AddValidatorsFromAssemblyContaining<CreateTenantCommandValidator>();
+
         return services;
     }
 }

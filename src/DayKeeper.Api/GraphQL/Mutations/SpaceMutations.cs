@@ -12,6 +12,7 @@ namespace DayKeeper.Api.GraphQL.Mutations;
 public sealed class SpaceMutations
 {
     /// <summary>Creates a new space within a tenant.</summary>
+    [Error<InputValidationException>]
     [Error<EntityNotFoundException>]
     [Error<DuplicateSpaceNameException>]
     public Task<Space> CreateSpaceAsync(
@@ -27,6 +28,7 @@ public sealed class SpaceMutations
     }
 
     /// <summary>Updates an existing space.</summary>
+    [Error<InputValidationException>]
     [Error<EntityNotFoundException>]
     [Error<DuplicateSpaceNameException>]
     public Task<Space> UpdateSpaceAsync(

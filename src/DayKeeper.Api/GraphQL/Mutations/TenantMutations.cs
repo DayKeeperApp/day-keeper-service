@@ -11,6 +11,7 @@ namespace DayKeeper.Api.GraphQL.Mutations;
 public sealed class TenantMutations
 {
     /// <summary>Creates a new tenant.</summary>
+    [Error<InputValidationException>]
     [Error<DuplicateSlugException>]
     public Task<Tenant> CreateTenantAsync(
         string name,
@@ -22,6 +23,7 @@ public sealed class TenantMutations
     }
 
     /// <summary>Updates an existing tenant.</summary>
+    [Error<InputValidationException>]
     [Error<EntityNotFoundException>]
     [Error<DuplicateSlugException>]
     public Task<Tenant> UpdateTenantAsync(
