@@ -1,4 +1,5 @@
 using System.Globalization;
+using Asp.Versioning;
 using DayKeeper.Api.GraphQL;
 using DayKeeper.Api.GraphQL.Mutations;
 using DayKeeper.Api.GraphQL.Queries;
@@ -37,6 +38,21 @@ try
     // ── Controllers ──────────────────────────────────────────
     builder.Services.AddControllers();
 
+    // ── API Versioning ─────────────────────────────────────
+    builder.Services
+        .AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+        })
+        .AddMvc()
+        .AddApiExplorer(options =>
+        {
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+        });
+
     // ── GraphQL ──────────────────────────────────────────────
     builder.Services
         .AddGraphQLServer()
@@ -68,7 +84,7 @@ try
         });
 
     // ── OpenAPI / Scalar ─────────────────────────────────────
-    builder.Services.AddOpenApi();
+    builder.Services.AddOpenApi("v1");
 
     // ── Health Checks ────────────────────────────────────────
     builder.Services.AddHealthChecks();
