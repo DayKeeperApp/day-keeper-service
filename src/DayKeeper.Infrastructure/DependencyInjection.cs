@@ -38,6 +38,8 @@ public static class DependencyInjection
         services.AddScoped<ISpaceService, SpaceService>();
         services.AddScoped<ITenantService, TenantService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IProjectService, ProjectService>();
+        services.AddScoped<ITaskItemService, TaskItemService>();
         services.AddScoped<ISyncService, SyncService>();
 
         services.AddHealthChecks()
