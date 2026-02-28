@@ -47,7 +47,7 @@ public sealed class ChangeLogInterceptor(
     {
         var utcNow = dateTimeProvider.UtcNow;
 
-        foreach (var entry in context.ChangeTracker.Entries<BaseEntity>())
+        foreach (var entry in context.ChangeTracker.Entries<BaseEntity>().ToList())
         {
             var operation = entry.State switch
             {
