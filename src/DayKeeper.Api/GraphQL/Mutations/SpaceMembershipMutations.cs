@@ -12,6 +12,7 @@ namespace DayKeeper.Api.GraphQL.Mutations;
 public sealed class SpaceMembershipMutations
 {
     /// <summary>Adds a user as a member of a space.</summary>
+    [Error<InputValidationException>]
     [Error<EntityNotFoundException>]
     [Error<DuplicateMembershipException>]
     public Task<SpaceMembership> AddSpaceMemberAsync(
@@ -25,6 +26,7 @@ public sealed class SpaceMembershipMutations
     }
 
     /// <summary>Changes the role of an existing space member.</summary>
+    [Error<InputValidationException>]
     [Error<EntityNotFoundException>]
     [Error<BusinessRuleViolationException>]
     public Task<SpaceMembership> UpdateSpaceMemberRoleAsync(

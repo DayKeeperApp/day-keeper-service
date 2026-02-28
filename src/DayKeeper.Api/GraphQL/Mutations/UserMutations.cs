@@ -12,6 +12,7 @@ namespace DayKeeper.Api.GraphQL.Mutations;
 public sealed class UserMutations
 {
     /// <summary>Creates a new user within a tenant.</summary>
+    [Error<InputValidationException>]
     [Error<EntityNotFoundException>]
     [Error<DuplicateEmailException>]
     public Task<User> CreateUserAsync(
@@ -29,6 +30,7 @@ public sealed class UserMutations
     }
 
     /// <summary>Updates an existing user.</summary>
+    [Error<InputValidationException>]
     [Error<EntityNotFoundException>]
     [Error<DuplicateEmailException>]
     public Task<User> UpdateUserAsync(

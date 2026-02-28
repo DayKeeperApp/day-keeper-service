@@ -26,6 +26,10 @@
     <PackageVersion Include="Scalar.AspNetCore" Version="2.12.46" />
   </ItemGroup>
 
+  <ItemGroup Label="Validation">
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+  </ItemGroup>
+
   <ItemGroup Label="GraphQL">
     <PackageVersion Include="HotChocolate.AspNetCore" Version="15.1.12" />
     <PackageVersion Include="HotChocolate.Data.EntityFramework" Version="15.1.12" />
