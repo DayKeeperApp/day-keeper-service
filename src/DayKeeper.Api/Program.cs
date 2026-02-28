@@ -54,6 +54,7 @@ try
         {
             ApplyToAllMutations = true,
         })
+        .AddErrorFilter<DomainErrorFilter>()
         .TryAddTypeInterceptor<ValidationTypeInterceptor>()
         .AddFiltering()
         .AddSorting()
