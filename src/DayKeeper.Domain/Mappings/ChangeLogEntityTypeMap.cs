@@ -10,7 +10,7 @@ namespace DayKeeper.Domain.Mappings;
 /// </summary>
 public static class ChangeLogEntityTypeMap
 {
-    private static readonly FrozenDictionary<Type, ChangeLogEntityType> TypeToEnum =
+    private static readonly FrozenDictionary<Type, ChangeLogEntityType> _typeToEnum =
         new Dictionary<Type, ChangeLogEntityType>
         {
             [typeof(Tenant)] = ChangeLogEntityType.Tenant,
@@ -40,14 +40,14 @@ public static class ChangeLogEntityTypeMap
     /// Returns <c>false</c> for unmapped types (e.g. <see cref="ChangeLog"/>).
     /// </summary>
     public static bool TryGetEntityType(Type clrType, out ChangeLogEntityType entityType)
-        => TypeToEnum.TryGetValue(clrType, out entityType);
+        => _typeToEnum.TryGetValue(clrType, out entityType);
 
     /// <summary>
     /// Resolves the <see cref="ChangeLogEntityType"/> for the given CLR type.
     /// Throws <see cref="ArgumentException"/> if the type is not mapped.
     /// </summary>
     public static ChangeLogEntityType GetEntityType(Type clrType)
-        => TypeToEnum.TryGetValue(clrType, out var entityType)
+        => _typeToEnum.TryGetValue(clrType, out var entityType)
             ? entityType
             : throw new ArgumentException(
                 $"No ChangeLogEntityType mapping for {clrType.Name}.", nameof(clrType));

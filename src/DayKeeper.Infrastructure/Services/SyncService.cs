@@ -16,8 +16,8 @@ public sealed class SyncService(
     ITenantContext tenantContext,
     IDateTimeProvider dateTimeProvider) : ISyncService
 {
-    private const int MaxBatchSize = 1000;
-    private const int DefaultBatchSize = 1000;
+    private const int _maxBatchSize = 1000;
+    private const int _defaultBatchSize = 1000;
 
     private readonly DayKeeperDbContext _dbContext = dbContext;
     private readonly ITenantContext _tenantContext = tenantContext;
@@ -31,7 +31,7 @@ public sealed class SyncService(
         CancellationToken cancellationToken = default)
     {
         var effectiveCursor = cursor ?? 0L;
-        var effectiveLimit = Math.Clamp(limit ?? DefaultBatchSize, 1, MaxBatchSize);
+        var effectiveLimit = Math.Clamp(limit ?? _defaultBatchSize, 1, _maxBatchSize);
         var currentTenantId = _tenantContext.CurrentTenantId;
 
         var query = _dbContext.ChangeLogs
