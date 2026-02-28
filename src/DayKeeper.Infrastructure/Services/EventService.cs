@@ -5,6 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DayKeeper.Infrastructure.Services;
 
+/// <summary>
+/// Application service for managing <see cref="CalendarEvent"/> entities.
+/// Handles CRUD operations and time-range queries with four-phase recurrence
+/// expansion (single events, recurring masters, exception loading, RRULE expansion).
+/// </summary>
 public sealed class EventService(
     IRepository<CalendarEvent> eventRepository,
     IRepository<Calendar> calendarRepository,

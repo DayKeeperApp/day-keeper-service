@@ -3,8 +3,15 @@ using FluentValidation;
 
 namespace DayKeeper.Application.Validation.Validators;
 
+/// <summary>
+/// Validates the <see cref="UpdateProjectCommand"/> input before project updates.
+/// </summary>
 public sealed class UpdateProjectCommandValidator : AbstractValidator<UpdateProjectCommand>
 {
+    /// <summary>
+    /// Initializes validation rules: <c>Id</c> required; <c>Name</c> max 256 when provided;
+    /// <c>Description</c> max 2000 when provided.
+    /// </summary>
     public UpdateProjectCommandValidator()
     {
         RuleFor(x => x.Id)

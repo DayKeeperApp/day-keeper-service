@@ -5,6 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DayKeeper.Infrastructure.Services;
 
+/// <summary>
+/// Application service for managing <see cref="Calendar"/> entities.
+/// Handles creation, retrieval, update, and soft-delete with duplicate-name
+/// checks and mutual exclusion of the default calendar per space.
+/// </summary>
 public sealed class CalendarService(
     IRepository<Calendar> calendarRepository,
     IRepository<Space> spaceRepository,

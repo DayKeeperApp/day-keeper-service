@@ -3,6 +3,10 @@ using System.Text.Json;
 
 namespace DayKeeper.Api.Middleware;
 
+/// <summary>
+/// Catch-all middleware that logs unhandled exceptions and returns a generic
+/// 500 JSON response with the request trace identifier.
+/// </summary>
 public sealed partial class ExceptionHandlingMiddleware
 {
     private static readonly JsonSerializerOptions _jsonOptions = new()
