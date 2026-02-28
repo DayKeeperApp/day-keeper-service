@@ -100,5 +100,47 @@ internal static class InputFactory
             ctx.ArgumentOptional<DateTime?>("dueAt") is { HasValue: true, Value: var utda } ? utda : null,
             ctx.ArgumentOptional<DateOnly?>("dueDate") is { HasValue: true, Value: var utdd } ? utdd : null,
             ctx.ArgumentOptional<string?>("recurrenceRule") is { HasValue: true, Value: var utr } ? utr : null),
+
+        ["createCalendar"] = ctx => new CreateCalendarCommand(
+            ctx.ArgumentValue<Guid>("spaceId"),
+            ctx.ArgumentValue<string>("name"),
+            ctx.ArgumentValue<string>("color"),
+            ctx.ArgumentValue<bool>("isDefault")),
+
+        ["updateCalendar"] = ctx => new UpdateCalendarCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("name") is { HasValue: true, Value: var ucn } ? ucn : null,
+            ctx.ArgumentOptional<string?>("color") is { HasValue: true, Value: var ucc } ? ucc : null,
+            ctx.ArgumentOptional<bool?>("isDefault") is { HasValue: true, Value: var ucd } ? ucd : null),
+
+        ["createCalendarEvent"] = ctx => new CreateCalendarEventCommand(
+            ctx.ArgumentValue<Guid>("calendarId"),
+            ctx.ArgumentValue<string>("title"),
+            ctx.ArgumentOptional<string?>("description") is { HasValue: true, Value: var cced } ? cced : null,
+            ctx.ArgumentValue<bool>("isAllDay"),
+            ctx.ArgumentValue<DateTime>("startAt"),
+            ctx.ArgumentValue<DateTime>("endAt"),
+            ctx.ArgumentOptional<DateOnly?>("startDate") is { HasValue: true, Value: var ccesd } ? ccesd : null,
+            ctx.ArgumentOptional<DateOnly?>("endDate") is { HasValue: true, Value: var cceed } ? cceed : null,
+            ctx.ArgumentValue<string>("timezone"),
+            ctx.ArgumentOptional<string?>("recurrenceRule") is { HasValue: true, Value: var ccerr } ? ccerr : null,
+            ctx.ArgumentOptional<DateTime?>("recurrenceEndAt") is { HasValue: true, Value: var ccerea } ? ccerea : null,
+            ctx.ArgumentOptional<string?>("location") is { HasValue: true, Value: var ccel } ? ccel : null,
+            ctx.ArgumentOptional<Guid?>("eventTypeId") is { HasValue: true, Value: var cceet } ? cceet : null),
+
+        ["updateCalendarEvent"] = ctx => new UpdateCalendarEventCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("title") is { HasValue: true, Value: var ucet } ? ucet : null,
+            ctx.ArgumentOptional<string?>("description") is { HasValue: true, Value: var uced } ? uced : null,
+            ctx.ArgumentOptional<bool?>("isAllDay") is { HasValue: true, Value: var ucead } ? ucead : null,
+            ctx.ArgumentOptional<DateTime?>("startAt") is { HasValue: true, Value: var ucesa } ? ucesa : null,
+            ctx.ArgumentOptional<DateTime?>("endAt") is { HasValue: true, Value: var uceea } ? uceea : null,
+            ctx.ArgumentOptional<DateOnly?>("startDate") is { HasValue: true, Value: var ucesd } ? ucesd : null,
+            ctx.ArgumentOptional<DateOnly?>("endDate") is { HasValue: true, Value: var uceed } ? uceed : null,
+            ctx.ArgumentOptional<string?>("timezone") is { HasValue: true, Value: var ucetz } ? ucetz : null,
+            ctx.ArgumentOptional<string?>("recurrenceRule") is { HasValue: true, Value: var ucerr } ? ucerr : null,
+            ctx.ArgumentOptional<DateTime?>("recurrenceEndAt") is { HasValue: true, Value: var ucerea } ? ucerea : null,
+            ctx.ArgumentOptional<string?>("location") is { HasValue: true, Value: var ucel } ? ucel : null,
+            ctx.ArgumentOptional<Guid?>("eventTypeId") is { HasValue: true, Value: var uceet } ? uceet : null),
     };
 }
