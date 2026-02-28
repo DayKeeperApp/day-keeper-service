@@ -16,6 +16,15 @@
           "Microsoft.EntityFrameworkCore": "9.0.2"
         }
       },
+      "Ical.Net": {
+        "type": "Direct",
+        "requested": "[5.2.1, )",
+        "resolved": "5.2.1",
+        "contentHash": "zHjl8M24IX1kNlB2zX7c2clyTdD5C+PplmyiMHJ0kMlt0ng2TMfNNKO4u7hNV86oITujLiJ6y/+ATcI7bbmjAw==",
+        "dependencies": {
+          "NodaTime": "3.2.2"
+        }
+      },
       "Meziantou.Analyzer": {
         "type": "Direct",
         "requested": "[2.0.154, )",
@@ -500,6 +509,11 @@
         "type": "Transitive",
         "resolved": "10.0.3",
         "contentHash": "GEcpTwo7sUoLGGNTqV1FZEuL+tTD9m81NX/mh099dqGNna07/UGZShKQNZRw4hv6nlliSUwYQgSYc7OR99Jufg=="
+      },
+      "NodaTime": {
+        "type": "Transitive",
+        "resolved": "3.2.2",
+        "contentHash": "dmju5W0UYC3QP/UJM0juKAZkH0HSDMp0gH91A0+mT9M0kgyM2Jm67hUZPl/WRQLq8Lijjqmdk8kyAViWFWM7dA=="
       },
       "Npgsql": {
         "type": "Transitive",
