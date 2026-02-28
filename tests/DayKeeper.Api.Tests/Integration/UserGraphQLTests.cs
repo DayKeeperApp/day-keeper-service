@@ -239,6 +239,122 @@ public class UserGraphQLTests
         content.Should().Contain("true");
     }
 
+    [Fact]
+    public async Task UpdateUser_Mutation_ReturnsUser()
+    {
+        // Arrange
+        var tenantId = await CreateTenantAsync();
+        var userId = await CreateUserAsync(tenantId);
+
+        var query = new
+        {
+            query = $$"""
+                mutation {
+                    updateUser(input: {
+                        id: "{{userId}}"
+                        displayName: "Updated Name"
+                    }) {
+                        user {
+                            id
+                            displayName
+                            email
+                        }
+                        errors { __typename }
+                    }
+                }
+                """
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/graphql", query);
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("\"displayName\":\"Updated Name\"");
+        content.Should().NotContain("EntityNotFoundError");
+    }
+
+    [Fact]
+    public async Task UpdateUser_Mutation_NotFound_ReturnsError()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var query = new
+        {
+            query = $$"""
+                mutation {
+                    updateUser(input: { id: "{{id}}", displayName: "Nope" }) {
+                        user { id }
+                        errors {
+                            __typename
+                            ... on EntityNotFoundError {
+                                message
+                            }
+                        }
+                    }
+                }
+                """
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/graphql", query);
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("EntityNotFoundError");
+    }
+
+    [Fact]
+    public async Task UserByEmail_Query_ReturnsUser()
+    {
+        // Arrange
+        var tenantId = await CreateTenantAsync();
+        var email = $"byemail-{Guid.NewGuid():N}@example.com";
+
+        var createMutation = new
+        {
+            query = $$"""
+                mutation {
+                    createUser(input: {
+                        tenantId: "{{tenantId}}"
+                        displayName: "ByEmail User"
+                        email: "{{email}}"
+                        timezone: "UTC"
+                        weekStart: MONDAY
+                    }) {
+                        user { id }
+                        errors { __typename }
+                    }
+                }
+                """
+        };
+        await _client.PostAsJsonAsync("/graphql", createMutation);
+
+        // Act
+        var query = new
+        {
+            query = $$"""
+                {
+                    userByEmail(tenantId: "{{tenantId}}", email: "{{email}}") {
+                        id
+                        displayName
+                        email
+                    }
+                }
+                """
+        };
+        var response = await _client.PostAsJsonAsync("/graphql", query);
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("\"displayName\":\"ByEmail User\"");
+        content.Should().Contain($"\"email\":\"{email}\"");
+        content.Should().NotContain("\"errors\"");
+    }
+
     private async Task<string> CreateTenantAsync()
     {
         var slug = $"t-{Guid.NewGuid():N}";

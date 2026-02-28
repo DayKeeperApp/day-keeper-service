@@ -194,6 +194,62 @@ public class SpaceMutationTests
         content.Should().Contain("true");
     }
 
+    [Fact]
+    public async Task UpdateSpace_Mutation_NotFound_ReturnsError()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var query = new
+        {
+            query = $$"""
+                mutation {
+                    updateSpace(input: { id: "{{id}}", name: "Nope" }) {
+                        space { id }
+                        errors {
+                            __typename
+                            ... on EntityNotFoundError {
+                                message
+                            }
+                        }
+                    }
+                }
+                """
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/graphql", query);
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("EntityNotFoundError");
+    }
+
+    [Fact]
+    public async Task DeleteSpace_Mutation_WhenNotFound_ReturnsFalse()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var query = new
+        {
+            query = $$"""
+                mutation {
+                    deleteSpace(input: { id: "{{id}}" }) {
+                        boolean
+                    }
+                }
+                """
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/graphql", query);
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("false");
+    }
+
     private async Task<(string TenantId, string UserId)> CreateTenantAndUserAsync()
     {
         var slug = $"t-{Guid.NewGuid():N}";

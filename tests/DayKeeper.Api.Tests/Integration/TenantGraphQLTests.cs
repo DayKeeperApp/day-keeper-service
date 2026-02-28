@@ -272,6 +272,72 @@ public class TenantGraphQLTests
         content.Should().Contain("true");
     }
 
+    [Fact]
+    public async Task TenantBySlug_Query_ReturnsTenantWhenExists()
+    {
+        // Arrange
+        var slug = $"slug-{Guid.NewGuid():N}";
+        var create = new
+        {
+            query = $$"""
+                mutation {
+                    createTenant(input: { name: "SlugTest", slug: "{{slug}}" }) {
+                        tenant { id }
+                        errors { __typename }
+                    }
+                }
+                """
+        };
+        await _client.PostAsJsonAsync("/graphql", create);
+
+        // Act
+        var query = new
+        {
+            query = $$"""
+                {
+                    tenantBySlug(slug: "{{slug}}") {
+                        id
+                        name
+                        slug
+                    }
+                }
+                """
+        };
+        var response = await _client.PostAsJsonAsync("/graphql", query);
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("\"name\":\"SlugTest\"");
+        content.Should().Contain($"\"slug\":\"{slug}\"");
+        content.Should().NotContain("\"errors\"");
+    }
+
+    [Fact]
+    public async Task DeleteTenant_Mutation_WhenNotFound_ReturnsFalse()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var query = new
+        {
+            query = $$"""
+                mutation {
+                    deleteTenant(input: { id: "{{id}}" }) {
+                        boolean
+                    }
+                }
+                """
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/graphql", query);
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("false");
+    }
+
     private static string ExtractId(string json)
     {
         // Simple extraction of "id":"<value>" from JSON response
