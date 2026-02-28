@@ -17,7 +17,7 @@ public class HelloWorldEndpointTests
     public async Task GetHelloWorld_ShouldReturnOk()
     {
         // Act
-        var response = await _client.GetAsync("/api/helloworld");
+        var response = await _client.GetAsync("/api/v1/helloworld");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -27,7 +27,7 @@ public class HelloWorldEndpointTests
     public async Task GetHelloWorld_ShouldReturnExpectedMessage()
     {
         // Act
-        var response = await _client.GetFromJsonAsync<HelloWorldTestResponse>("/api/helloworld");
+        var response = await _client.GetFromJsonAsync<HelloWorldTestResponse>("/api/v1/helloworld");
 
         // Assert
         response.Should().NotBeNull();

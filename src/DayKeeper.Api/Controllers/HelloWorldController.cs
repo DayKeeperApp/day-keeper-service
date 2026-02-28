@@ -1,9 +1,11 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DayKeeper.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion(1.0)]
+[Route("api/v{version:apiVersion}/[controller]")]
 public sealed partial class HelloWorldController : ControllerBase
 {
     private readonly ILogger<HelloWorldController> _logger;
