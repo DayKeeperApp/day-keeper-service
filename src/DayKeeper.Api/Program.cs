@@ -66,6 +66,10 @@ try
         .AddTypeExtension<UserMutations>()
         .AddTypeExtension<SpaceMutations>()
         .AddTypeExtension<SpaceMembershipMutations>()
+        .AddTypeExtension<ProjectQueries>()
+        .AddTypeExtension<ProjectMutations>()
+        .AddTypeExtension<TaskItemQueries>()
+        .AddTypeExtension<TaskItemMutations>()
         .AddMutationConventions(new MutationConventionOptions
         {
             ApplyToAllMutations = true,

@@ -2,6 +2,7 @@ using DayKeeper.Application.Validation.Commands;
 using DayKeeper.Domain.Enums;
 using HotChocolate.Resolvers;
 
+
 namespace DayKeeper.Api.GraphQL.Validation;
 
 /// <summary>
@@ -67,5 +68,37 @@ internal static class InputFactory
             ctx.ArgumentValue<Guid>("spaceId"),
             ctx.ArgumentValue<Guid>("userId"),
             ctx.ArgumentValue<SpaceRole>("newRole")),
+
+        ["createProject"] = ctx => new CreateProjectCommand(
+            ctx.ArgumentValue<Guid>("spaceId"),
+            ctx.ArgumentValue<string>("name"),
+            ctx.ArgumentOptional<string?>("description") is { HasValue: true, Value: var cpd } ? cpd : null),
+
+        ["updateProject"] = ctx => new UpdateProjectCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("name") is { HasValue: true, Value: var upn } ? upn : null,
+            ctx.ArgumentOptional<string?>("description") is { HasValue: true, Value: var upd } ? upd : null),
+
+        ["createTaskItem"] = ctx => new CreateTaskItemCommand(
+            ctx.ArgumentValue<Guid>("spaceId"),
+            ctx.ArgumentValue<string>("title"),
+            ctx.ArgumentOptional<string?>("description") is { HasValue: true, Value: var ctd } ? ctd : null,
+            ctx.ArgumentOptional<Guid?>("projectId") is { HasValue: true, Value: var ctp } ? ctp : null,
+            ctx.ArgumentValue<TaskItemStatus>("status"),
+            ctx.ArgumentValue<TaskItemPriority>("priority"),
+            ctx.ArgumentOptional<DateTime?>("dueAt") is { HasValue: true, Value: var ctda } ? ctda : null,
+            ctx.ArgumentOptional<DateOnly?>("dueDate") is { HasValue: true, Value: var ctdd } ? ctdd : null,
+            ctx.ArgumentOptional<string?>("recurrenceRule") is { HasValue: true, Value: var ctr } ? ctr : null),
+
+        ["updateTaskItem"] = ctx => new UpdateTaskItemCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("title") is { HasValue: true, Value: var utt } ? utt : null,
+            ctx.ArgumentOptional<string?>("description") is { HasValue: true, Value: var utd } ? utd : null,
+            ctx.ArgumentOptional<TaskItemStatus?>("status") is { HasValue: true, Value: var uts } ? uts : null,
+            ctx.ArgumentOptional<TaskItemPriority?>("priority") is { HasValue: true, Value: var utp } ? utp : null,
+            ctx.ArgumentOptional<Guid?>("projectId") is { HasValue: true, Value: var utpj } ? utpj : null,
+            ctx.ArgumentOptional<DateTime?>("dueAt") is { HasValue: true, Value: var utda } ? utda : null,
+            ctx.ArgumentOptional<DateOnly?>("dueDate") is { HasValue: true, Value: var utdd } ? utdd : null,
+            ctx.ArgumentOptional<string?>("recurrenceRule") is { HasValue: true, Value: var utr } ? utr : null),
     };
 }
