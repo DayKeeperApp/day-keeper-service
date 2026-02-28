@@ -46,7 +46,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             {
                 options.UseSqlite(_connection);
                 options.AddInterceptors(
-                    serviceProvider.GetRequiredService<AuditFieldsInterceptor>());
+                    serviceProvider.GetRequiredService<AuditFieldsInterceptor>(),
+                    serviceProvider.GetRequiredService<ChangeLogInterceptor>());
             });
         });
     }

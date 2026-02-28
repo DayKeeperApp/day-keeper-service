@@ -22,12 +22,14 @@ public static class DependencyInjection
         services.AddSingleton<IAttachmentStorageService, AttachmentStorageService>();
         services.AddSingleton<IRecurrenceExpander, IcalNetRecurrenceExpander>();
         services.AddSingleton<AuditFieldsInterceptor>();
+        services.AddScoped<ChangeLogInterceptor>();
 
         services.AddDbContext<DayKeeperDbContext>((serviceProvider, options) =>
         {
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             options.AddInterceptors(
-                serviceProvider.GetRequiredService<AuditFieldsInterceptor>());
+                serviceProvider.GetRequiredService<AuditFieldsInterceptor>(),
+                serviceProvider.GetRequiredService<ChangeLogInterceptor>());
         });
 
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<DayKeeperDbContext>());
@@ -36,6 +38,7 @@ public static class DependencyInjection
         services.AddScoped<ISpaceService, SpaceService>();
         services.AddScoped<ITenantService, TenantService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ISyncService, SyncService>();
 
         services.AddHealthChecks()
             .AddDbContextCheck<DayKeeperDbContext>();
