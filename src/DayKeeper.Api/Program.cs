@@ -70,6 +70,10 @@ try
         .AddTypeExtension<ProjectMutations>()
         .AddTypeExtension<TaskItemQueries>()
         .AddTypeExtension<TaskItemMutations>()
+        .AddTypeExtension<CalendarQueries>()
+        .AddTypeExtension<CalendarMutations>()
+        .AddTypeExtension<CalendarEventQueries>()
+        .AddTypeExtension<CalendarEventMutations>()
         .AddMutationConventions(new MutationConventionOptions
         {
             ApplyToAllMutations = true,
