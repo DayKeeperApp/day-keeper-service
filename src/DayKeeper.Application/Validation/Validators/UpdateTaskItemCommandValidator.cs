@@ -3,8 +3,16 @@ using FluentValidation;
 
 namespace DayKeeper.Application.Validation.Validators;
 
+/// <summary>
+/// Validates the <see cref="UpdateTaskItemCommand"/> input before task item updates.
+/// </summary>
 public sealed class UpdateTaskItemCommandValidator : AbstractValidator<UpdateTaskItemCommand>
 {
+    /// <summary>
+    /// Initializes validation rules: <c>Id</c> required; <c>Title</c> max 512 when provided;
+    /// <c>Description</c> max 4000 when provided; <c>Status</c> valid enum when provided;
+    /// <c>Priority</c> valid enum when provided; <c>RecurrenceRule</c> max 1024 when provided.
+    /// </summary>
     public UpdateTaskItemCommandValidator()
     {
         RuleFor(x => x.Id)

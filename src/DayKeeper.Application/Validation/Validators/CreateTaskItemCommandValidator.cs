@@ -3,8 +3,16 @@ using FluentValidation;
 
 namespace DayKeeper.Application.Validation.Validators;
 
+/// <summary>
+/// Validates the <see cref="CreateTaskItemCommand"/> input before task item creation.
+/// </summary>
 public sealed class CreateTaskItemCommandValidator : AbstractValidator<CreateTaskItemCommand>
 {
+    /// <summary>
+    /// Initializes validation rules: <c>SpaceId</c> required; <c>Title</c> required, max 512;
+    /// <c>Description</c> max 4000 when provided; <c>Status</c> valid enum; <c>Priority</c> valid enum;
+    /// <c>RecurrenceRule</c> max 1024 when provided.
+    /// </summary>
     public CreateTaskItemCommandValidator()
     {
         RuleFor(x => x.SpaceId)

@@ -3,8 +3,16 @@ using FluentValidation;
 
 namespace DayKeeper.Application.Validation.Validators;
 
+/// <summary>
+/// Validates the <see cref="CreateUserCommand"/> input before user creation.
+/// </summary>
 public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
+    /// <summary>
+    /// Initializes validation rules: <c>TenantId</c> required; <c>DisplayName</c> required, max 256;
+    /// <c>Email</c> required, max 320, valid format; <c>Timezone</c> required, max 64, valid IANA;
+    /// <c>WeekStart</c> valid enum; <c>Locale</c> max 16 when provided.
+    /// </summary>
     public CreateUserCommandValidator()
     {
         RuleFor(x => x.TenantId)

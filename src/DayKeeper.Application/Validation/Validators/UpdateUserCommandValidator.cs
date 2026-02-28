@@ -3,8 +3,16 @@ using FluentValidation;
 
 namespace DayKeeper.Application.Validation.Validators;
 
+/// <summary>
+/// Validates the <see cref="UpdateUserCommand"/> input before user updates.
+/// </summary>
 public sealed class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
 {
+    /// <summary>
+    /// Initializes validation rules: <c>Id</c> required; <c>DisplayName</c> max 256 when provided;
+    /// <c>Email</c> max 320, valid format when provided; <c>Timezone</c> max 64, valid IANA when provided;
+    /// <c>WeekStart</c> valid enum when provided; <c>Locale</c> max 16 when provided.
+    /// </summary>
     public UpdateUserCommandValidator()
     {
         RuleFor(x => x.Id)
