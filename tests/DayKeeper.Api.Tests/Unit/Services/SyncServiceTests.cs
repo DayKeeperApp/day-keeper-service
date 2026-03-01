@@ -1,8 +1,11 @@
+using System.Text.Json;
 using DayKeeper.Api.Tests.Helpers;
+using DayKeeper.Application.DTOs.Sync;
 using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Domain.Enums;
 using DayKeeper.Infrastructure.Persistence;
+using DayKeeper.Infrastructure.Persistence.Interceptors;
 using DayKeeper.Infrastructure.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +24,7 @@ public sealed class SyncServiceTests : IDisposable
     private readonly DayKeeperDbContext _context;
     private readonly TestTenantContext _tenantContext;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly SyncSerializer _syncSerializer;
     private readonly SyncService _sut;
 
     public SyncServiceTests()
@@ -28,18 +32,32 @@ public sealed class SyncServiceTests : IDisposable
         _tenantContext = new TestTenantContext { CurrentTenantId = _tenantId };
         _dateTimeProvider = Substitute.For<IDateTimeProvider>();
         _dateTimeProvider.UtcNow.Returns(_fixedTime);
+        _syncSerializer = new SyncSerializer();
 
         _connection = new SqliteConnection("DataSource=:memory:");
         _connection.Open();
 
         var options = new DbContextOptionsBuilder<DayKeeperDbContext>()
             .UseSqlite(_connection)
+            .AddInterceptors(
+                new AuditFieldsInterceptor(_dateTimeProvider),
+                new ChangeLogInterceptor(_dateTimeProvider, _tenantContext))
             .Options;
 
         _context = new DayKeeperDbContext(options, _tenantContext);
         _context.Database.EnsureCreated();
 
-        _sut = new SyncService(_context, _tenantContext, _dateTimeProvider);
+        _context.Set<Tenant>().Add(new Tenant
+        {
+            Id = _tenantId,
+            Name = "Test Tenant",
+            Slug = "test-tenant",
+        });
+        _context.SaveChanges();
+        _context.ChangeLogs.ExecuteDelete();
+        _context.ChangeTracker.Clear();
+
+        _sut = new SyncService(_context, _tenantContext, _dateTimeProvider, _syncSerializer);
     }
 
     // ── PullAsync ─────────────────────────────────────────────────────
@@ -176,6 +194,31 @@ public sealed class SyncServiceTests : IDisposable
         result.Changes.Should().ContainSingle();
     }
 
+    [Fact]
+    public async Task PullAsync_ReturnsEntityDataForCreatedEntries()
+    {
+        var user = SeedUser();
+
+        var result = await _sut.PullAsync(null, null, null);
+
+        result.Changes.Should().ContainSingle();
+        var entry = result.Changes[0];
+        entry.Data.Should().NotBeNull();
+        entry.Data!.Value.GetProperty("displayName").GetString()
+            .Should().Be(user.DisplayName);
+    }
+
+    [Fact]
+    public async Task PullAsync_ReturnsNullDataForDeletedEntries()
+    {
+        SeedChangeLog(_tenantId, null, operation: ChangeOperation.Deleted);
+
+        var result = await _sut.PullAsync(null, null, null);
+
+        result.Changes.Should().ContainSingle();
+        result.Changes[0].Data.Should().BeNull();
+    }
+
     // ── PushAsync ─────────────────────────────────────────────────────
 
     [Fact]
@@ -191,13 +234,16 @@ public sealed class SyncServiceTests : IDisposable
     [Fact]
     public async Task PushAsync_WhenEntityIsNew_AcceptsChange()
     {
+        var entityId = Guid.NewGuid();
+        var data = SerializeUser(entityId);
         var changes = new[]
         {
-            new Application.DTOs.Sync.SyncPushEntry(
+            new SyncPushEntry(
                 ChangeLogEntityType.User,
-                Guid.NewGuid(),
+                entityId,
                 ChangeOperation.Created,
-                _fixedTime),
+                _fixedTime,
+                data),
         };
 
         var result = await _sut.PushAsync(changes);
@@ -210,16 +256,18 @@ public sealed class SyncServiceTests : IDisposable
     [Fact]
     public async Task PushAsync_WhenClientIsNewer_AcceptsChange()
     {
-        var entityId = Guid.NewGuid();
-        SeedChangeLog(_tenantId, null, entityId, _fixedTime.AddHours(-1));
+        var user = SeedUser();
+        SeedChangeLog(_tenantId, null, user.Id, _fixedTime.AddHours(-1));
 
+        var data = SerializeUser(user.Id, displayName: "Updated Name");
         var changes = new[]
         {
-            new Application.DTOs.Sync.SyncPushEntry(
+            new SyncPushEntry(
                 ChangeLogEntityType.User,
-                entityId,
+                user.Id,
                 ChangeOperation.Updated,
-                _fixedTime),
+                _fixedTime,
+                data),
         };
 
         var result = await _sut.PushAsync(changes);
@@ -237,11 +285,12 @@ public sealed class SyncServiceTests : IDisposable
 
         var changes = new[]
         {
-            new Application.DTOs.Sync.SyncPushEntry(
+            new SyncPushEntry(
                 ChangeLogEntityType.User,
                 entityId,
                 ChangeOperation.Updated,
-                _fixedTime),
+                _fixedTime,
+                null),
         };
 
         var result = await _sut.PushAsync(changes);
@@ -257,16 +306,18 @@ public sealed class SyncServiceTests : IDisposable
     [Fact]
     public async Task PushAsync_WhenTimestampsEqual_AcceptsChange()
     {
-        var entityId = Guid.NewGuid();
-        SeedChangeLog(_tenantId, null, entityId, _fixedTime);
+        var user = SeedUser();
+        SeedChangeLog(_tenantId, null, user.Id, _fixedTime);
 
+        var data = SerializeUser(user.Id, displayName: "Updated Name");
         var changes = new[]
         {
-            new Application.DTOs.Sync.SyncPushEntry(
+            new SyncPushEntry(
                 ChangeLogEntityType.User,
-                entityId,
+                user.Id,
                 ChangeOperation.Updated,
-                _fixedTime),
+                _fixedTime,
+                data),
         };
 
         var result = await _sut.PushAsync(changes);
@@ -276,16 +327,93 @@ public sealed class SyncServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task PushAsync_CreatesChangeLogEntriesForAccepted()
+    public async Task PushAsync_Create_AddsEntityToDatabase()
     {
         var entityId = Guid.NewGuid();
+        var data = SerializeUser(entityId, displayName: "New User");
         var changes = new[]
         {
-            new Application.DTOs.Sync.SyncPushEntry(
+            new SyncPushEntry(
                 ChangeLogEntityType.User,
                 entityId,
                 ChangeOperation.Created,
-                _fixedTime),
+                _fixedTime,
+                data),
+        };
+
+        await _sut.PushAsync(changes);
+
+        var user = await _context.Set<User>()
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(u => u.Id == entityId);
+        user.Should().NotBeNull();
+        user!.DisplayName.Should().Be("New User");
+    }
+
+    [Fact]
+    public async Task PushAsync_Update_ModifiesExistingEntity()
+    {
+        var user = SeedUser(displayName: "Original");
+        SeedChangeLog(_tenantId, null, user.Id, _fixedTime.AddHours(-1));
+
+        var data = SerializeUser(user.Id, displayName: "Modified");
+        var changes = new[]
+        {
+            new SyncPushEntry(
+                ChangeLogEntityType.User,
+                user.Id,
+                ChangeOperation.Updated,
+                _fixedTime,
+                data),
+        };
+
+        await _sut.PushAsync(changes);
+
+        _context.ChangeTracker.Clear();
+        var updated = await _context.Set<User>()
+            .IgnoreQueryFilters()
+            .SingleAsync(u => u.Id == user.Id);
+        updated.DisplayName.Should().Be("Modified");
+    }
+
+    [Fact]
+    public async Task PushAsync_Delete_SetsDeletedAt()
+    {
+        var user = SeedUser();
+        SeedChangeLog(_tenantId, null, user.Id, _fixedTime.AddHours(-1));
+
+        var changes = new[]
+        {
+            new SyncPushEntry(
+                ChangeLogEntityType.User,
+                user.Id,
+                ChangeOperation.Deleted,
+                _fixedTime,
+                null),
+        };
+
+        await _sut.PushAsync(changes);
+
+        _context.ChangeTracker.Clear();
+        var deleted = await _context.Set<User>()
+            .IgnoreQueryFilters()
+            .SingleAsync(u => u.Id == user.Id);
+        deleted.DeletedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task PushAsync_CreatesChangeLogEntriesForAccepted()
+    {
+        var entityId = Guid.NewGuid();
+        var data = SerializeUser(entityId);
+        var changes = new[]
+        {
+            new SyncPushEntry(
+                ChangeLogEntityType.User,
+                entityId,
+                ChangeOperation.Created,
+                _fixedTime,
+                data),
         };
 
         await _sut.PushAsync(changes);
@@ -306,11 +434,12 @@ public sealed class SyncServiceTests : IDisposable
 
         var changes = new[]
         {
-            new Application.DTOs.Sync.SyncPushEntry(
+            new SyncPushEntry(
                 ChangeLogEntityType.User,
                 entityId,
                 ChangeOperation.Updated,
-                _fixedTime),
+                _fixedTime,
+                null),
         };
 
         await _sut.PushAsync(changes);
@@ -326,18 +455,21 @@ public sealed class SyncServiceTests : IDisposable
         var existingEntityId = Guid.NewGuid();
         SeedChangeLog(_tenantId, null, existingEntityId, _fixedTime.AddHours(1));
 
+        var data = SerializeUser(newEntityId);
         var changes = new[]
         {
-            new Application.DTOs.Sync.SyncPushEntry(
+            new SyncPushEntry(
                 ChangeLogEntityType.User,
                 newEntityId,
                 ChangeOperation.Created,
-                _fixedTime),
-            new Application.DTOs.Sync.SyncPushEntry(
+                _fixedTime,
+                data),
+            new SyncPushEntry(
                 ChangeLogEntityType.User,
                 existingEntityId,
                 ChangeOperation.Updated,
-                _fixedTime),
+                _fixedTime,
+                null),
         };
 
         var result = await _sut.PushAsync(changes);
@@ -345,6 +477,24 @@ public sealed class SyncServiceTests : IDisposable
         result.AppliedCount.Should().Be(1);
         result.RejectedCount.Should().Be(1);
         result.Conflicts.Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task PushAsync_CreateWithoutData_IsSkipped()
+    {
+        var changes = new[]
+        {
+            new SyncPushEntry(
+                ChangeLogEntityType.User,
+                Guid.NewGuid(),
+                ChangeOperation.Created,
+                _fixedTime,
+                null),
+        };
+
+        var result = await _sut.PushAsync(changes);
+
+        result.AppliedCount.Should().Be(0);
     }
 
     // ── Seed Helpers ──────────────────────────────────────────────────
@@ -361,18 +511,54 @@ public sealed class SyncServiceTests : IDisposable
         Guid? tenantId,
         Guid? spaceId,
         Guid? entityId = null,
-        DateTime? timestamp = null)
+        DateTime? timestamp = null,
+        ChangeOperation operation = ChangeOperation.Created)
     {
         _context.ChangeLogs.Add(new ChangeLog
         {
             EntityType = ChangeLogEntityType.User,
             EntityId = entityId ?? Guid.NewGuid(),
-            Operation = ChangeOperation.Created,
+            Operation = operation,
             TenantId = tenantId,
             SpaceId = spaceId,
             Timestamp = timestamp ?? _fixedTime,
         });
         _context.SaveChanges();
+    }
+
+    private User SeedUser(
+        Guid? id = null,
+        string displayName = "Test User")
+    {
+        var user = new User
+        {
+            Id = id ?? Guid.NewGuid(),
+            TenantId = _tenantId,
+            DisplayName = displayName,
+            Email = $"{Guid.NewGuid():N}@test.com",
+            Timezone = "America/Chicago",
+            WeekStart = WeekStart.Monday,
+        };
+        _context.Set<User>().Add(user);
+        _context.SaveChanges();
+        _context.ChangeTracker.Clear();
+        return user;
+    }
+
+    private JsonElement SerializeUser(
+        Guid id,
+        string displayName = "Test User")
+    {
+        var user = new User
+        {
+            Id = id,
+            TenantId = _tenantId,
+            DisplayName = displayName,
+            Email = $"{Guid.NewGuid():N}@test.com",
+            Timezone = "America/Chicago",
+            WeekStart = WeekStart.Monday,
+        };
+        return _syncSerializer.Serialize(user);
     }
 
     public void Dispose()

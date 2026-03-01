@@ -21,6 +21,7 @@ public static class DependencyInjection
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddSingleton<IAttachmentStorageService, AttachmentStorageService>();
         services.AddSingleton<IRecurrenceExpander, IcalNetRecurrenceExpander>();
+        services.AddSingleton<ISyncSerializer, SyncSerializer>();
         services.AddSingleton<AuditFieldsInterceptor>();
         services.AddScoped<ChangeLogInterceptor>();
 
