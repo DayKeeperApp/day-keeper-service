@@ -1,4 +1,6 @@
 using System.Net;
+using System.Net.Http.Json;
+using DayKeeper.Application.DTOs.Sync;
 
 namespace DayKeeper.Api.Tests.Integration;
 
@@ -15,8 +17,9 @@ public class ApiVersioningTests
     [Fact]
     public async Task VersionedRoute_ShouldReturnOk()
     {
-        // Act
-        var response = await _client.GetAsync("/api/v1/helloworld");
+        // Act — use the Sync pull endpoint as a versioned REST target
+        var request = new SyncPullRequest(0, null, 10);
+        var response = await _client.PostAsJsonAsync("/api/v1/sync/pull", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -26,7 +29,7 @@ public class ApiVersioningTests
     public async Task UnversionedRoute_ShouldReturnNotFound()
     {
         // Act
-        var response = await _client.GetAsync("/api/helloworld");
+        var response = await _client.PostAsync("/api/sync/pull", null);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -36,7 +39,8 @@ public class ApiVersioningTests
     public async Task VersionedRoute_ShouldReportSupportedVersions()
     {
         // Act
-        var response = await _client.GetAsync("/api/v1/helloworld");
+        var request = new SyncPullRequest(0, null, 10);
+        var response = await _client.PostAsJsonAsync("/api/v1/sync/pull", request);
 
         // Assert
         response.Headers.Should().ContainKey("api-supported-versions");
