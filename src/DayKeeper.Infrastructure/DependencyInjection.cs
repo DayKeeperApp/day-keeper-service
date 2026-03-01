@@ -44,6 +44,7 @@ public static class DependencyInjection
         services.AddScoped<ICalendarService, CalendarService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<ISyncService, SyncService>();
+        services.AddScoped<IPersonService, PersonService>();
 
         services.AddHealthChecks()
             .AddDbContextCheck<DayKeeperDbContext>();

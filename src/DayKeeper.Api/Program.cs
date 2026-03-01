@@ -74,6 +74,11 @@ try
         .AddTypeExtension<CalendarMutations>()
         .AddTypeExtension<CalendarEventQueries>()
         .AddTypeExtension<CalendarEventMutations>()
+        .AddTypeExtension<PersonQueries>()
+        .AddTypeExtension<PersonMutations>()
+        .AddTypeExtension<ContactMethodMutations>()
+        .AddTypeExtension<AddressMutations>()
+        .AddTypeExtension<ImportantDateMutations>()
         .AddMutationConventions(new MutationConventionOptions
         {
             ApplyToAllMutations = true,

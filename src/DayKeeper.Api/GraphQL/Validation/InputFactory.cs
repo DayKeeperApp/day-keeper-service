@@ -142,5 +142,65 @@ internal static class InputFactory
             ctx.ArgumentOptional<DateTime?>("recurrenceEndAt") is { HasValue: true, Value: var ucerea } ? ucerea : null,
             ctx.ArgumentOptional<string?>("location") is { HasValue: true, Value: var ucel } ? ucel : null,
             ctx.ArgumentOptional<Guid?>("eventTypeId") is { HasValue: true, Value: var uceet } ? uceet : null),
+
+        ["createPerson"] = ctx => new CreatePersonCommand(
+            ctx.ArgumentValue<Guid>("spaceId"),
+            ctx.ArgumentValue<string>("firstName"),
+            ctx.ArgumentValue<string>("lastName"),
+            ctx.ArgumentOptional<string?>("notes") is { HasValue: true, Value: var cpn } ? cpn : null),
+
+        ["updatePerson"] = ctx => new UpdatePersonCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("firstName") is { HasValue: true, Value: var upfn } ? upfn : null,
+            ctx.ArgumentOptional<string?>("lastName") is { HasValue: true, Value: var upln } ? upln : null,
+            ctx.ArgumentOptional<string?>("notes") is { HasValue: true, Value: var upn } ? upn : null),
+
+        ["createContactMethod"] = ctx => new CreateContactMethodCommand(
+            ctx.ArgumentValue<Guid>("personId"),
+            ctx.ArgumentValue<ContactMethodType>("type"),
+            ctx.ArgumentValue<string>("value"),
+            ctx.ArgumentOptional<string?>("label") is { HasValue: true, Value: var ccml } ? ccml : null,
+            ctx.ArgumentValue<bool>("isPrimary")),
+
+        ["updateContactMethod"] = ctx => new UpdateContactMethodCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<ContactMethodType?>("type") is { HasValue: true, Value: var ucmt } ? ucmt : null,
+            ctx.ArgumentOptional<string?>("value") is { HasValue: true, Value: var ucmv } ? ucmv : null,
+            ctx.ArgumentOptional<string?>("label") is { HasValue: true, Value: var ucml } ? ucml : null,
+            ctx.ArgumentOptional<bool?>("isPrimary") is { HasValue: true, Value: var ucmp } ? ucmp : null),
+
+        ["createAddress"] = ctx => new CreateAddressCommand(
+            ctx.ArgumentValue<Guid>("personId"),
+            ctx.ArgumentOptional<string?>("label") is { HasValue: true, Value: var cal } ? cal : null,
+            ctx.ArgumentValue<string>("street1"),
+            ctx.ArgumentOptional<string?>("street2") is { HasValue: true, Value: var cas2 } ? cas2 : null,
+            ctx.ArgumentValue<string>("city"),
+            ctx.ArgumentOptional<string?>("state") is { HasValue: true, Value: var cast } ? cast : null,
+            ctx.ArgumentOptional<string?>("postalCode") is { HasValue: true, Value: var capc } ? capc : null,
+            ctx.ArgumentValue<string>("country"),
+            ctx.ArgumentValue<bool>("isPrimary")),
+
+        ["updateAddress"] = ctx => new UpdateAddressCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("label") is { HasValue: true, Value: var ual } ? ual : null,
+            ctx.ArgumentOptional<string?>("street1") is { HasValue: true, Value: var uas1 } ? uas1 : null,
+            ctx.ArgumentOptional<string?>("street2") is { HasValue: true, Value: var uas2 } ? uas2 : null,
+            ctx.ArgumentOptional<string?>("city") is { HasValue: true, Value: var uac } ? uac : null,
+            ctx.ArgumentOptional<string?>("state") is { HasValue: true, Value: var uast } ? uast : null,
+            ctx.ArgumentOptional<string?>("postalCode") is { HasValue: true, Value: var uapc } ? uapc : null,
+            ctx.ArgumentOptional<string?>("country") is { HasValue: true, Value: var uaco } ? uaco : null,
+            ctx.ArgumentOptional<bool?>("isPrimary") is { HasValue: true, Value: var uap } ? uap : null),
+
+        ["createImportantDate"] = ctx => new CreateImportantDateCommand(
+            ctx.ArgumentValue<Guid>("personId"),
+            ctx.ArgumentValue<string>("label"),
+            ctx.ArgumentValue<DateOnly>("dateValue"),
+            ctx.ArgumentOptional<Guid?>("eventTypeId") is { HasValue: true, Value: var cidet } ? cidet : null),
+
+        ["updateImportantDate"] = ctx => new UpdateImportantDateCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("label") is { HasValue: true, Value: var uidl } ? uidl : null,
+            ctx.ArgumentOptional<DateOnly?>("dateValue") is { HasValue: true, Value: var uidd } ? uidd : null,
+            ctx.ArgumentOptional<Guid?>("eventTypeId") is { HasValue: true, Value: var uidet } ? uidet : null),
     };
 }
