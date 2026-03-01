@@ -74,4 +74,39 @@ public sealed class ChangeLogEntityTypeMapTests
                     $"ChangeLogEntityType.{value} should have a CLR type mapping");
         }
     }
+
+    // ── Reverse map (enum → CLR type) ────────────────────────────────
+
+    [Theory]
+    [MemberData(nameof(AllMappings))]
+    public void GetClrType_ReturnsCorrectMapping(
+        Type expectedClrType, ChangeLogEntityType entityType)
+    {
+        ChangeLogEntityTypeMap.GetClrType(entityType).Should().Be(expectedClrType);
+    }
+
+    [Theory]
+    [MemberData(nameof(AllMappings))]
+    public void TryGetClrType_ReturnsTrue_ForMappedEnum(
+        Type expectedClrType, ChangeLogEntityType entityType)
+    {
+        ChangeLogEntityTypeMap.TryGetClrType(entityType, out var result).Should().BeTrue();
+        result.Should().Be(expectedClrType);
+    }
+
+    [Fact]
+    public void GetClrType_ThrowsArgumentException_ForUnmappedValue()
+    {
+        var act = () => ChangeLogEntityTypeMap.GetClrType((ChangeLogEntityType)999);
+
+        act.Should().Throw<ArgumentException>()
+            .WithParameterName("entityType");
+    }
+
+    [Fact]
+    public void TryGetClrType_ReturnsFalse_ForUnmappedValue()
+    {
+        ChangeLogEntityTypeMap.TryGetClrType((ChangeLogEntityType)999, out _)
+            .Should().BeFalse();
+    }
 }

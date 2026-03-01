@@ -35,6 +35,11 @@ public static class ChangeLogEntityTypeMap
             [typeof(RecurrenceException)] = ChangeLogEntityType.RecurrenceException,
         }.ToFrozenDictionary();
 
+    private static readonly FrozenDictionary<ChangeLogEntityType, Type> _enumToType =
+        _typeToEnum
+            .ToDictionary(kvp => kvp.Value, kvp => kvp.Key)
+            .ToFrozenDictionary();
+
     /// <summary>
     /// Attempts to resolve the <see cref="ChangeLogEntityType"/> for the given CLR type.
     /// Returns <c>false</c> for unmapped types (e.g. <see cref="ChangeLog"/>).
@@ -51,4 +56,21 @@ public static class ChangeLogEntityTypeMap
             ? entityType
             : throw new ArgumentException(
                 $"No ChangeLogEntityType mapping for {clrType.Name}.", nameof(clrType));
+
+    /// <summary>
+    /// Attempts to resolve the CLR type for the given <see cref="ChangeLogEntityType"/>.
+    /// Returns <c>false</c> if the enum value is not mapped.
+    /// </summary>
+    public static bool TryGetClrType(ChangeLogEntityType entityType, out Type clrType)
+        => _enumToType.TryGetValue(entityType, out clrType!);
+
+    /// <summary>
+    /// Resolves the CLR type for the given <see cref="ChangeLogEntityType"/>.
+    /// Throws <see cref="ArgumentException"/> if the value is not mapped.
+    /// </summary>
+    public static Type GetClrType(ChangeLogEntityType entityType)
+        => _enumToType.TryGetValue(entityType, out var clrType)
+            ? clrType
+            : throw new ArgumentException(
+                $"No CLR type mapping for {entityType}.", nameof(entityType));
 }

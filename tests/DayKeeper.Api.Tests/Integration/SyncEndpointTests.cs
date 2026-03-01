@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using DayKeeper.Application.DTOs.Sync;
+using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Domain.Enums;
 using DayKeeper.Infrastructure.Persistence;
@@ -77,29 +78,56 @@ public class SyncEndpointTests
     public async Task PostPush_WithNewEntity_ThenPull_ReturnsChange()
     {
         var entityId = Guid.NewGuid();
-        var pushRequest = new SyncPushRequest(
-        [
-            new SyncPushEntry(
-                ChangeLogEntityType.User,
-                entityId,
-                ChangeOperation.Created,
-                DateTime.UtcNow),
-        ]);
+        var tenantId = Guid.NewGuid();
+
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider
+                .GetRequiredService<DayKeeperDbContext>();
+            db.Set<Tenant>().Add(new Tenant
+            {
+                Id = tenantId,
+                Name = "Push Test Tenant",
+                Slug = "push-test-tenant",
+            });
+            await db.SaveChangesAsync();
+        }
+
+        var serializer = _factory.Services
+            .GetRequiredService<ISyncSerializer>();
+        var data = serializer.Serialize(new User
+        {
+            Id = entityId,
+            TenantId = tenantId,
+            DisplayName = "Integration Test User",
+            Email = $"{Guid.NewGuid():N}@test.com",
+            Timezone = "UTC",
+            WeekStart = WeekStart.Monday,
+        });
 
         var pushResponse = await _client.PostAsJsonAsync(
-            "/api/v1/sync/push", pushRequest);
+            "/api/v1/sync/push",
+            new SyncPushRequest(
+            [
+                new SyncPushEntry(
+                    ChangeLogEntityType.User,
+                    entityId,
+                    ChangeOperation.Created,
+                    DateTime.UtcNow,
+                    data),
+            ]));
         pushResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var pushBody = await pushResponse.Content
             .ReadFromJsonAsync<SyncPushResponse>();
         pushBody!.AppliedCount.Should().Be(1);
 
-        var pullRequest = new SyncPullRequest(null, null, null);
         var pullResponse = await _client.PostAsJsonAsync(
-            "/api/v1/sync/pull", pullRequest);
+            "/api/v1/sync/pull", new SyncPullRequest(null, null, null));
+        pullResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
         var pullBody = await pullResponse.Content
             .ReadFromJsonAsync<SyncPullResponse>();
-
         pullBody!.Changes.Should().Contain(c => c.EntityId == entityId);
     }
 
@@ -131,7 +159,8 @@ public class SyncEndpointTests
                 ChangeLogEntityType.User,
                 entityId,
                 ChangeOperation.Updated,
-                DateTime.UtcNow.AddHours(-1)),
+                DateTime.UtcNow.AddHours(-1),
+                null),
         ]);
 
         var response = await _client.PostAsJsonAsync(
