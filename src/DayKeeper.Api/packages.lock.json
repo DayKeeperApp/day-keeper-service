@@ -698,7 +698,10 @@
           "Ical.Net": "[5.2.1, )",
           "Microsoft.EntityFrameworkCore": "[10.0.3, )",
           "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": "[10.0.3, )",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )",
+          "Quartz": "[3.16.0, )",
+          "Quartz.Extensions.DependencyInjection": "[3.16.0, )",
+          "Quartz.Extensions.Hosting": "[3.16.0, )"
         }
       },
       "FluentValidation.DependencyInjectionExtensions": {
@@ -761,6 +764,30 @@
           "Microsoft.EntityFrameworkCore": "[10.0.0, 11.0.0)",
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.0, 11.0.0)",
           "Npgsql": "10.0.0"
+        }
+      },
+      "Quartz": {
+        "type": "CentralTransitive",
+        "requested": "[3.16.0, )",
+        "resolved": "3.16.0",
+        "contentHash": "t7kQhPD/S3kJElFsxBy3JfQqreimOCu6CUdnCP5JB9zoZsnNeey3ovPZtZAGlw29b2cWGpmuCp8cncXb5myJQA=="
+      },
+      "Quartz.Extensions.DependencyInjection": {
+        "type": "CentralTransitive",
+        "requested": "[3.16.0, )",
+        "resolved": "3.16.0",
+        "contentHash": "ZjUY92BOW3S8Qv84laYpzqoQOy/2Jy40l1tjPgge771dl8tAKYva8xc/p4K26onncdtJzKeeUj2vfAYce3z/hQ==",
+        "dependencies": {
+          "Quartz": "3.16.0"
+        }
+      },
+      "Quartz.Extensions.Hosting": {
+        "type": "CentralTransitive",
+        "requested": "[3.16.0, )",
+        "resolved": "3.16.0",
+        "contentHash": "YLTC5ImUjAKcQCSJMdJYAO5TSZYtEDZEhM/CdssUSU+08k/6UKCexdmpZDsezbDV4tySiKCoJxfaUyI9O3mJ7w==",
+        "dependencies": {
+          "Quartz.Extensions.DependencyInjection": "3.16.0"
         }
       }
     }

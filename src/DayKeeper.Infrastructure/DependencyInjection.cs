@@ -6,6 +6,7 @@ using DayKeeper.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 
 namespace DayKeeper.Infrastructure;
 
@@ -49,9 +50,28 @@ public static class DependencyInjection
         services.AddScoped<IAttachmentService, AttachmentService>();
         services.AddScoped<IDeviceService, DeviceService>();
 
+        AddScheduler(services);
+
         services.AddHealthChecks()
             .AddDbContextCheck<DayKeeperDbContext>();
 
         return services;
+    }
+
+    /// <summary>
+    /// Configures Quartz.NET scheduler with in-memory job store and hosted service.
+    /// Jobs are resolved via Microsoft DI with scoped lifetime by default.
+    /// </summary>
+    private static void AddScheduler(IServiceCollection services)
+    {
+        services.AddQuartz(q =>
+        {
+            q.UseInMemoryStore();
+        });
+
+        services.AddQuartzHostedService(options =>
+        {
+            options.WaitForJobsToComplete = true;
+        });
     }
 }

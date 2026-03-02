@@ -80,6 +80,36 @@
           "Npgsql": "10.0.0"
         }
       },
+      "Quartz": {
+        "type": "Direct",
+        "requested": "[3.16.0, )",
+        "resolved": "3.16.0",
+        "contentHash": "t7kQhPD/S3kJElFsxBy3JfQqreimOCu6CUdnCP5JB9zoZsnNeey3ovPZtZAGlw29b2cWGpmuCp8cncXb5myJQA==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "2.1.1"
+        }
+      },
+      "Quartz.Extensions.DependencyInjection": {
+        "type": "Direct",
+        "requested": "[3.16.0, )",
+        "resolved": "3.16.0",
+        "contentHash": "ZjUY92BOW3S8Qv84laYpzqoQOy/2Jy40l1tjPgge771dl8tAKYva8xc/p4K26onncdtJzKeeUj2vfAYce3z/hQ==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.0",
+          "Microsoft.Extensions.Options": "10.0.0",
+          "Quartz": "3.16.0"
+        }
+      },
+      "Quartz.Extensions.Hosting": {
+        "type": "Direct",
+        "requested": "[3.16.0, )",
+        "resolved": "3.16.0",
+        "contentHash": "YLTC5ImUjAKcQCSJMdJYAO5TSZYtEDZEhM/CdssUSU+08k/6UKCexdmpZDsezbDV4tySiKCoJxfaUyI9O3mJ7w==",
+        "dependencies": {
+          "Microsoft.Extensions.Hosting.Abstractions": "10.0.0",
+          "Quartz.Extensions.DependencyInjection": "3.16.0"
+        }
+      },
       "FluentValidation": {
         "type": "Transitive",
         "resolved": "12.1.1",
