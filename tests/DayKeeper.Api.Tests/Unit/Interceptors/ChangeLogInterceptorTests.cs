@@ -203,6 +203,7 @@ public sealed class ChangeLogInterceptorTests : IDisposable
                 entity.Ignore(e => e.IsDeleted);
                 entity.Ignore(e => e.Tenant);
                 entity.Ignore(e => e.SpaceMemberships);
+                entity.Ignore(e => e.Devices);
             });
 
             modelBuilder.Entity<Calendar>(entity =>

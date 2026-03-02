@@ -28,6 +28,7 @@ public sealed class ChangeLogEntityTypeMapTests
         { typeof(ListItem), ChangeLogEntityType.ListItem },
         { typeof(Attachment), ChangeLogEntityType.Attachment },
         { typeof(RecurrenceException), ChangeLogEntityType.RecurrenceException },
+        { typeof(Device), ChangeLogEntityType.Device },
     };
 
     [Theory]

@@ -31,4 +31,7 @@ public class User : BaseEntity, ITenantScoped
 
     /// <summary>Space memberships for this user.</summary>
     public ICollection<SpaceMembership> SpaceMemberships { get; set; } = [];
+
+    /// <summary>Registered devices for this user.</summary>
+    public ICollection<Device> Devices { get; set; } = [];
 }
