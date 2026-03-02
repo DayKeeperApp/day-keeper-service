@@ -79,6 +79,9 @@ try
         .AddTypeExtension<ContactMethodMutations>()
         .AddTypeExtension<AddressMutations>()
         .AddTypeExtension<ImportantDateMutations>()
+        .AddTypeExtension<ShoppingListQueries>()
+        .AddTypeExtension<ShoppingListMutations>()
+        .AddTypeExtension<ListItemMutations>()
         .AddMutationConventions(new MutationConventionOptions
         {
             ApplyToAllMutations = true,
