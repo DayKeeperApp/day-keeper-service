@@ -82,6 +82,8 @@ try
         .AddTypeExtension<ShoppingListQueries>()
         .AddTypeExtension<ShoppingListMutations>()
         .AddTypeExtension<ListItemMutations>()
+        .AddTypeExtension<AttachmentQueries>()
+        .AddTypeExtension<AttachmentMutations>()
         .AddMutationConventions(new MutationConventionOptions
         {
             ApplyToAllMutations = true,
