@@ -202,5 +202,28 @@ internal static class InputFactory
             ctx.ArgumentOptional<string?>("label") is { HasValue: true, Value: var uidl } ? uidl : null,
             ctx.ArgumentOptional<DateOnly?>("dateValue") is { HasValue: true, Value: var uidd } ? uidd : null,
             ctx.ArgumentOptional<Guid?>("eventTypeId") is { HasValue: true, Value: var uidet } ? uidet : null),
+
+        ["createShoppingList"] = ctx => new CreateShoppingListCommand(
+            ctx.ArgumentValue<Guid>("spaceId"),
+            ctx.ArgumentValue<string>("name")),
+
+        ["updateShoppingList"] = ctx => new UpdateShoppingListCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("name") is { HasValue: true, Value: var usln } ? usln : null),
+
+        ["createListItem"] = ctx => new CreateListItemCommand(
+            ctx.ArgumentValue<Guid>("shoppingListId"),
+            ctx.ArgumentValue<string>("name"),
+            ctx.ArgumentValue<decimal>("quantity"),
+            ctx.ArgumentOptional<string?>("unit") is { HasValue: true, Value: var cliu } ? cliu : null,
+            ctx.ArgumentValue<int>("sortOrder")),
+
+        ["updateListItem"] = ctx => new UpdateListItemCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("name") is { HasValue: true, Value: var ulin } ? ulin : null,
+            ctx.ArgumentOptional<decimal?>("quantity") is { HasValue: true, Value: var uliq } ? uliq : null,
+            ctx.ArgumentOptional<string?>("unit") is { HasValue: true, Value: var uliu } ? uliu : null,
+            ctx.ArgumentOptional<bool?>("isChecked") is { HasValue: true, Value: var ulic } ? ulic : null,
+            ctx.ArgumentOptional<int?>("sortOrder") is { HasValue: true, Value: var ulis } ? ulis : null),
     };
 }

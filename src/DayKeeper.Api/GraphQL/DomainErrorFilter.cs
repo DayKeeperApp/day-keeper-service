@@ -35,6 +35,7 @@ public sealed partial class DomainErrorFilter : IErrorFilter
             DuplicateProjectNameException ex => MapConflict(error, ex.Message),
             DuplicateCalendarNameException ex => MapConflict(error, ex.Message),
             DuplicateMembershipException ex => MapConflict(error, ex.Message),
+            DuplicateShoppingListNameException ex => MapConflict(error, ex.Message),
             _ => MapUnexpected(error),
         };
     }
