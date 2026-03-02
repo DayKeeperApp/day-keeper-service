@@ -225,5 +225,17 @@ internal static class InputFactory
             ctx.ArgumentOptional<string?>("unit") is { HasValue: true, Value: var uliu } ? uliu : null,
             ctx.ArgumentOptional<bool?>("isChecked") is { HasValue: true, Value: var ulic } ? ulic : null,
             ctx.ArgumentOptional<int?>("sortOrder") is { HasValue: true, Value: var ulis } ? ulis : null),
+
+        ["createDevice"] = ctx => new CreateDeviceCommand(
+            ctx.ArgumentValue<Guid>("userId"),
+            ctx.ArgumentValue<string>("deviceName"),
+            ctx.ArgumentValue<DevicePlatform>("platform"),
+            ctx.ArgumentValue<string>("fcmToken")),
+
+        ["updateDevice"] = ctx => new UpdateDeviceCommand(
+            ctx.ArgumentValue<Guid>("id"),
+            ctx.ArgumentOptional<string?>("deviceName") is { HasValue: true, Value: var udn } ? udn : null,
+            ctx.ArgumentOptional<string?>("fcmToken") is { HasValue: true, Value: var uft } ? uft : null,
+            ctx.ArgumentOptional<DateTime?>("lastSyncAt") is { HasValue: true, Value: var uls } ? uls : null),
     };
 }

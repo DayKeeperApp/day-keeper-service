@@ -426,3 +426,6 @@ efbundle.exe
 
 # Serena MCP plugin
 .serena/
+
+# bv (beads viewer) local config and caches
+.bv/

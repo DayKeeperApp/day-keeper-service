@@ -84,6 +84,8 @@ try
         .AddTypeExtension<ListItemMutations>()
         .AddTypeExtension<AttachmentQueries>()
         .AddTypeExtension<AttachmentMutations>()
+        .AddTypeExtension<DeviceQueries>()
+        .AddTypeExtension<DeviceMutations>()
         .AddMutationConventions(new MutationConventionOptions
         {
             ApplyToAllMutations = true,
