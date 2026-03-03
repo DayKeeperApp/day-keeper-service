@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IShoppingListService, ShoppingListService>();
         services.AddScoped<IAttachmentService, AttachmentService>();
         services.AddScoped<IDeviceService, DeviceService>();
+        services.AddScoped<IReminderSchedulerService, ReminderSchedulerService>();
 
         AddScheduler(services);
 
