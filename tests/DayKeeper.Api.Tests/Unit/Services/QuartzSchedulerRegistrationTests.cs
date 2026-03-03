@@ -12,40 +12,19 @@ using Quartz;
 
 namespace DayKeeper.Api.Tests.Unit.Services;
 
-public sealed class QuartzSchedulerRegistrationTests : IDisposable
+public sealed class QuartzSchedulerRegistrationTests : IClassFixture<QuartzSchedulerRegistrationTests.Fixture>
 {
-    private readonly SqliteConnection _connection;
-    private readonly ServiceCollection _services;
-    private readonly ServiceProvider _serviceProvider;
+    private readonly Fixture _fixture;
 
-    public QuartzSchedulerRegistrationTests()
+    public QuartzSchedulerRegistrationTests(Fixture fixture)
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _connection.Open();
-
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>(StringComparer.Ordinal)
-            {
-                ["ConnectionStrings:DefaultConnection"] = "Host=localhost;Database=test",
-            })
-            .Build();
-
-        _services = new ServiceCollection();
-        _services.AddLogging();
-        _services.AddSingleton<ITenantContext>(new TestTenantContext { CurrentTenantId = null });
-        _services.AddInfrastructureServices(configuration);
-
-        // Override the Npgsql DbContext with SQLite for testing
-        _services.AddDbContext<DayKeeperDbContext>((sp, options) =>
-            options.UseSqlite(_connection));
-
-        _serviceProvider = _services.BuildServiceProvider();
+        _fixture = fixture;
     }
 
     [Fact]
     public void AddInfrastructureServices_RegistersSchedulerFactory()
     {
-        var factory = _serviceProvider.GetService<ISchedulerFactory>();
+        var factory = _fixture.ServiceProvider.GetService<ISchedulerFactory>();
 
         factory.Should().NotBeNull();
     }
@@ -53,7 +32,7 @@ public sealed class QuartzSchedulerRegistrationTests : IDisposable
     [Fact]
     public async Task SchedulerFactory_CreatesWorkingScheduler()
     {
-        var factory = _serviceProvider.GetRequiredService<ISchedulerFactory>();
+        var factory = _fixture.ServiceProvider.GetRequiredService<ISchedulerFactory>();
 
         var scheduler = await factory.GetScheduler();
 
@@ -64,15 +43,82 @@ public sealed class QuartzSchedulerRegistrationTests : IDisposable
     [Fact]
     public void AddInfrastructureServices_RegistersQuartzHostedService()
     {
-        _services.Should().Contain(sd =>
+        _fixture.Services.Should().Contain(sd =>
             sd.ServiceType == typeof(IHostedService)
             && sd.ImplementationType != null
             && sd.ImplementationType.Name.Contains("Quartz", StringComparison.Ordinal));
     }
 
-    public void Dispose()
+    /// <summary>
+    /// Shared fixture so all tests use a single ServiceProvider / scheduler instance.
+    /// The ServiceProvider is intentionally NOT disposed: Quartz's static LogProvider
+    /// holds a global reference to the DI LoggerFactory, and disposing it would corrupt
+    /// Quartz initialization in the integration tests that run in parallel.
+    /// The scheduler is shut down to remove the entry from the global SchedulerRepository.
+    /// </summary>
+    public sealed class Fixture : IAsyncLifetime, IDisposable
     {
-        _serviceProvider.Dispose();
-        _connection.Dispose();
+        private readonly SqliteConnection _connection;
+
+        public ServiceCollection Services { get; }
+        public ServiceProvider ServiceProvider { get; }
+
+        public Fixture()
+        {
+            _connection = new SqliteConnection("DataSource=:memory:");
+            _connection.Open();
+
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>(StringComparer.Ordinal)
+                {
+                    ["ConnectionStrings:DefaultConnection"] = "Host=localhost;Database=test",
+                })
+                .Build();
+
+            Services = new ServiceCollection();
+            Services.AddLogging();
+            Services.AddSingleton<ITenantContext>(new TestTenantContext { CurrentTenantId = null });
+            Services.AddInfrastructureServices(configuration);
+
+            // Give the test scheduler a unique name so it doesn't collide with the
+            // integration tests' Quartz scheduler in the global SchedulerRepository.
+            Services.AddQuartz(q =>
+                q.SchedulerName = $"UnitTestScheduler_{Guid.NewGuid():N}");
+
+            // Override the Npgsql DbContext with SQLite for testing
+            Services.AddDbContext<DayKeeperDbContext>((sp, options) =>
+                options.UseSqlite(_connection));
+
+            ServiceProvider = Services.BuildServiceProvider();
+        }
+
+        public Task InitializeAsync() => Task.CompletedTask;
+
+        public async Task DisposeAsync()
+        {
+            // Shut down the scheduler to remove it from the global SchedulerRepository.
+            try
+            {
+                var factory = ServiceProvider.GetService<ISchedulerFactory>();
+                if (factory is not null)
+                {
+                    var scheduler = await factory.GetScheduler().ConfigureAwait(false);
+                    if (!scheduler.IsShutdown)
+                    {
+                        await scheduler.Shutdown(waitForJobsToComplete: false).ConfigureAwait(false);
+                    }
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                // Safe to ignore — scheduler may already be torn down.
+            }
+        }
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+            // ServiceProvider is intentionally NOT disposed here — see class summary.
+        }
     }
 }
