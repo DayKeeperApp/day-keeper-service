@@ -20,7 +20,8 @@ public sealed partial class ReminderNotificationJob(
 
     public Task Execute(IJobExecutionContext context)
     {
-        var reminderIdString = context.MergedJobDataMap.GetString(ReminderIdKey);
+        var dataMap = context.MergedJobDataMap;
+        var reminderIdString = dataMap.ContainsKey(ReminderIdKey) ? dataMap.GetString(ReminderIdKey) : null;
 
         if (!Guid.TryParse(reminderIdString, out var reminderId))
         {

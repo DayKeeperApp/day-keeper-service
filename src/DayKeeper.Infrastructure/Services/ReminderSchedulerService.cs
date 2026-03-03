@@ -13,7 +13,7 @@ public sealed partial class ReminderSchedulerService(
     ISchedulerFactory schedulerFactory,
     ILogger<ReminderSchedulerService> logger) : IReminderSchedulerService
 {
-    private const string ReminderGroupName = "reminders";
+    private const string _reminderGroupName = "reminders";
 
     private readonly ISchedulerFactory _schedulerFactory = schedulerFactory;
     private readonly ILogger<ReminderSchedulerService> _logger = logger;
@@ -35,7 +35,7 @@ public sealed partial class ReminderSchedulerService(
             .Build();
 
         var trigger = TriggerBuilder.Create()
-            .WithIdentity($"reminder-{reminderId}", ReminderGroupName)
+            .WithIdentity($"reminder-{reminderId}", _reminderGroupName)
             .StartAt(new DateTimeOffset(fireAtUtc, TimeSpan.Zero))
             .Build();
 
@@ -69,7 +69,7 @@ public sealed partial class ReminderSchedulerService(
     }
 
     private static JobKey CreateJobKey(Guid reminderId)
-        => new($"reminder-{reminderId}", ReminderGroupName);
+        => new($"reminder-{reminderId}", _reminderGroupName);
 
     [LoggerMessage(Level = LogLevel.Information,
         Message = "Scheduled reminder {ReminderId} to fire at {FireAtUtc}.")]
