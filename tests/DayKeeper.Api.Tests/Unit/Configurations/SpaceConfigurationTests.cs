@@ -72,6 +72,31 @@ public sealed class SpaceConfigurationTests : IDisposable
     }
 
     [Fact]
+    public async Task SystemSpace_WithNullTenantId_CanBePersisted()
+    {
+        _context.Spaces.Add(new Space
+        {
+            TenantId = null,
+            Name = "Holidays",
+            NormalizedName = "holidays",
+            SpaceType = SpaceType.System,
+        });
+
+        var act = () => _context.SaveChangesAsync();
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [Fact]
+    public void Model_IsSystemProperty_IsIgnored()
+    {
+        var entityType = _context.Model.FindEntityType(typeof(Space))!;
+        var isSystemProperty = entityType.FindProperty(nameof(Space.IsSystem));
+
+        isSystemProperty.Should().BeNull();
+    }
+
+    [Fact]
     public async Task Tenant_CascadeDelete_RemovesSpaces()
     {
         var tenant = new Tenant { Name = "Acme", Slug = "acme" };

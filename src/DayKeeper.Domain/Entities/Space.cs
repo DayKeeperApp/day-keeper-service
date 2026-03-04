@@ -5,11 +5,15 @@ namespace DayKeeper.Domain.Entities;
 
 /// <summary>
 /// An organizational container that groups related data within a tenant.
+/// System spaces (<see cref="TenantId"/> is <c>null</c>) are visible to all tenants.
 /// </summary>
-public class Space : BaseEntity, ITenantScoped
+public class Space : BaseEntity, IOptionalTenantScoped
 {
-    /// <summary>Foreign key to the owning <see cref="Tenant"/>.</summary>
-    public Guid TenantId { get; set; }
+    /// <summary>
+    /// Foreign key to the owning <see cref="Tenant"/>.
+    /// <c>null</c> for system-defined spaces.
+    /// </summary>
+    public Guid? TenantId { get; set; }
 
     /// <summary>Display name for the space.</summary>
     public required string Name { get; set; }
@@ -20,8 +24,14 @@ public class Space : BaseEntity, ITenantScoped
     /// <summary>Determines the behavior and constraints of this space.</summary>
     public SpaceType SpaceType { get; set; }
 
-    /// <summary>Navigation to the owning tenant.</summary>
-    public Tenant Tenant { get; set; } = null!;
+    /// <summary>
+    /// Indicates whether this is a system-defined space.
+    /// System spaces have no owning tenant and are available to all tenants.
+    /// </summary>
+    public bool IsSystem => !TenantId.HasValue;
+
+    /// <summary>Navigation to the owning tenant. <c>null</c> for system-defined spaces.</summary>
+    public Tenant? Tenant { get; set; }
 
     /// <summary>Users who are members of this space.</summary>
     public ICollection<SpaceMembership> Memberships { get; set; } = [];

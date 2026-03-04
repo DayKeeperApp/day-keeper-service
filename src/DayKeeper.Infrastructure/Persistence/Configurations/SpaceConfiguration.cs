@@ -14,7 +14,7 @@ public sealed class SpaceConfiguration : BaseEntityConfiguration<Space>
     protected override void ConfigureEntity(EntityTypeBuilder<Space> builder)
     {
         builder.Property(e => e.TenantId)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(e => e.Name)
             .IsRequired()
@@ -29,6 +29,8 @@ public sealed class SpaceConfiguration : BaseEntityConfiguration<Space>
             .HasConversion<string>()
             .HasMaxLength(16);
 
+        builder.Ignore(e => e.IsSystem);
+
         builder.HasOne(e => e.Tenant)
             .WithMany(t => t.Spaces)
             .HasForeignKey(e => e.TenantId)
@@ -37,6 +39,7 @@ public sealed class SpaceConfiguration : BaseEntityConfiguration<Space>
         builder.HasIndex(e => e.TenantId);
 
         builder.HasIndex(e => new { e.TenantId, e.NormalizedName })
-            .IsUnique();
+            .IsUnique()
+            .AreNullsDistinct(false);
     }
 }
