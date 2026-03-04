@@ -424,6 +424,10 @@ migrations.sql
 efbundle
 efbundle.exe
 
+# Firebase Keys
+firebase-creds/*
+!firebase-creds/.gitkeep
+
 # Serena MCP plugin
 .serena/
 
