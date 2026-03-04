@@ -12,5 +12,4 @@
 **/*.md
 Dockerfile
 .dockerignore
-.editorconfig
 .gitignore
