@@ -1,5 +1,6 @@
 using System.Globalization;
 using Asp.Versioning;
+using DayKeeper.Api.Extensions;
 using DayKeeper.Api.GraphQL;
 using DayKeeper.Api.GraphQL.Mutations;
 using DayKeeper.Api.GraphQL.Queries;
@@ -120,6 +121,9 @@ try
     });
 
     var app = builder.Build();
+
+    // ── Database initialization ──────────────────────────────
+    await app.InitializeDatabaseAsync().ConfigureAwait(false);
 
     // ── Exception handling (first in pipeline) ───────────────
     app.UseMiddleware<ExceptionHandlingMiddleware>();
