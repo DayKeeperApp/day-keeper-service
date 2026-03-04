@@ -7,7 +7,8 @@ namespace DayKeeper.Infrastructure.Persistence.Configurations;
 /// <summary>
 /// EF Core configuration for the <see cref="Calendar"/> entity.
 /// Defines property constraints, the Space relationship, and indexes
-/// including a unique composite on <c>(SpaceId, NormalizedName)</c>.
+/// including a unique composite on <c>(SpaceId, NormalizedName)</c>
+/// and <c>(SpaceId, UpdatedAt)</c> for sync queries.
 /// </summary>
 public sealed class CalendarConfiguration : BaseEntityConfiguration<Calendar>
 {
@@ -40,5 +41,7 @@ public sealed class CalendarConfiguration : BaseEntityConfiguration<Calendar>
 
         builder.HasIndex(e => new { e.SpaceId, e.NormalizedName })
             .IsUnique();
+
+        builder.HasIndex(e => new { e.SpaceId, e.UpdatedAt });
     }
 }

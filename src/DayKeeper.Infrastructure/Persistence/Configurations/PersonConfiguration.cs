@@ -7,7 +7,8 @@ namespace DayKeeper.Infrastructure.Persistence.Configurations;
 /// <summary>
 /// EF Core configuration for the <see cref="Person"/> entity.
 /// Defines property constraints, the Space relationship, and indexes
-/// including a unique composite on <c>(SpaceId, NormalizedFullName)</c>.
+/// including a unique composite on <c>(SpaceId, NormalizedFullName)</c>
+/// and <c>(SpaceId, UpdatedAt)</c> for sync queries.
 /// </summary>
 public sealed class PersonConfiguration : BaseEntityConfiguration<Person>
 {
@@ -40,5 +41,7 @@ public sealed class PersonConfiguration : BaseEntityConfiguration<Person>
 
         builder.HasIndex(e => new { e.SpaceId, e.NormalizedFullName })
             .IsUnique();
+
+        builder.HasIndex(e => new { e.SpaceId, e.UpdatedAt });
     }
 }

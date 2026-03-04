@@ -7,8 +7,9 @@ namespace DayKeeper.Infrastructure.Persistence.Configurations;
 /// <summary>
 /// EF Core configuration for the <see cref="TaskItem"/> entity.
 /// Defines property constraints, Space and Project relationships,
-/// enum-to-string conversions, and indexes including a composite on
-/// <c>(SpaceId, Status, DueAt)</c> for task listing queries.
+/// enum-to-string conversions, and indexes including composites on
+/// <c>(SpaceId, Status, DueAt)</c> and <c>(SpaceId, Status, DueDate)</c>
+/// for task listing queries, plus <c>(SpaceId, UpdatedAt)</c> for sync.
 /// </summary>
 public sealed class TaskItemConfiguration : BaseEntityConfiguration<TaskItem>
 {
@@ -65,5 +66,9 @@ public sealed class TaskItemConfiguration : BaseEntityConfiguration<TaskItem>
         builder.HasIndex(e => e.ProjectId);
 
         builder.HasIndex(e => new { e.SpaceId, e.Status, e.DueAt });
+
+        builder.HasIndex(e => new { e.SpaceId, e.Status, e.DueDate });
+
+        builder.HasIndex(e => new { e.SpaceId, e.UpdatedAt });
     }
 }

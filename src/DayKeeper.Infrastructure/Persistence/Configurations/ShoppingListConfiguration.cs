@@ -7,7 +7,8 @@ namespace DayKeeper.Infrastructure.Persistence.Configurations;
 /// <summary>
 /// EF Core configuration for the <see cref="ShoppingList"/> entity.
 /// Defines property constraints, the Space relationship, and indexes
-/// including a unique composite on <c>(SpaceId, NormalizedName)</c>.
+/// including a unique composite on <c>(SpaceId, NormalizedName)</c>
+/// and <c>(SpaceId, UpdatedAt)</c> for sync queries.
 /// </summary>
 public sealed class ShoppingListConfiguration : BaseEntityConfiguration<ShoppingList>
 {
@@ -33,5 +34,7 @@ public sealed class ShoppingListConfiguration : BaseEntityConfiguration<Shopping
 
         builder.HasIndex(e => new { e.SpaceId, e.NormalizedName })
             .IsUnique();
+
+        builder.HasIndex(e => new { e.SpaceId, e.UpdatedAt });
     }
 }
