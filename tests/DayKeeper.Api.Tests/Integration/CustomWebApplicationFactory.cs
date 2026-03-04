@@ -1,3 +1,4 @@
+using DayKeeper.Application.Interfaces;
 using DayKeeper.Infrastructure.Persistence;
 using DayKeeper.Infrastructure.Persistence.Interceptors;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +8,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NSubstitute;
 
 namespace DayKeeper.Api.Tests.Integration;
 
@@ -17,6 +19,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
+
+        // Open the SQLite connection early and create the schema so that
+        // DbInitializer.SeedAsync (called from Program.cs on startup) finds tables.
+        _connection = new SqliteConnection("DataSource=:memory:");
+        _connection.Open();
+        EnsureSchemaCreated(_connection);
 
         builder.ConfigureTestServices(services =>
         {
@@ -38,10 +46,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 services.Remove(descriptor);
             }
 
-            // Use a persistent SQLite in-memory connection for tests
-            _connection = new SqliteConnection("DataSource=:memory:");
-            _connection.Open();
-
+            // Use the persistent SQLite in-memory connection for tests
             services.AddDbContext<DayKeeperDbContext>((serviceProvider, options) =>
             {
                 options.UseSqlite(_connection);
@@ -53,17 +58,17 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     }
 
     /// <summary>
-    /// Ensures the SQLite database schema is created after the host is built.
+    /// Creates the database schema on the SQLite connection using a temporary context.
+    /// This must happen before the host starts because Program.cs runs DbInitializer on startup.
     /// </summary>
-    protected override IHost CreateHost(IHostBuilder builder)
+    private static void EnsureSchemaCreated(SqliteConnection connection)
     {
-        var host = base.CreateHost(builder);
+        var optionsBuilder = new DbContextOptionsBuilder<DayKeeperDbContext>();
+        optionsBuilder.UseSqlite(connection);
 
-        using var scope = host.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<DayKeeperDbContext>();
-        db.Database.EnsureCreated();
-
-        return host;
+        var tenantContext = Substitute.For<ITenantContext>();
+        using var context = new DayKeeperDbContext(optionsBuilder.Options, tenantContext);
+        context.Database.EnsureCreated();
     }
 
     protected override void Dispose(bool disposing)
