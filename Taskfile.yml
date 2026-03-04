@@ -9,8 +9,65 @@ vars:
 tasks:
   default:
     desc: List available tasks
+    silent: true
     cmds:
-      - task --list-all
+      - |
+        B="\033[1m"
+        D="\033[2m"
+        R="\033[0m"
+        C="\033[36m"
+        HR="───────────────────────────────────────────────────────────────────"
+        echo ""
+        echo -e "  ${D}╭${HR}╮${R}"
+        echo -e "  ${D}│${R}  ${B}📦 DayKeeper Service${R}$(printf '%45s')${D}│${R}"
+        echo -e "  ${D}╰${HR}╯${R}"
+        echo ""
+        echo -e "  ${B}${C}🔨 Build${R}"
+        echo -e "  ${D}${HR}${R}"
+        echo -e "    ${B}restore${R}              Restore NuGet packages"
+        echo -e "    ${B}build${R}                Build the solution (Debug)"
+        echo -e "    ${B}build:release${R}        Build the solution (Release)"
+        echo -e "    ${B}publish${R}              Publish the API project (Release)"
+        echo -e "    ${B}clean${R}                Clean build outputs and test results"
+        echo ""
+        echo -e "  ${B}${C}🚀 Run${R}"
+        echo -e "  ${D}${HR}${R}"
+        echo -e "    ${B}run${R}                  Run the API locally"
+        echo -e "    ${B}watch${R}                Run the API with hot reload"
+        echo ""
+        echo -e "  ${B}${C}🧪 Test${R}"
+        echo -e "  ${D}${HR}${R}"
+        echo -e "    ${B}test${R}                 Run all tests"
+        echo -e "    ${B}test:unit${R}            Run unit tests only"
+        echo -e "    ${B}test:integration${R}     Run integration tests only"
+        echo -e "    ${B}test:coverage${R}        Run tests with code coverage (Cobertura XML)"
+        echo -e "    ${B}test:coverage:report${R} Generate and open HTML coverage report"
+        echo ""
+        echo -e "  ${B}${C}✨ Code Quality${R}"
+        echo -e "  ${D}${HR}${R}"
+        echo -e "    ${B}format${R}               Auto-format all C# files"
+        echo -e "    ${B}format:check${R}         Verify formatting without changes"
+        echo -e "    ${B}lint${R}                 Run lefthook pre-commit checks"
+        echo -e "    ${B}lint:all${R}             Run lefthook pre-commit checks on all files"
+        echo -e "    ${B}vuln${R}                 Check for vulnerable packages"
+        echo -e "    ${B}outdated${R}             List outdated packages"
+        echo ""
+        echo -e "  ${B}${C}🐳 Docker${R}"
+        echo -e "  ${D}${HR}${R}"
+        echo -e "    ${B}docker:build${R}         Build Docker image"
+        echo -e "    ${B}docker:run${R}           Run Docker container"
+        echo ""
+        echo -e "  ${B}${C}🗄️  Database${R}"
+        echo -e "  ${D}${HR}${R}"
+        echo -e "    ${B}db:migrate:add${R}       Create a new migration (-- MigrationName)"
+        echo -e "    ${B}db:migrate:apply${R}     Apply pending migrations"
+        echo -e "    ${B}db:migrate:script${R}    Generate idempotent SQL migration script"
+        echo -e "    ${B}db:migrate:bundle${R}    Create self-contained migration bundle"
+        echo ""
+        echo -e "  ${B}${C}⚙️  Setup${R}"
+        echo -e "  ${D}${HR}${R}"
+        echo -e "    ${B}setup${R}                Set up local development environment"
+        echo ""
 
   # ── Build ────────────────────────────────────────────
 
@@ -59,11 +116,37 @@ tasks:
     cmds:
       - dotnet test {{.SLN}} --verbosity quiet
 
+  test:unit:
+    desc: Run unit tests only
+    cmds:
+      - dotnet test {{.SLN}} --filter "FullyQualifiedName~DayKeeper.Api.Tests.Unit"
+        --verbosity quiet
+
+  test:integration:
+    desc: Run integration tests only
+    cmds:
+      - dotnet test {{.SLN}} --filter "FullyQualifiedName~DayKeeper.Api.Tests.Integration"
+        --verbosity quiet
+
   test:coverage:
     desc: Run tests with code coverage (Cobertura XML)
     cmds:
       - dotnet test {{.SLN}} --collect:"XPlat Code Coverage"
         --results-directory ./TestResults --verbosity quiet
+
+  test:coverage:report:
+    desc: Generate and open HTML coverage report
+    deps: [test:coverage]
+    cmds:
+      - dotnet reportgenerator
+        -reports:"./TestResults/**/coverage.cobertura.xml"
+        -targetdir:"./TestResults/Report"
+        -reporttypes:Html
+      - echo "Report at ./TestResults/Report/index.html"
+      - >
+        open ./TestResults/Report/index.html ||
+        xdg-open ./TestResults/Report/index.html 2>/dev/null ||
+        true
 
   # ── Code Quality ─────────────────────────────────────
 
@@ -81,6 +164,11 @@ tasks:
     desc: Run all lefthook pre-commit checks
     cmds:
       - lefthook run pre-commit
+
+  lint:all:
+    desc: Run lefthook pre-commit checks on all files
+    cmds:
+      - lefthook run pre-commit --all-files
 
   vuln:
     desc: Check for vulnerable packages
