@@ -7,8 +7,8 @@ namespace DayKeeper.Infrastructure.Persistence.Configurations;
 /// <summary>
 /// EF Core configuration for the <see cref="CalendarEvent"/> entity.
 /// Defines property constraints, Calendar and optional EventType relationships,
-/// and indexes including a composite on <c>(CalendarId, StartAt)</c> for
-/// efficient event range queries.
+/// and indexes including composites on <c>(CalendarId, StartAt)</c> and
+/// <c>(CalendarId, StartDate)</c> for efficient event range queries.
 /// </summary>
 public sealed class CalendarEventConfiguration : BaseEntityConfiguration<CalendarEvent>
 {
@@ -86,6 +86,8 @@ public sealed class CalendarEventConfiguration : BaseEntityConfiguration<Calenda
         builder.HasIndex(e => e.EventTypeId);
 
         builder.HasIndex(e => new { e.CalendarId, e.StartAt });
+
+        builder.HasIndex(e => new { e.CalendarId, e.StartDate });
 
         builder.HasIndex("CalendarId")
             .HasFilter("\"RecurrenceRule\" IS NOT NULL")
