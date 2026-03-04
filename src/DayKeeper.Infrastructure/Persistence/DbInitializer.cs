@@ -36,6 +36,21 @@ public static partial class DbInitializer
     private static readonly Guid _categoryLearningId = new("b0000000-0000-0000-0000-000000000009");
     private static readonly Guid _categorySocialId = new("b0000000-0000-0000-0000-00000000000a");
 
+    // ── System Holidays Space/Calendar/Event IDs (deterministic) ──
+    private static readonly Guid _systemHolidaysSpaceId = new("c0000000-0000-0000-0000-000000000001");
+    private static readonly Guid _systemHolidaysCalendarId = new("c0000000-0000-0000-0000-000000000002");
+    private static readonly Guid _eventNewYearsDayId = new("c0000000-0000-0000-0000-000000000010");
+    private static readonly Guid _eventMlkDayId = new("c0000000-0000-0000-0000-000000000011");
+    private static readonly Guid _eventPresidentsDayId = new("c0000000-0000-0000-0000-000000000012");
+    private static readonly Guid _eventMemorialDayId = new("c0000000-0000-0000-0000-000000000013");
+    private static readonly Guid _eventJuneteenthId = new("c0000000-0000-0000-0000-000000000014");
+    private static readonly Guid _eventIndependenceDayId = new("c0000000-0000-0000-0000-000000000015");
+    private static readonly Guid _eventLaborDayId = new("c0000000-0000-0000-0000-000000000016");
+    private static readonly Guid _eventColumbusDayId = new("c0000000-0000-0000-0000-000000000017");
+    private static readonly Guid _eventVeteransDayId = new("c0000000-0000-0000-0000-000000000018");
+    private static readonly Guid _eventThanksgivingId = new("c0000000-0000-0000-0000-000000000019");
+    private static readonly Guid _eventChristmasDayId = new("c0000000-0000-0000-0000-00000000001a");
+
     // ── Development fixture IDs (deterministic) ─────────────
     private static readonly Guid _devTenantId = new("d0000000-0000-0000-0000-000000000001");
     private static readonly Guid _devUserId = new("d0000000-0000-0000-0000-000000000002");
@@ -51,6 +66,7 @@ public static partial class DbInitializer
     {
         await SeedSystemEventTypesAsync(context, logger, ct).ConfigureAwait(false);
         await SeedSystemCategoriesAsync(context, logger, ct).ConfigureAwait(false);
+        await SeedSystemHolidaysAsync(context, logger, ct).ConfigureAwait(false);
 
         if (isDevelopment)
         {
@@ -108,6 +124,46 @@ public static partial class DbInitializer
         context.Set<Category>().AddRange(toAdd);
         await context.SaveChangesAsync(ct).ConfigureAwait(false);
         LogSeededCategories(logger, toAdd.Count);
+    }
+
+    private static async Task SeedSystemHolidaysAsync(
+        DayKeeperDbContext context,
+        ILogger logger,
+        CancellationToken ct)
+    {
+        var spaceExists = await context.Set<Space>()
+            .IgnoreQueryFilters()
+            .AnyAsync(s => s.Id == _systemHolidaysSpaceId, ct)
+            .ConfigureAwait(false);
+
+        if (spaceExists)
+        {
+            return;
+        }
+
+        context.Set<Space>().Add(new Space
+        {
+            Id = _systemHolidaysSpaceId,
+            TenantId = null,
+            Name = "Holidays",
+            NormalizedName = "holidays",
+            SpaceType = SpaceType.System,
+        });
+
+        context.Set<Calendar>().Add(new Calendar
+        {
+            Id = _systemHolidaysCalendarId,
+            SpaceId = _systemHolidaysSpaceId,
+            Name = "US Holidays",
+            NormalizedName = "us holidays",
+            Color = "#FFD93D",
+            IsDefault = true,
+        });
+
+        context.Set<CalendarEvent>().AddRange(GetSystemHolidayEvents());
+
+        await context.SaveChangesAsync(ct).ConfigureAwait(false);
+        LogSeededHolidays(logger, 11);
     }
 
     private static async Task SeedDevelopmentDataAsync(
@@ -203,6 +259,36 @@ public static partial class DbInitializer
         new() { Id = _categorySocialId, TenantId = null, Name = "Social", NormalizedName = "social", Color = "#FDCB6E", Icon = "people" },
     ];
 
+    private static List<CalendarEvent> GetSystemHolidayEvents() =>
+    [
+        Holiday(_eventNewYearsDayId, "New Year's Day", 2024, 1, 1, "FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1"),
+        Holiday(_eventMlkDayId, "Martin Luther King Jr. Day", 2024, 1, 15, "FREQ=YEARLY;BYMONTH=1;BYDAY=3MO"),
+        Holiday(_eventPresidentsDayId, "Presidents' Day", 2024, 2, 19, "FREQ=YEARLY;BYMONTH=2;BYDAY=3MO"),
+        Holiday(_eventMemorialDayId, "Memorial Day", 2024, 5, 27, "FREQ=YEARLY;BYMONTH=5;BYDAY=-1MO"),
+        Holiday(_eventJuneteenthId, "Juneteenth", 2024, 6, 19, "FREQ=YEARLY;BYMONTH=6;BYMONTHDAY=19"),
+        Holiday(_eventIndependenceDayId, "Independence Day", 2024, 7, 4, "FREQ=YEARLY;BYMONTH=7;BYMONTHDAY=4"),
+        Holiday(_eventLaborDayId, "Labor Day", 2024, 9, 2, "FREQ=YEARLY;BYMONTH=9;BYDAY=1MO"),
+        Holiday(_eventColumbusDayId, "Columbus Day / Indigenous Peoples' Day", 2024, 10, 14, "FREQ=YEARLY;BYMONTH=10;BYDAY=2MO"),
+        Holiday(_eventVeteransDayId, "Veterans Day", 2024, 11, 11, "FREQ=YEARLY;BYMONTH=11;BYMONTHDAY=11"),
+        Holiday(_eventThanksgivingId, "Thanksgiving Day", 2024, 11, 28, "FREQ=YEARLY;BYMONTH=11;BYDAY=4TH"),
+        Holiday(_eventChristmasDayId, "Christmas Day", 2024, 12, 25, "FREQ=YEARLY;BYMONTH=12;BYMONTHDAY=25"),
+    ];
+
+    private static CalendarEvent Holiday(Guid id, string title, int year, int month, int day, string rrule) => new()
+    {
+        Id = id,
+        CalendarId = _systemHolidaysCalendarId,
+        EventTypeId = _eventTypeHolidayId,
+        Title = title,
+        IsAllDay = true,
+        Timezone = "UTC",
+        StartAt = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc),
+        EndAt = new DateTime(year, month, day, 23, 59, 59, DateTimeKind.Utc),
+        StartDate = new DateOnly(year, month, day),
+        EndDate = new DateOnly(year, month, day),
+        RecurrenceRule = rrule,
+    };
+
     // ── LoggerMessage delegates ─────────────────────────────
 
     [LoggerMessage(Level = LogLevel.Information,
@@ -212,6 +298,10 @@ public static partial class DbInitializer
     [LoggerMessage(Level = LogLevel.Information,
         Message = "Seeded {Count} system categories.")]
     private static partial void LogSeededCategories(ILogger logger, int count);
+
+    [LoggerMessage(Level = LogLevel.Information,
+        Message = "Seeded system holidays space with calendar and {Count} holiday events.")]
+    private static partial void LogSeededHolidays(ILogger logger, int count);
 
     [LoggerMessage(Level = LogLevel.Information,
         Message = "Seeded development tenant {TenantId} with user, space, and calendar.")]
