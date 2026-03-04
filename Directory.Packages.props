@@ -44,6 +44,10 @@
     <PackageVersion Include="Ical.Net" Version="5.2.1" />
   </ItemGroup>
 
+  <ItemGroup Label="Firebase">
+    <PackageVersion Include="FirebaseAdmin" Version="3.4.0" />
+  </ItemGroup>
+
   <ItemGroup Label="Scheduling">
     <PackageVersion Include="Quartz" Version="3.16.0" />
     <PackageVersion Include="Quartz.Extensions.DependencyInjection" Version="3.16.0" />

@@ -4,6 +4,10 @@
     <RootNamespace>DayKeeper.Infrastructure</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup Label="Firebase">
+    <PackageReference Include="FirebaseAdmin" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="HotChocolate.Data.EntityFramework" />
     <PackageReference Include="Ical.Net" />

@@ -49,6 +49,19 @@ task run
 task test
 ```
 
+### Firebase (Push Notifications)
+
+Push notifications use Firebase Cloud Messaging. This is **optional** for
+local development — the app starts and runs without it.
+
+To enable locally:
+
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com/)
+2. Go to **Project settings > Service accounts > Generate new private key**
+3. Save the JSON file to `firebase-creds/` (gitignored)
+4. Set `Firebase:ProjectId` in `appsettings.Development.json`
+5. Dev credentials load via `launchSettings.json` automatically
+
 The API starts at `http://localhost:5000` (or `https://localhost:5001`).
 Run `task` to see all available commands.
 

@@ -3,6 +3,8 @@ using DayKeeper.Infrastructure.Persistence;
 using DayKeeper.Infrastructure.Persistence.Interceptors;
 using DayKeeper.Infrastructure.Persistence.Repositories;
 using DayKeeper.Infrastructure.Services;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,8 +52,10 @@ public static class DependencyInjection
         services.AddScoped<IAttachmentService, AttachmentService>();
         services.AddScoped<IDeviceService, DeviceService>();
         services.AddScoped<IReminderSchedulerService, ReminderSchedulerService>();
+        services.AddSingleton<INotificationSender, FcmNotificationSender>();
 
         AddScheduler(services);
+        AddFirebase(services, configuration);
 
         services.AddHealthChecks()
             .AddDbContextCheck<DayKeeperDbContext>();
@@ -74,5 +78,40 @@ public static class DependencyInjection
         {
             options.WaitForJobsToComplete = true;
         });
+    }
+
+    /// <summary>
+    /// Initializes the Firebase Admin SDK using application-default credentials
+    /// (via the <c>GOOGLE_APPLICATION_CREDENTIALS</c> environment variable).
+    /// Logs a warning and continues if credentials are not configured.
+    /// </summary>
+    private static void AddFirebase(IServiceCollection services, IConfiguration configuration)
+    {
+        if (FirebaseApp.DefaultInstance is not null)
+        {
+            return;
+        }
+
+        try
+        {
+            var options = new AppOptions
+            {
+                Credential = GoogleCredential.GetApplicationDefault(),
+            };
+
+            var projectId = configuration["Firebase:ProjectId"];
+            if (!string.IsNullOrEmpty(projectId))
+            {
+                options.ProjectId = projectId;
+            }
+
+            FirebaseApp.Create(options);
+        }
+        catch (Exception) when (FirebaseApp.DefaultInstance is null)
+        {
+            // Firebase credentials not configured (GOOGLE_APPLICATION_CREDENTIALS not set).
+            // Push notifications will be unavailable. This is expected in local dev and tests.
+            // At runtime, FcmNotificationSender will throw when FirebaseMessaging.DefaultInstance is null.
+        }
     }
 }
