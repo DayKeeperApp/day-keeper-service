@@ -10,8 +10,12 @@ using DayKeeper.Api.Services;
 using DayKeeper.Application;
 using DayKeeper.Application.Interfaces;
 using DayKeeper.Infrastructure;
+using dotenv.net;
 using Scalar.AspNetCore;
 using Serilog;
+
+// Load .env file from solution root (if present) before any configuration is built
+DotEnv.Load(new DotEnvOptions(probeForEnv: true, probeLevelsToSearch: 6));
 
 // Bootstrap Serilog early so startup errors are captured
 Log.Logger = new LoggerConfiguration()

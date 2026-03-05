@@ -20,6 +20,12 @@
           "Asp.Versioning.Mvc": "8.1.1"
         }
       },
+      "dotenv.net": {
+        "type": "Direct",
+        "requested": "[4.0.1, )",
+        "resolved": "4.0.1",
+        "contentHash": "/+JYtUaZLscosmQBhJRiP1+2sLLKgi2I7fjnrJamcqUSFIbthH5lVcJtTHNuC9NJpMnvRKXTUUzxMBFmTEyD8g=="
+      },
       "HotChocolate.AspNetCore": {
         "type": "Direct",
         "requested": "[15.1.12, )",
