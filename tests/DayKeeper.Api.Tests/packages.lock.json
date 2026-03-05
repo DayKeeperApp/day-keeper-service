@@ -1060,7 +1060,8 @@
           "Scalar.AspNetCore": "[2.12.46, )",
           "Serilog.AspNetCore": "[10.0.0, )",
           "Serilog.Sinks.Console": "[6.1.1, )",
-          "Serilog.Sinks.File": "[7.0.0, )"
+          "Serilog.Sinks.File": "[7.0.0, )",
+          "dotenv.net": "[4.0.1, )"
         }
       },
       "daykeeper.application": {
@@ -1109,6 +1110,12 @@
         "dependencies": {
           "Asp.Versioning.Mvc": "8.1.1"
         }
+      },
+      "dotenv.net": {
+        "type": "CentralTransitive",
+        "requested": "[4.0.1, )",
+        "resolved": "4.0.1",
+        "contentHash": "/+JYtUaZLscosmQBhJRiP1+2sLLKgi2I7fjnrJamcqUSFIbthH5lVcJtTHNuC9NJpMnvRKXTUUzxMBFmTEyD8g=="
       },
       "FirebaseAdmin": {
         "type": "CentralTransitive",

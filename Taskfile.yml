@@ -191,7 +191,7 @@ tasks:
     desc: Run Docker container
     deps: [docker:build]
     cmds:
-      - docker run -p 8080:8080 {{.DOCKER_IMAGE}}
+      - docker run --env-file .env --network host {{.DOCKER_IMAGE}}
 
   # ── Database ────────────────────────────────────────────
 

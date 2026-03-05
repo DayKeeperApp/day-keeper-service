@@ -42,7 +42,7 @@ jobs:
           --startup-project src/DayKeeper.Api/DayKeeper.Api.csproj
           --idempotent
           --no-build
-          -c Release
+          --configuration Release
           --output /dev/null
 
       - name: Test with coverage
