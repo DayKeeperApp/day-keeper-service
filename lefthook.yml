@@ -61,6 +61,12 @@ pre-commit:
             exclude: "^(\\.beads/.*)$"
             run: uvx yamllint {staged_files}
 
+          - name: kubescore
+            glob: "deploy/k8s/**/*.{yaml,yml}"
+            run: >
+              kubectl kustomize deploy/k8s/overlays/dev/
+              | kube-score score --min-replicas-deployment 1 -
+
           - name: editorconfig-check
             run: npx --yes --quiet editorconfig-checker
 
@@ -72,6 +78,10 @@ pre-commit:
         jobs:
           - name: gitleaks
             run: npx --yes --quiet @ziul285/gitleaks detect --source . -v
+
+          - name: checkov
+            glob: "deploy/k8s/**/*.{yaml,yml}"
+            run: uvx checkov --config-file .checkov.yml
 
 commit-msg:
   commands:

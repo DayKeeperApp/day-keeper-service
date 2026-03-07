@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: daykeeper-api-config
+  namespace: daykeeper
+  labels:
+    app.kubernetes.io/name: daykeeper-api
+    app.kubernetes.io/component: api
+data:
+  ASPNETCORE_ENVIRONMENT: "Development"
+  AttachmentStorage__BasePath: "/data/attachments"
+  AttachmentStorage__MaxFileSizeBytes: "10485760"
+  Firebase__ProjectId: "day-keeper-dev"
+  GOOGLE_APPLICATION_CREDENTIALS: "/etc/firebase/credentials.json"
