@@ -1,0 +1,33 @@
+area/api:
+  - changed-files:
+      - any-glob-to-any-file: "src/DayKeeper.Api/**"
+
+area/application:
+  - changed-files:
+      - any-glob-to-any-file: "src/DayKeeper.Application/**"
+
+area/domain:
+  - changed-files:
+      - any-glob-to-any-file: "src/DayKeeper.Domain/**"
+
+area/infrastructure:
+  - changed-files:
+      - any-glob-to-any-file: "src/DayKeeper.Infrastructure/**"
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file: "tests/**"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
+
+k8s:
+  - changed-files:
+      - any-glob-to-any-file: "deploy/k8s/**"
+
+docker:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "Dockerfile"
+          - ".dockerignore"
