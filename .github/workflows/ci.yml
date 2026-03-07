@@ -98,6 +98,24 @@ jobs:
         uses: k1LoW/octocov-action@73d561f65d59e66899ed5c87e4621a913b5d5c20 # v1
         if: success() || failure()
 
+      - name: Push coverage badge
+        if: github.ref == 'refs/heads/main' && success()
+        run: |
+          cp badges/coverage.svg /tmp/coverage.svg
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash --include-untracked
+          if git fetch origin badges 2>/dev/null; then
+            git checkout badges
+          else
+            git switch --orphan badges
+          fi
+          mkdir -p badges
+          cp /tmp/coverage.svg badges/coverage.svg
+          git add badges/coverage.svg
+          git diff --cached --quiet || git commit -m "chore: update coverage badge [skip ci]"
+          git push origin badges
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
