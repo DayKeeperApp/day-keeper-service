@@ -319,4 +319,5 @@ tasks:
       - task: restore
       - dotnet tool restore
       - lefthook install
+      - go install github.com/zegl/kube-score/cmd/kube-score@latest
       - echo "Done! Run 'task run' to start the API."
