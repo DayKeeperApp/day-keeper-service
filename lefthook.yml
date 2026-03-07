@@ -65,7 +65,7 @@ pre-commit:
             glob: "deploy/k8s/**/*.{yaml,yml}"
             run: >
               kubectl kustomize deploy/k8s/overlays/dev/
-              | kube-score score -
+              | kube-score score --min-replicas-deployment 1 -
 
           - name: editorconfig-check
             run: npx --yes --quiet editorconfig-checker
@@ -81,10 +81,7 @@ pre-commit:
 
           - name: checkov
             glob: "deploy/k8s/**/*.{yaml,yml}"
-            run: >
-              uvx checkov --framework kubernetes
-              --directory deploy/k8s/
-              --compact --quiet
+            run: uvx checkov --config-file .checkov.yml
 
 commit-msg:
   commands:

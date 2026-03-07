@@ -15,16 +15,48 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: daykeeper-api
+      annotations:
+        # k3d uses locally-imported images; pull policy and tags
+        # are intentionally set for local dev
+        kube-score/ignore: container-image-pull-policy,container-image-tag
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10654
+        runAsGroup: 10654
+        fsGroup: 10654
+        seccompProfile:
+          type: RuntimeDefault
       initContainers:
         - name: migrate
           image: daykeeper-api:latest
           imagePullPolicy: Never
           command: ["/app/efbundle"]
           args: ["--connection", "$(ConnectionStrings__DefaultConnection)"]
+          env:
+            - name: DOTNET_BUNDLE_EXTRACT_BASE_DIR
+              value: /tmp/dotnet-bundle
           envFrom:
             - secretRef:
                 name: daykeeper-api-secrets
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+              ephemeral-storage: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+              ephemeral-storage: 128Mi
       containers:
         - name: api
           image: daykeeper-api:latest
@@ -37,19 +69,30 @@ spec:
                 name: daykeeper-api-config
             - secretRef:
                 name: daykeeper-api-secrets
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - name: attachments
               mountPath: /data/attachments
             - name: firebase-credentials
               mountPath: /etc/firebase
               readOnly: true
+            - name: tmp
+              mountPath: /tmp
+            - name: logs
+              mountPath: /app/logs
           resources:
             requests:
               cpu: 100m
               memory: 128Mi
+              ephemeral-storage: 64Mi
             limits:
               cpu: 500m
               memory: 512Mi
+              ephemeral-storage: 256Mi
           livenessProbe:
             httpGet:
               path: /health/live
@@ -83,3 +126,7 @@ spec:
             items:
               - key: firebase-credentials.json
                 path: credentials.json
+        - name: tmp
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}

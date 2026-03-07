@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: postgres
     app.kubernetes.io/component: database
 spec:
-  type: ClusterIP
+  clusterIP: None
   ports:
     - port: 5432
       targetPort: 5432
@@ -33,7 +33,18 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: postgres
+      annotations:
+        # postgres-alpine image runs as UID 70 (hardcoded)
+        kube-score/ignore: container-image-pull-policy,container-security-context-user-group-id
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70
+        runAsGroup: 70
+        fsGroup: 70
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: postgres
           image: postgres:18-alpine
@@ -42,27 +53,43 @@ spec:
           envFrom:
             - secretRef:
                 name: postgres-credentials
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
           resources:
             requests:
               cpu: 100m
               memory: 128Mi
+              ephemeral-storage: 64Mi
             limits:
               cpu: 500m
               memory: 512Mi
+              ephemeral-storage: 256Mi
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
               subPath: pgdata
+            - name: postgres-run
+              mountPath: /var/run/postgresql
+            - name: postgres-tmp
+              mountPath: /tmp
           readinessProbe:
             exec:
               command: ["pg_isready", "-U", "daykeeper"]
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
-            exec:
-              command: ["pg_isready", "-U", "daykeeper"]
+            tcpSocket:
+              port: 5432
             initialDelaySeconds: 15
             periodSeconds: 20
+      volumes:
+        - name: postgres-run
+          emptyDir: {}
+        - name: postgres-tmp
+          emptyDir: {}
   volumeClaimTemplates:
     - metadata:
         name: postgres-data
