@@ -1,0 +1,7 @@
+{
+  "pid": 223528,
+  "parent_pid": 223508,
+  "database": "/home/jsamuelsen/dayKeeperApp/day-keeper-service/.beads/beads.db",
+  "version": "0.49.0",
+  "started_at": "2026-02-23T03:00:10.772794396Z"
+}
