@@ -5,6 +5,7 @@ vars:
   API_PROJECT: src/DayKeeper.Api/DayKeeper.Api.csproj
   INFRA_PROJECT: src/DayKeeper.Infrastructure/DayKeeper.Infrastructure.csproj
   DOCKER_IMAGE: daykeeper-api
+  K3D_CLUSTER: daykeeper
 
 tasks:
   default:
@@ -56,6 +57,14 @@ tasks:
         echo -e "  ${D}${HR}${R}"
         echo -e "    ${B}docker:build${R}         Build Docker image"
         echo -e "    ${B}docker:run${R}           Run Docker container"
+        echo ""
+        echo -e "  ${B}${C}☸  Deploy${R}"
+        echo -e "  ${D}${HR}${R}"
+        echo -e "    ${B}deploy:dev${R}           Deploy to local k3d cluster (dev)"
+        echo -e "    ${B}deploy:prod${R}          Deploy to local k3d cluster (prod)"
+        echo -e "    ${B}deploy:status${R}        Show deployment status"
+        echo -e "    ${B}deploy:logs${R}          Tail API logs"
+        echo -e "    ${B}deploy:teardown${R}      Delete k3d cluster"
         echo ""
         echo -e "  ${B}${C}🗄️  Database${R}"
         echo -e "  ${D}${HR}${R}"
@@ -235,6 +244,72 @@ tasks:
         --force
         --self-contained
       - echo "Bundle created at ./efbundle"
+
+  # ── Deploy ───────────────────────────────────────────
+
+  deploy:dev:
+    desc: Deploy DayKeeper to local k3d cluster (dev)
+    cmds:
+      - task: deploy:cluster
+      - task: docker:build
+      - task: deploy:import
+      - task: deploy:apply:dev
+
+  deploy:prod:
+    desc: Deploy DayKeeper to local k3d cluster (prod)
+    cmds:
+      - task: deploy:cluster
+      - task: docker:build
+      - task: deploy:import
+      - task: deploy:apply:prod
+
+  deploy:cluster:
+    desc: Create k3d cluster if it doesn't exist
+    internal: true
+    status:
+      - k3d cluster list | grep -q {{.K3D_CLUSTER}}
+    cmds:
+      - k3d cluster create {{.K3D_CLUSTER}}
+        --port "8080:8080@loadbalancer"
+        --wait
+
+  deploy:import:
+    desc: Import Docker image into k3d cluster
+    internal: true
+    cmds:
+      - k3d image import {{.DOCKER_IMAGE}}:latest
+        --cluster {{.K3D_CLUSTER}}
+
+  deploy:apply:dev:
+    desc: Apply dev Kubernetes manifests
+    internal: true
+    cmds:
+      - kubectl apply -k deploy/k8s/overlays/dev/
+      - kubectl -n daykeeper rollout status statefulset/postgres --timeout=120s
+      - kubectl -n daykeeper rollout status deployment/daykeeper-api --timeout=180s
+
+  deploy:apply:prod:
+    desc: Apply prod Kubernetes manifests
+    internal: true
+    cmds:
+      - kubectl apply -k deploy/k8s/overlays/prod/
+      - kubectl -n daykeeper rollout status statefulset/postgres --timeout=120s
+      - kubectl -n daykeeper rollout status deployment/daykeeper-api --timeout=180s
+
+  deploy:status:
+    desc: Show status of DayKeeper deployment
+    cmds:
+      - kubectl -n daykeeper get all
+
+  deploy:logs:
+    desc: Tail DayKeeper API logs
+    cmds:
+      - kubectl -n daykeeper logs -f deployment/daykeeper-api
+
+  deploy:teardown:
+    desc: Delete k3d cluster
+    cmds:
+      - k3d cluster delete {{.K3D_CLUSTER}}
 
   # ── Setup ────────────────────────────────────────────
 
