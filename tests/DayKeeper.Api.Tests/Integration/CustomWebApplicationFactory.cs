@@ -20,11 +20,17 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Development");
 
-        // Open the SQLite connection early and create the schema so that
-        // DbInitializer.SeedAsync (called from Program.cs on startup) finds tables.
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _connection.Open();
-        EnsureSchemaCreated(_connection);
+        var testConnectionString = Environment.GetEnvironmentVariable("TEST_CONNECTION_STRING");
+        var usePostgres = !string.IsNullOrEmpty(testConnectionString);
+
+        if (!usePostgres)
+        {
+            // Local dev: open SQLite connection early and create schema so that
+            // DbInitializer.SeedAsync (called from Program.cs on startup) finds tables.
+            _connection = new SqliteConnection("DataSource=:memory:");
+            _connection.Open();
+            EnsureSchemaCreated(_connection);
+        }
 
         builder.ConfigureTestServices(services =>
         {
@@ -46,14 +52,28 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 services.Remove(descriptor);
             }
 
-            // Use the persistent SQLite in-memory connection for tests
-            services.AddDbContext<DayKeeperDbContext>((serviceProvider, options) =>
+            if (usePostgres)
             {
-                options.UseSqlite(_connection);
-                options.AddInterceptors(
-                    serviceProvider.GetRequiredService<AuditFieldsInterceptor>(),
-                    serviceProvider.GetRequiredService<ChangeLogInterceptor>());
-            });
+                // CI: use real PostgreSQL (migrations already applied by CI step)
+                services.AddDbContext<DayKeeperDbContext>((serviceProvider, options) =>
+                {
+                    options.UseNpgsql(testConnectionString);
+                    options.AddInterceptors(
+                        serviceProvider.GetRequiredService<AuditFieldsInterceptor>(),
+                        serviceProvider.GetRequiredService<ChangeLogInterceptor>());
+                });
+            }
+            else
+            {
+                // Local: use persistent SQLite in-memory connection
+                services.AddDbContext<DayKeeperDbContext>((serviceProvider, options) =>
+                {
+                    options.UseSqlite(_connection!);
+                    options.AddInterceptors(
+                        serviceProvider.GetRequiredService<AuditFieldsInterceptor>(),
+                        serviceProvider.GetRequiredService<ChangeLogInterceptor>());
+                });
+            }
         });
     }
 
