@@ -1,7 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
+  "assignees": ["jsamuelsen11"],
   "schedule": ["before 6am on monday"],
+  "pinDigests": true,
   "enabledManagers": [
     "nuget",
     "dockerfile",

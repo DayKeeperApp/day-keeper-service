@@ -1,7 +1,10 @@
 # Day Keeper Service
 
 [![CI](https://github.com/DayKeeperApp/day-keeper-service/actions/workflows/ci.yml/badge.svg)](https://github.com/DayKeeperApp/day-keeper-service/actions/workflows/ci.yml)
+![Coverage](https://raw.githubusercontent.com/DayKeeperApp/day-keeper-service/badges/badges/coverage.svg)
 ![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)
+[![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen?logo=renovatebot)](https://github.com/DayKeeperApp/day-keeper-service/pulls?q=is%3Apr+author%3Arenovate)
+[![Link checker](https://github.com/DayKeeperApp/day-keeper-service/actions/workflows/links.yml/badge.svg)](https://github.com/DayKeeperApp/day-keeper-service/actions/workflows/links.yml)
 
 Backend API for Day Keeper, a personal life management app
 for calendar events, tasks, contacts, and shared lists.
@@ -136,8 +139,15 @@ curl http://localhost:8080/health/live
 
 GitHub Actions runs on every push to `main` and on all pull requests:
 
-1. **Build & Test** — restore, build, test with code coverage, octocov PR comments
-2. **Docker Build** — verifies the Dockerfile compiles (main branch only)
+| Workflow                | Description                                                      |
+| ----------------------- | ---------------------------------------------------------------- |
+| **Build & Test**        | Restore, build, format & vuln check, migrations, test + coverage |
+| **Lint**                | actionlint (workflow syntax), hadolint (Dockerfile)              |
+| **Docker Build & Push** | Build, push to GHCR, Trivy scan (main only)                      |
+| **Label PRs**           | Auto-label by changed file paths                                 |
+| **Stale**               | Mark inactive issues/PRs after 30 days, close after 37           |
+| **Lock threads**        | Lock closed issues/PRs after 60 days                             |
+| **Link checker**        | Weekly broken link scan across markdown files                    |
 
 ## Project Structure
 
