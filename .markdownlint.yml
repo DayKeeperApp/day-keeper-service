@@ -1,3 +1,8 @@
 MD013:
+  line_length: 100
   tables: false
   code_blocks: false
+  # Ordered/unordered list continuation lines use 3-space indent
+  # (CommonMark spec) which conflicts with editorconfig 2-space rule.
+  # Prettier handles list formatting; skip length checks in lists.
+  ol_and_ul: false
