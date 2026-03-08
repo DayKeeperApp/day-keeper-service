@@ -60,6 +60,11 @@ dotnet_naming_symbols.private_fields.applicable_accessibilities = private
 dotnet_naming_style.underscore_camel_case.required_prefix = _
 dotnet_naming_style.underscore_camel_case.capitalization = camel_case
 
+# Generated API schema files (HotChocolate uses 2-space indent for SDL)
+[docs/api/schema.graphql]
+indent_size = 2
+charset = unset
+
 # EF Core migrations are auto-generated; suppress style enforcement
 [**/Migrations/*.cs]
 generated_code = true

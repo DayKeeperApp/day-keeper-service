@@ -1,0 +1,2367 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+interface Error {
+  message: String!
+}
+
+type AddSpaceMemberPayload {
+  spaceMembership: SpaceMembership
+  errors: [AddSpaceMemberError!]
+}
+
+type Address {
+  personId: UUID!
+  label: String
+  street1: String!
+  street2: String
+  city: String!
+  state: String
+  postalCode: String
+  country: String!
+  isPrimary: Boolean!
+  person: Person!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type AssignCategoryPayload {
+  taskCategory: TaskCategory
+  errors: [AssignCategoryError!]
+}
+
+type Attachment {
+  tenantId: UUID!
+  calendarEventId: UUID
+  taskItemId: UUID
+  personId: UUID
+  fileName: String!
+  contentType: String!
+  fileSize: Long!
+  storagePath: String!
+  tenant: Tenant!
+  calendarEvent: CalendarEvent
+  taskItem: TaskItem
+  person: Person
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+"A connection to a list of items."
+type AttachmentsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [AttachmentsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Attachment!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type AttachmentsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Attachment!
+}
+
+type BusinessRuleViolationError implements Error {
+  message: String!
+  rule: String!
+}
+
+type Calendar {
+  spaceId: UUID!
+  name: String!
+  normalizedName: String!
+  color: String!
+  isDefault: Boolean!
+  space: Space!
+  events: [CalendarEvent!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type CalendarEvent {
+  calendarId: UUID!
+  eventTypeId: UUID
+  title: String!
+  description: String
+  isAllDay: Boolean!
+  startAt: DateTime!
+  endAt: DateTime!
+  startDate: LocalDate
+  endDate: LocalDate
+  timezone: String!
+  recurrenceRule: String
+  recurrenceEndAt: DateTime
+  location: String
+  calendar: Calendar!
+  eventType: EventType
+  reminders: [EventReminder!]!
+  recurrenceExceptions: [RecurrenceException!]!
+  attachments: [Attachment!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+"A connection to a list of items."
+type CalendarEventsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [CalendarEventsEdge!]
+  "A flattened list of the nodes."
+  nodes: [CalendarEvent!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type CalendarEventsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: CalendarEvent!
+}
+
+"A connection to a list of items."
+type CalendarsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [CalendarsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Calendar!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type CalendarsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Calendar!
+}
+
+type Category {
+  tenantId: UUID
+  name: String!
+  normalizedName: String!
+  color: String!
+  icon: String
+  isSystem: Boolean!
+  tenant: Tenant
+  taskCategories: [TaskCategory!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type CompleteTaskItemPayload {
+  taskItem: TaskItem
+  errors: [CompleteTaskItemError!]
+}
+
+type ContactMethod {
+  personId: UUID!
+  type: ContactMethodType!
+  value: String!
+  label: String
+  isPrimary: Boolean!
+  person: Person!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type CreateAddressPayload {
+  address: Address
+  errors: [CreateAddressError!]
+}
+
+type CreateCalendarEventPayload {
+  calendarEvent: CalendarEvent
+  errors: [CreateCalendarEventError!]
+}
+
+type CreateCalendarPayload {
+  calendar: Calendar
+  errors: [CreateCalendarError!]
+}
+
+type CreateContactMethodPayload {
+  contactMethod: ContactMethod
+  errors: [CreateContactMethodError!]
+}
+
+type CreateDevicePayload {
+  device: Device
+  errors: [CreateDeviceError!]
+}
+
+type CreateImportantDatePayload {
+  importantDate: ImportantDate
+  errors: [CreateImportantDateError!]
+}
+
+type CreateListItemPayload {
+  listItem: ListItem
+  errors: [CreateListItemError!]
+}
+
+type CreatePersonPayload {
+  person: Person
+  errors: [CreatePersonError!]
+}
+
+type CreateProjectPayload {
+  project: Project
+  errors: [CreateProjectError!]
+}
+
+type CreateShoppingListPayload {
+  shoppingList: ShoppingList
+  errors: [CreateShoppingListError!]
+}
+
+type CreateSpacePayload {
+  space: Space
+  errors: [CreateSpaceError!]
+}
+
+type CreateTaskItemPayload {
+  taskItem: TaskItem
+  errors: [CreateTaskItemError!]
+}
+
+type CreateTenantPayload {
+  tenant: Tenant
+  errors: [CreateTenantError!]
+}
+
+type CreateUserPayload {
+  user: User
+  errors: [CreateUserError!]
+}
+
+type DeleteAddressPayload {
+  boolean: Boolean
+}
+
+type DeleteAttachmentPayload {
+  boolean: Boolean
+}
+
+type DeleteCalendarEventPayload {
+  boolean: Boolean
+}
+
+type DeleteCalendarPayload {
+  boolean: Boolean
+}
+
+type DeleteContactMethodPayload {
+  boolean: Boolean
+}
+
+type DeleteDevicePayload {
+  boolean: Boolean
+}
+
+type DeleteImportantDatePayload {
+  boolean: Boolean
+}
+
+type DeleteListItemPayload {
+  boolean: Boolean
+}
+
+type DeletePersonPayload {
+  boolean: Boolean
+}
+
+type DeleteProjectPayload {
+  boolean: Boolean
+}
+
+type DeleteShoppingListPayload {
+  boolean: Boolean
+}
+
+type DeleteSpacePayload {
+  boolean: Boolean
+}
+
+type DeleteTaskItemPayload {
+  boolean: Boolean
+}
+
+type DeleteTenantPayload {
+  boolean: Boolean
+}
+
+type DeleteUserPayload {
+  boolean: Boolean
+}
+
+type Device {
+  tenantId: UUID!
+  userId: UUID!
+  deviceName: String!
+  platform: DevicePlatform!
+  fcmToken: String!
+  lastSyncAt: DateTime
+  tenant: Tenant!
+  user: User!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+"A connection to a list of items."
+type DevicesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [DevicesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Device!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type DevicesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Device!
+}
+
+type DuplicateCalendarNameError implements Error {
+  message: String!
+  spaceId: UUID!
+  normalizedName: String!
+}
+
+type DuplicateEmailError implements Error {
+  message: String!
+  tenantId: UUID!
+  email: String!
+}
+
+type DuplicateFcmTokenError implements Error {
+  message: String!
+  fcmToken: String!
+}
+
+type DuplicateMembershipError implements Error {
+  message: String!
+  spaceId: UUID!
+  userId: UUID!
+}
+
+type DuplicatePersonNameError implements Error {
+  message: String!
+  spaceId: UUID!
+  normalizedFullName: String!
+}
+
+type DuplicateProjectNameError implements Error {
+  message: String!
+  spaceId: UUID!
+  normalizedName: String!
+}
+
+type DuplicateShoppingListNameError implements Error {
+  message: String!
+  spaceId: UUID!
+  normalizedName: String!
+}
+
+type DuplicateSlugError implements Error {
+  message: String!
+  slug: String!
+}
+
+type DuplicateSpaceNameError implements Error {
+  message: String!
+  tenantId: UUID
+  normalizedName: String!
+}
+
+type EntityNotFoundError implements Error {
+  message: String!
+  entityName: String!
+  entityId: UUID!
+}
+
+type EventReminder {
+  calendarEventId: UUID!
+  minutesBefore: Int!
+  method: ReminderMethod!
+  calendarEvent: CalendarEvent!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type EventType {
+  tenantId: UUID
+  name: String!
+  normalizedName: String!
+  color: String!
+  icon: String
+  isSystem: Boolean!
+  tenant: Tenant
+  events: [CalendarEvent!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type ExpandedOccurrence {
+  calendarEventId: UUID!
+  recurrenceExceptionId: UUID
+  originalStartAt: DateTime!
+  title: String!
+  description: String
+  startAt: DateTime!
+  endAt: DateTime!
+  isAllDay: Boolean!
+  startDate: LocalDate
+  endDate: LocalDate
+  timezone: String!
+  location: String
+  calendarId: UUID!
+  eventTypeId: UUID
+  isRecurring: Boolean!
+  isException: Boolean!
+}
+
+type ImportantDate {
+  personId: UUID!
+  label: String!
+  date: LocalDate!
+  eventTypeId: UUID
+  person: Person!
+  eventType: EventType
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type InputValidationError implements Error {
+  message: String!
+  errors: [KeyValuePairOfStringAndString__!]!
+}
+
+type KeyValuePairOfStringAndString__ {
+  key: String!
+  value: [String!]!
+}
+
+type ListItem {
+  shoppingListId: UUID!
+  name: String!
+  quantity: Decimal!
+  unit: String
+  isChecked: Boolean!
+  sortOrder: Int!
+  shoppingList: ShoppingList!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type Mutation {
+  createTenant(input: CreateTenantInput!): CreateTenantPayload! @cost(weight: "10")
+  updateTenant(input: UpdateTenantInput!): UpdateTenantPayload! @cost(weight: "10")
+  deleteTenant(input: DeleteTenantInput!): DeleteTenantPayload! @cost(weight: "10")
+  createUser(input: CreateUserInput!): CreateUserPayload! @cost(weight: "10")
+  updateUser(input: UpdateUserInput!): UpdateUserPayload! @cost(weight: "10")
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload! @cost(weight: "10")
+  createSpace(input: CreateSpaceInput!): CreateSpacePayload! @cost(weight: "10")
+  updateSpace(input: UpdateSpaceInput!): UpdateSpacePayload! @cost(weight: "10")
+  deleteSpace(input: DeleteSpaceInput!): DeleteSpacePayload! @cost(weight: "10")
+  addSpaceMember(input: AddSpaceMemberInput!): AddSpaceMemberPayload! @cost(weight: "10")
+  updateSpaceMemberRole(input: UpdateSpaceMemberRoleInput!): UpdateSpaceMemberRolePayload! @cost(weight: "10")
+  removeSpaceMember(input: RemoveSpaceMemberInput!): RemoveSpaceMemberPayload! @cost(weight: "10")
+  createProject(input: CreateProjectInput!): CreateProjectPayload! @cost(weight: "10")
+  updateProject(input: UpdateProjectInput!): UpdateProjectPayload! @cost(weight: "10")
+  deleteProject(input: DeleteProjectInput!): DeleteProjectPayload! @cost(weight: "10")
+  createTaskItem(input: CreateTaskItemInput!): CreateTaskItemPayload! @cost(weight: "10")
+  updateTaskItem(input: UpdateTaskItemInput!): UpdateTaskItemPayload! @cost(weight: "10")
+  completeTaskItem(input: CompleteTaskItemInput!): CompleteTaskItemPayload! @cost(weight: "10")
+  deleteTaskItem(input: DeleteTaskItemInput!): DeleteTaskItemPayload! @cost(weight: "10")
+  assignCategory(input: AssignCategoryInput!): AssignCategoryPayload! @cost(weight: "10")
+  removeCategory(input: RemoveCategoryInput!): RemoveCategoryPayload! @cost(weight: "10")
+  createCalendar(input: CreateCalendarInput!): CreateCalendarPayload! @cost(weight: "10")
+  updateCalendar(input: UpdateCalendarInput!): UpdateCalendarPayload! @cost(weight: "10")
+  deleteCalendar(input: DeleteCalendarInput!): DeleteCalendarPayload! @cost(weight: "10")
+  createCalendarEvent(input: CreateCalendarEventInput!): CreateCalendarEventPayload! @cost(weight: "10")
+  updateCalendarEvent(input: UpdateCalendarEventInput!): UpdateCalendarEventPayload! @cost(weight: "10")
+  deleteCalendarEvent(input: DeleteCalendarEventInput!): DeleteCalendarEventPayload! @cost(weight: "10")
+  createPerson(input: CreatePersonInput!): CreatePersonPayload! @cost(weight: "10")
+  updatePerson(input: UpdatePersonInput!): UpdatePersonPayload! @cost(weight: "10")
+  deletePerson(input: DeletePersonInput!): DeletePersonPayload! @cost(weight: "10")
+  createContactMethod(input: CreateContactMethodInput!): CreateContactMethodPayload! @cost(weight: "10")
+  updateContactMethod(input: UpdateContactMethodInput!): UpdateContactMethodPayload! @cost(weight: "10")
+  deleteContactMethod(input: DeleteContactMethodInput!): DeleteContactMethodPayload! @cost(weight: "10")
+  createAddress(input: CreateAddressInput!): CreateAddressPayload! @cost(weight: "10")
+  updateAddress(input: UpdateAddressInput!): UpdateAddressPayload! @cost(weight: "10")
+  deleteAddress(input: DeleteAddressInput!): DeleteAddressPayload! @cost(weight: "10")
+  createImportantDate(input: CreateImportantDateInput!): CreateImportantDatePayload! @cost(weight: "10")
+  updateImportantDate(input: UpdateImportantDateInput!): UpdateImportantDatePayload! @cost(weight: "10")
+  deleteImportantDate(input: DeleteImportantDateInput!): DeleteImportantDatePayload! @cost(weight: "10")
+  createShoppingList(input: CreateShoppingListInput!): CreateShoppingListPayload! @cost(weight: "10")
+  updateShoppingList(input: UpdateShoppingListInput!): UpdateShoppingListPayload! @cost(weight: "10")
+  deleteShoppingList(input: DeleteShoppingListInput!): DeleteShoppingListPayload! @cost(weight: "10")
+  createListItem(input: CreateListItemInput!): CreateListItemPayload! @cost(weight: "10")
+  updateListItem(input: UpdateListItemInput!): UpdateListItemPayload! @cost(weight: "10")
+  deleteListItem(input: DeleteListItemInput!): DeleteListItemPayload! @cost(weight: "10")
+  deleteAttachment(input: DeleteAttachmentInput!): DeleteAttachmentPayload! @cost(weight: "10")
+  createDevice(input: CreateDeviceInput!): CreateDevicePayload! @cost(weight: "10")
+  updateDevice(input: UpdateDeviceInput!): UpdateDevicePayload! @cost(weight: "10")
+  deleteDevice(input: DeleteDeviceInput!): DeleteDevicePayload! @cost(weight: "10")
+}
+
+"Information about pagination in a connection."
+type PageInfo {
+  "Indicates whether more edges exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more edges exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
+}
+
+type Person {
+  spaceId: UUID!
+  firstName: String!
+  lastName: String!
+  normalizedFullName: String!
+  notes: String
+  space: Space!
+  contactMethods: [ContactMethod!]!
+  addresses: [Address!]!
+  importantDates: [ImportantDate!]!
+  attachments: [Attachment!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+"A connection to a list of items."
+type PersonsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [PersonsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Person!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type PersonsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Person!
+}
+
+type Project {
+  spaceId: UUID!
+  name: String!
+  normalizedName: String!
+  description: String
+  space: Space!
+  taskItems: [TaskItem!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+"A connection to a list of items."
+type ProjectsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [ProjectsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Project!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type ProjectsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Project!
+}
+
+type Query {
+  serviceStatus: String!
+  tenants("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: TenantFilterInput @cost(weight: "10") order: [TenantSortInput!] @cost(weight: "10")): TenantsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  tenantById(id: UUID!): Tenant @cost(weight: "10")
+  tenantBySlug(slug: String!): Tenant @cost(weight: "10")
+  users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: UserFilterInput @cost(weight: "10") order: [UserSortInput!] @cost(weight: "10")): UsersConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  userById(id: UUID!): User @cost(weight: "10")
+  userByEmail(tenantId: UUID! email: String!): User @cost(weight: "10")
+  spaces("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: SpaceFilterInput @cost(weight: "10") order: [SpaceSortInput!] @cost(weight: "10")): SpacesConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  spaceById(id: UUID!): Space @cost(weight: "10")
+  spaceMemberships("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: SpaceMembershipFilterInput @cost(weight: "10") order: [SpaceMembershipSortInput!] @cost(weight: "10")): SpaceMembershipsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  projects(spaceId: UUID "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ProjectFilterInput @cost(weight: "10") order: [ProjectSortInput!] @cost(weight: "10")): ProjectsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  projectById(id: UUID!): Project @cost(weight: "10")
+  taskItems(spaceId: UUID "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: TaskItemFilterInput @cost(weight: "10") order: [TaskItemSortInput!] @cost(weight: "10")): TaskItemsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  taskItemById(id: UUID!): TaskItem @cost(weight: "10")
+  recurringOccurrences(taskItemId: UUID! timezone: String! rangeStart: DateTime! rangeEnd: DateTime!): [DateTime!]! @cost(weight: "10")
+  calendars(spaceId: UUID "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: CalendarFilterInput @cost(weight: "10") order: [CalendarSortInput!] @cost(weight: "10")): CalendarsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  calendarById(id: UUID!): Calendar @cost(weight: "10")
+  calendarEvents(calendarId: UUID "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: CalendarEventFilterInput @cost(weight: "10") order: [CalendarEventSortInput!] @cost(weight: "10")): CalendarEventsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  calendarEventById(id: UUID!): CalendarEvent @cost(weight: "10")
+  eventsForRange(calendarIds: [UUID!]! rangeStart: DateTime! rangeEnd: DateTime! timezone: String!): [ExpandedOccurrence!]! @cost(weight: "10")
+  persons(spaceId: UUID "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: PersonFilterInput @cost(weight: "10") order: [PersonSortInput!] @cost(weight: "10")): PersonsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  personById(id: UUID!): Person @cost(weight: "10")
+  shoppingLists(spaceId: UUID "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ShoppingListFilterInput @cost(weight: "10") order: [ShoppingListSortInput!] @cost(weight: "10")): ShoppingListsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  shoppingListById(id: UUID!): ShoppingList @cost(weight: "10")
+  attachments(calendarEventId: UUID taskItemId: UUID personId: UUID "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: AttachmentFilterInput @cost(weight: "10") order: [AttachmentSortInput!] @cost(weight: "10")): AttachmentsConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  attachmentById(id: UUID!): Attachment @cost(weight: "10")
+  devices(userId: UUID "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: DeviceFilterInput @cost(weight: "10") order: [DeviceSortInput!] @cost(weight: "10")): DevicesConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  deviceById(id: UUID!): Device @cost(weight: "10")
+}
+
+type RecurrenceException {
+  calendarEventId: UUID!
+  originalStartAt: DateTime!
+  isCancelled: Boolean!
+  title: String
+  description: String
+  startAt: DateTime
+  endAt: DateTime
+  location: String
+  calendarEvent: CalendarEvent!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type RemoveCategoryPayload {
+  boolean: Boolean
+  errors: [RemoveCategoryError!]
+}
+
+type RemoveSpaceMemberPayload {
+  boolean: Boolean
+  errors: [RemoveSpaceMemberError!]
+}
+
+type ShoppingList {
+  spaceId: UUID!
+  name: String!
+  normalizedName: String!
+  space: Space!
+  listItems: [ListItem!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+"A connection to a list of items."
+type ShoppingListsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [ShoppingListsEdge!]
+  "A flattened list of the nodes."
+  nodes: [ShoppingList!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type ShoppingListsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: ShoppingList!
+}
+
+type Space {
+  tenantId: UUID
+  name: String!
+  normalizedName: String!
+  spaceType: SpaceType!
+  isSystem: Boolean!
+  tenant: Tenant
+  memberships: [SpaceMembership!]!
+  calendars: [Calendar!]!
+  people: [Person!]!
+  projects: [Project!]!
+  taskItems: [TaskItem!]!
+  shoppingLists: [ShoppingList!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type SpaceMembership {
+  spaceId: UUID!
+  userId: UUID!
+  role: SpaceRole!
+  space: Space!
+  user: User!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+"A connection to a list of items."
+type SpaceMembershipsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [SpaceMembershipsEdge!]
+  "A flattened list of the nodes."
+  nodes: [SpaceMembership!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type SpaceMembershipsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: SpaceMembership!
+}
+
+"A connection to a list of items."
+type SpacesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [SpacesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Space!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type SpacesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Space!
+}
+
+type TaskCategory {
+  taskItemId: UUID!
+  categoryId: UUID!
+  taskItem: TaskItem!
+  category: Category!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type TaskItem {
+  spaceId: UUID!
+  projectId: UUID
+  title: String!
+  description: String
+  status: TaskItemStatus!
+  priority: TaskItemPriority!
+  dueAt: DateTime
+  dueDate: LocalDate
+  recurrenceRule: String
+  completedAt: DateTime
+  space: Space!
+  project: Project
+  taskCategories: [TaskCategory!]!
+  attachments: [Attachment!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+"A connection to a list of items."
+type TaskItemsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [TaskItemsEdge!]
+  "A flattened list of the nodes."
+  nodes: [TaskItem!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type TaskItemsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: TaskItem!
+}
+
+type Tenant {
+  name: String!
+  slug: String!
+  users: [User!]!
+  spaces: [Space!]!
+  eventTypes: [EventType!]!
+  categories: [Category!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+"A connection to a list of items."
+type TenantsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [TenantsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Tenant!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type TenantsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Tenant!
+}
+
+type UpdateAddressPayload {
+  address: Address
+  errors: [UpdateAddressError!]
+}
+
+type UpdateCalendarEventPayload {
+  calendarEvent: CalendarEvent
+  errors: [UpdateCalendarEventError!]
+}
+
+type UpdateCalendarPayload {
+  calendar: Calendar
+  errors: [UpdateCalendarError!]
+}
+
+type UpdateContactMethodPayload {
+  contactMethod: ContactMethod
+  errors: [UpdateContactMethodError!]
+}
+
+type UpdateDevicePayload {
+  device: Device
+  errors: [UpdateDeviceError!]
+}
+
+type UpdateImportantDatePayload {
+  importantDate: ImportantDate
+  errors: [UpdateImportantDateError!]
+}
+
+type UpdateListItemPayload {
+  listItem: ListItem
+  errors: [UpdateListItemError!]
+}
+
+type UpdatePersonPayload {
+  person: Person
+  errors: [UpdatePersonError!]
+}
+
+type UpdateProjectPayload {
+  project: Project
+  errors: [UpdateProjectError!]
+}
+
+type UpdateShoppingListPayload {
+  shoppingList: ShoppingList
+  errors: [UpdateShoppingListError!]
+}
+
+type UpdateSpaceMemberRolePayload {
+  spaceMembership: SpaceMembership
+  errors: [UpdateSpaceMemberRoleError!]
+}
+
+type UpdateSpacePayload {
+  space: Space
+  errors: [UpdateSpaceError!]
+}
+
+type UpdateTaskItemPayload {
+  taskItem: TaskItem
+  errors: [UpdateTaskItemError!]
+}
+
+type UpdateTenantPayload {
+  tenant: Tenant
+  errors: [UpdateTenantError!]
+}
+
+type UpdateUserPayload {
+  user: User
+  errors: [UpdateUserError!]
+}
+
+type User {
+  tenantId: UUID!
+  displayName: String!
+  email: String!
+  timezone: String!
+  weekStart: WeekStart!
+  locale: String
+  tenant: Tenant!
+  spaceMemberships: [SpaceMembership!]!
+  devices: [Device!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+"A connection to a list of items."
+type UsersConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [UsersEdge!]
+  "A flattened list of the nodes."
+  nodes: [User!]
+  "Identifies the total count of items in the connection."
+  totalCount: Int! @cost(weight: "10")
+}
+
+"An edge in a connection."
+type UsersEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: User!
+}
+
+union AddSpaceMemberError = InputValidationError | EntityNotFoundError | DuplicateMembershipError
+
+union AssignCategoryError = EntityNotFoundError | BusinessRuleViolationError
+
+union CompleteTaskItemError = EntityNotFoundError
+
+union CreateAddressError = InputValidationError | EntityNotFoundError
+
+union CreateCalendarError = InputValidationError | EntityNotFoundError | DuplicateCalendarNameError
+
+union CreateCalendarEventError = InputValidationError | EntityNotFoundError
+
+union CreateContactMethodError = InputValidationError | EntityNotFoundError
+
+union CreateDeviceError = InputValidationError | EntityNotFoundError | DuplicateFcmTokenError
+
+union CreateImportantDateError = InputValidationError | EntityNotFoundError
+
+union CreateListItemError = InputValidationError | EntityNotFoundError
+
+union CreatePersonError = InputValidationError | EntityNotFoundError | DuplicatePersonNameError
+
+union CreateProjectError = InputValidationError | EntityNotFoundError | DuplicateProjectNameError
+
+union CreateShoppingListError = InputValidationError | EntityNotFoundError | DuplicateShoppingListNameError
+
+union CreateSpaceError = InputValidationError | EntityNotFoundError | DuplicateSpaceNameError
+
+union CreateTaskItemError = InputValidationError | EntityNotFoundError | BusinessRuleViolationError
+
+union CreateTenantError = InputValidationError | DuplicateSlugError
+
+union CreateUserError = InputValidationError | EntityNotFoundError | DuplicateEmailError
+
+union RemoveCategoryError = EntityNotFoundError
+
+union RemoveSpaceMemberError = EntityNotFoundError | BusinessRuleViolationError
+
+union UpdateAddressError = InputValidationError | EntityNotFoundError
+
+union UpdateCalendarError = InputValidationError | EntityNotFoundError | DuplicateCalendarNameError
+
+union UpdateCalendarEventError = InputValidationError | EntityNotFoundError
+
+union UpdateContactMethodError = InputValidationError | EntityNotFoundError
+
+union UpdateDeviceError = InputValidationError | EntityNotFoundError | DuplicateFcmTokenError
+
+union UpdateImportantDateError = InputValidationError | EntityNotFoundError
+
+union UpdateListItemError = InputValidationError | EntityNotFoundError
+
+union UpdatePersonError = InputValidationError | EntityNotFoundError | DuplicatePersonNameError
+
+union UpdateProjectError = InputValidationError | EntityNotFoundError | DuplicateProjectNameError
+
+union UpdateShoppingListError = InputValidationError | EntityNotFoundError | DuplicateShoppingListNameError
+
+union UpdateSpaceError = InputValidationError | EntityNotFoundError | DuplicateSpaceNameError
+
+union UpdateSpaceMemberRoleError = InputValidationError | EntityNotFoundError | BusinessRuleViolationError
+
+union UpdateTaskItemError = InputValidationError | EntityNotFoundError | BusinessRuleViolationError
+
+union UpdateTenantError = InputValidationError | EntityNotFoundError | DuplicateSlugError
+
+union UpdateUserError = InputValidationError | EntityNotFoundError | DuplicateEmailError
+
+input AddSpaceMemberInput {
+  spaceId: UUID!
+  userId: UUID!
+  role: SpaceRole!
+}
+
+input AddressFilterInput {
+  and: [AddressFilterInput!]
+  or: [AddressFilterInput!]
+  personId: UuidOperationFilterInput
+  label: StringOperationFilterInput
+  street1: StringOperationFilterInput
+  street2: StringOperationFilterInput
+  city: StringOperationFilterInput
+  state: StringOperationFilterInput
+  postalCode: StringOperationFilterInput
+  country: StringOperationFilterInput
+  isPrimary: BooleanOperationFilterInput
+  person: PersonFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input AssignCategoryInput {
+  taskItemId: UUID!
+  categoryId: UUID!
+}
+
+input AttachmentFilterInput {
+  and: [AttachmentFilterInput!]
+  or: [AttachmentFilterInput!]
+  tenantId: UuidOperationFilterInput
+  calendarEventId: UuidOperationFilterInput
+  taskItemId: UuidOperationFilterInput
+  personId: UuidOperationFilterInput
+  fileName: StringOperationFilterInput
+  contentType: StringOperationFilterInput
+  fileSize: LongOperationFilterInput
+  storagePath: StringOperationFilterInput
+  tenant: TenantFilterInput
+  calendarEvent: CalendarEventFilterInput
+  taskItem: TaskItemFilterInput
+  person: PersonFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input AttachmentSortInput {
+  tenantId: SortEnumType @cost(weight: "10")
+  calendarEventId: SortEnumType @cost(weight: "10")
+  taskItemId: SortEnumType @cost(weight: "10")
+  personId: SortEnumType @cost(weight: "10")
+  fileName: SortEnumType @cost(weight: "10")
+  contentType: SortEnumType @cost(weight: "10")
+  fileSize: SortEnumType @cost(weight: "10")
+  storagePath: SortEnumType @cost(weight: "10")
+  tenant: TenantSortInput @cost(weight: "10")
+  calendarEvent: CalendarEventSortInput @cost(weight: "10")
+  taskItem: TaskItemSortInput @cost(weight: "10")
+  person: PersonSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input BooleanOperationFilterInput {
+  eq: Boolean @cost(weight: "10")
+  neq: Boolean @cost(weight: "10")
+}
+
+input CalendarEventFilterInput {
+  and: [CalendarEventFilterInput!]
+  or: [CalendarEventFilterInput!]
+  calendarId: UuidOperationFilterInput
+  eventTypeId: UuidOperationFilterInput
+  title: StringOperationFilterInput
+  description: StringOperationFilterInput
+  isAllDay: BooleanOperationFilterInput
+  startAt: DateTimeOperationFilterInput
+  endAt: DateTimeOperationFilterInput
+  startDate: LocalDateOperationFilterInput
+  endDate: LocalDateOperationFilterInput
+  timezone: StringOperationFilterInput
+  recurrenceRule: StringOperationFilterInput
+  recurrenceEndAt: DateTimeOperationFilterInput
+  location: StringOperationFilterInput
+  calendar: CalendarFilterInput
+  eventType: EventTypeFilterInput
+  reminders: ListFilterInputTypeOfEventReminderFilterInput
+  recurrenceExceptions: ListFilterInputTypeOfRecurrenceExceptionFilterInput
+  attachments: ListFilterInputTypeOfAttachmentFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input CalendarEventSortInput {
+  calendarId: SortEnumType @cost(weight: "10")
+  eventTypeId: SortEnumType @cost(weight: "10")
+  title: SortEnumType @cost(weight: "10")
+  description: SortEnumType @cost(weight: "10")
+  isAllDay: SortEnumType @cost(weight: "10")
+  startAt: SortEnumType @cost(weight: "10")
+  endAt: SortEnumType @cost(weight: "10")
+  startDate: SortEnumType @cost(weight: "10")
+  endDate: SortEnumType @cost(weight: "10")
+  timezone: SortEnumType @cost(weight: "10")
+  recurrenceRule: SortEnumType @cost(weight: "10")
+  recurrenceEndAt: SortEnumType @cost(weight: "10")
+  location: SortEnumType @cost(weight: "10")
+  calendar: CalendarSortInput @cost(weight: "10")
+  eventType: EventTypeSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input CalendarFilterInput {
+  and: [CalendarFilterInput!]
+  or: [CalendarFilterInput!]
+  spaceId: UuidOperationFilterInput
+  name: StringOperationFilterInput
+  normalizedName: StringOperationFilterInput
+  color: StringOperationFilterInput
+  isDefault: BooleanOperationFilterInput
+  space: SpaceFilterInput
+  events: ListFilterInputTypeOfCalendarEventFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input CalendarSortInput {
+  spaceId: SortEnumType @cost(weight: "10")
+  name: SortEnumType @cost(weight: "10")
+  normalizedName: SortEnumType @cost(weight: "10")
+  color: SortEnumType @cost(weight: "10")
+  isDefault: SortEnumType @cost(weight: "10")
+  space: SpaceSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input CategoryFilterInput {
+  and: [CategoryFilterInput!]
+  or: [CategoryFilterInput!]
+  tenantId: UuidOperationFilterInput
+  name: StringOperationFilterInput
+  normalizedName: StringOperationFilterInput
+  color: StringOperationFilterInput
+  icon: StringOperationFilterInput
+  isSystem: BooleanOperationFilterInput
+  tenant: TenantFilterInput
+  taskCategories: ListFilterInputTypeOfTaskCategoryFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input CompleteTaskItemInput {
+  id: UUID!
+}
+
+input ContactMethodFilterInput {
+  and: [ContactMethodFilterInput!]
+  or: [ContactMethodFilterInput!]
+  personId: UuidOperationFilterInput
+  type: ContactMethodTypeOperationFilterInput
+  value: StringOperationFilterInput
+  label: StringOperationFilterInput
+  isPrimary: BooleanOperationFilterInput
+  person: PersonFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input ContactMethodTypeOperationFilterInput {
+  eq: ContactMethodType @cost(weight: "10")
+  neq: ContactMethodType @cost(weight: "10")
+  in: [ContactMethodType!] @cost(weight: "10")
+  nin: [ContactMethodType!] @cost(weight: "10")
+}
+
+input CreateAddressInput {
+  personId: UUID!
+  label: String
+  street1: String!
+  street2: String
+  city: String!
+  state: String
+  postalCode: String
+  country: String!
+  isPrimary: Boolean!
+}
+
+input CreateCalendarEventInput {
+  calendarId: UUID!
+  title: String!
+  description: String
+  isAllDay: Boolean!
+  startAt: DateTime!
+  endAt: DateTime!
+  startDate: LocalDate
+  endDate: LocalDate
+  timezone: String!
+  recurrenceRule: String
+  recurrenceEndAt: DateTime
+  location: String
+  eventTypeId: UUID
+}
+
+input CreateCalendarInput {
+  spaceId: UUID!
+  name: String!
+  color: String!
+  isDefault: Boolean!
+}
+
+input CreateContactMethodInput {
+  personId: UUID!
+  type: ContactMethodType!
+  value: String!
+  label: String
+  isPrimary: Boolean!
+}
+
+input CreateDeviceInput {
+  userId: UUID!
+  deviceName: String!
+  platform: DevicePlatform!
+  fcmToken: String!
+}
+
+input CreateImportantDateInput {
+  personId: UUID!
+  label: String!
+  dateValue: LocalDate!
+  eventTypeId: UUID
+}
+
+input CreateListItemInput {
+  shoppingListId: UUID!
+  name: String!
+  quantity: Decimal!
+  unit: String
+  sortOrder: Int!
+}
+
+input CreatePersonInput {
+  spaceId: UUID!
+  firstName: String!
+  lastName: String!
+  notes: String
+}
+
+input CreateProjectInput {
+  spaceId: UUID!
+  name: String!
+  description: String
+}
+
+input CreateShoppingListInput {
+  spaceId: UUID!
+  name: String!
+}
+
+input CreateSpaceInput {
+  tenantId: UUID!
+  name: String!
+  spaceType: SpaceType!
+  createdByUserId: UUID!
+}
+
+input CreateTaskItemInput {
+  spaceId: UUID!
+  title: String!
+  description: String
+  projectId: UUID
+  status: TaskItemStatus!
+  priority: TaskItemPriority!
+  dueAt: DateTime
+  dueDate: LocalDate
+  recurrenceRule: String
+}
+
+input CreateTenantInput {
+  name: String!
+  slug: String!
+}
+
+input CreateUserInput {
+  tenantId: UUID!
+  displayName: String!
+  email: String!
+  timezone: String!
+  weekStart: WeekStart!
+  locale: String
+}
+
+input DateTimeOperationFilterInput {
+  eq: DateTime @cost(weight: "10")
+  neq: DateTime @cost(weight: "10")
+  in: [DateTime] @cost(weight: "10")
+  nin: [DateTime] @cost(weight: "10")
+  gt: DateTime @cost(weight: "10")
+  ngt: DateTime @cost(weight: "10")
+  gte: DateTime @cost(weight: "10")
+  ngte: DateTime @cost(weight: "10")
+  lt: DateTime @cost(weight: "10")
+  nlt: DateTime @cost(weight: "10")
+  lte: DateTime @cost(weight: "10")
+  nlte: DateTime @cost(weight: "10")
+}
+
+input DecimalOperationFilterInput {
+  eq: Decimal @cost(weight: "10")
+  neq: Decimal @cost(weight: "10")
+  in: [Decimal] @cost(weight: "10")
+  nin: [Decimal] @cost(weight: "10")
+  gt: Decimal @cost(weight: "10")
+  ngt: Decimal @cost(weight: "10")
+  gte: Decimal @cost(weight: "10")
+  ngte: Decimal @cost(weight: "10")
+  lt: Decimal @cost(weight: "10")
+  nlt: Decimal @cost(weight: "10")
+  lte: Decimal @cost(weight: "10")
+  nlte: Decimal @cost(weight: "10")
+}
+
+input DeleteAddressInput {
+  id: UUID!
+}
+
+input DeleteAttachmentInput {
+  id: UUID!
+}
+
+input DeleteCalendarEventInput {
+  id: UUID!
+}
+
+input DeleteCalendarInput {
+  id: UUID!
+}
+
+input DeleteContactMethodInput {
+  id: UUID!
+}
+
+input DeleteDeviceInput {
+  id: UUID!
+}
+
+input DeleteImportantDateInput {
+  id: UUID!
+}
+
+input DeleteListItemInput {
+  id: UUID!
+}
+
+input DeletePersonInput {
+  id: UUID!
+}
+
+input DeleteProjectInput {
+  id: UUID!
+}
+
+input DeleteShoppingListInput {
+  id: UUID!
+}
+
+input DeleteSpaceInput {
+  id: UUID!
+}
+
+input DeleteTaskItemInput {
+  id: UUID!
+}
+
+input DeleteTenantInput {
+  id: UUID!
+}
+
+input DeleteUserInput {
+  id: UUID!
+}
+
+input DeviceFilterInput {
+  and: [DeviceFilterInput!]
+  or: [DeviceFilterInput!]
+  tenantId: UuidOperationFilterInput
+  userId: UuidOperationFilterInput
+  deviceName: StringOperationFilterInput
+  platform: DevicePlatformOperationFilterInput
+  fcmToken: StringOperationFilterInput
+  lastSyncAt: DateTimeOperationFilterInput
+  tenant: TenantFilterInput
+  user: UserFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input DevicePlatformOperationFilterInput {
+  eq: DevicePlatform @cost(weight: "10")
+  neq: DevicePlatform @cost(weight: "10")
+  in: [DevicePlatform!] @cost(weight: "10")
+  nin: [DevicePlatform!] @cost(weight: "10")
+}
+
+input DeviceSortInput {
+  tenantId: SortEnumType @cost(weight: "10")
+  userId: SortEnumType @cost(weight: "10")
+  deviceName: SortEnumType @cost(weight: "10")
+  platform: SortEnumType @cost(weight: "10")
+  fcmToken: SortEnumType @cost(weight: "10")
+  lastSyncAt: SortEnumType @cost(weight: "10")
+  tenant: TenantSortInput @cost(weight: "10")
+  user: UserSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input EventReminderFilterInput {
+  and: [EventReminderFilterInput!]
+  or: [EventReminderFilterInput!]
+  calendarEventId: UuidOperationFilterInput
+  minutesBefore: IntOperationFilterInput
+  method: ReminderMethodOperationFilterInput
+  calendarEvent: CalendarEventFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input EventTypeFilterInput {
+  and: [EventTypeFilterInput!]
+  or: [EventTypeFilterInput!]
+  tenantId: UuidOperationFilterInput
+  name: StringOperationFilterInput
+  normalizedName: StringOperationFilterInput
+  color: StringOperationFilterInput
+  icon: StringOperationFilterInput
+  isSystem: BooleanOperationFilterInput
+  tenant: TenantFilterInput
+  events: ListFilterInputTypeOfCalendarEventFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input EventTypeSortInput {
+  tenantId: SortEnumType @cost(weight: "10")
+  name: SortEnumType @cost(weight: "10")
+  normalizedName: SortEnumType @cost(weight: "10")
+  color: SortEnumType @cost(weight: "10")
+  icon: SortEnumType @cost(weight: "10")
+  isSystem: SortEnumType @cost(weight: "10")
+  tenant: TenantSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input ImportantDateFilterInput {
+  and: [ImportantDateFilterInput!]
+  or: [ImportantDateFilterInput!]
+  personId: UuidOperationFilterInput
+  label: StringOperationFilterInput
+  date: LocalDateOperationFilterInput
+  eventTypeId: UuidOperationFilterInput
+  person: PersonFilterInput
+  eventType: EventTypeFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input IntOperationFilterInput {
+  eq: Int @cost(weight: "10")
+  neq: Int @cost(weight: "10")
+  in: [Int] @cost(weight: "10")
+  nin: [Int] @cost(weight: "10")
+  gt: Int @cost(weight: "10")
+  ngt: Int @cost(weight: "10")
+  gte: Int @cost(weight: "10")
+  ngte: Int @cost(weight: "10")
+  lt: Int @cost(weight: "10")
+  nlt: Int @cost(weight: "10")
+  lte: Int @cost(weight: "10")
+  nlte: Int @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfAddressFilterInput {
+  all: AddressFilterInput @cost(weight: "10")
+  none: AddressFilterInput @cost(weight: "10")
+  some: AddressFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfAttachmentFilterInput {
+  all: AttachmentFilterInput @cost(weight: "10")
+  none: AttachmentFilterInput @cost(weight: "10")
+  some: AttachmentFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfCalendarEventFilterInput {
+  all: CalendarEventFilterInput @cost(weight: "10")
+  none: CalendarEventFilterInput @cost(weight: "10")
+  some: CalendarEventFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfCalendarFilterInput {
+  all: CalendarFilterInput @cost(weight: "10")
+  none: CalendarFilterInput @cost(weight: "10")
+  some: CalendarFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfCategoryFilterInput {
+  all: CategoryFilterInput @cost(weight: "10")
+  none: CategoryFilterInput @cost(weight: "10")
+  some: CategoryFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfContactMethodFilterInput {
+  all: ContactMethodFilterInput @cost(weight: "10")
+  none: ContactMethodFilterInput @cost(weight: "10")
+  some: ContactMethodFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfDeviceFilterInput {
+  all: DeviceFilterInput @cost(weight: "10")
+  none: DeviceFilterInput @cost(weight: "10")
+  some: DeviceFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfEventReminderFilterInput {
+  all: EventReminderFilterInput @cost(weight: "10")
+  none: EventReminderFilterInput @cost(weight: "10")
+  some: EventReminderFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfEventTypeFilterInput {
+  all: EventTypeFilterInput @cost(weight: "10")
+  none: EventTypeFilterInput @cost(weight: "10")
+  some: EventTypeFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfImportantDateFilterInput {
+  all: ImportantDateFilterInput @cost(weight: "10")
+  none: ImportantDateFilterInput @cost(weight: "10")
+  some: ImportantDateFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfListItemFilterInput {
+  all: ListItemFilterInput @cost(weight: "10")
+  none: ListItemFilterInput @cost(weight: "10")
+  some: ListItemFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfPersonFilterInput {
+  all: PersonFilterInput @cost(weight: "10")
+  none: PersonFilterInput @cost(weight: "10")
+  some: PersonFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfProjectFilterInput {
+  all: ProjectFilterInput @cost(weight: "10")
+  none: ProjectFilterInput @cost(weight: "10")
+  some: ProjectFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfRecurrenceExceptionFilterInput {
+  all: RecurrenceExceptionFilterInput @cost(weight: "10")
+  none: RecurrenceExceptionFilterInput @cost(weight: "10")
+  some: RecurrenceExceptionFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfShoppingListFilterInput {
+  all: ShoppingListFilterInput @cost(weight: "10")
+  none: ShoppingListFilterInput @cost(weight: "10")
+  some: ShoppingListFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfSpaceFilterInput {
+  all: SpaceFilterInput @cost(weight: "10")
+  none: SpaceFilterInput @cost(weight: "10")
+  some: SpaceFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfSpaceMembershipFilterInput {
+  all: SpaceMembershipFilterInput @cost(weight: "10")
+  none: SpaceMembershipFilterInput @cost(weight: "10")
+  some: SpaceMembershipFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfTaskCategoryFilterInput {
+  all: TaskCategoryFilterInput @cost(weight: "10")
+  none: TaskCategoryFilterInput @cost(weight: "10")
+  some: TaskCategoryFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfTaskItemFilterInput {
+  all: TaskItemFilterInput @cost(weight: "10")
+  none: TaskItemFilterInput @cost(weight: "10")
+  some: TaskItemFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfUserFilterInput {
+  all: UserFilterInput @cost(weight: "10")
+  none: UserFilterInput @cost(weight: "10")
+  some: UserFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListItemFilterInput {
+  and: [ListItemFilterInput!]
+  or: [ListItemFilterInput!]
+  shoppingListId: UuidOperationFilterInput
+  name: StringOperationFilterInput
+  quantity: DecimalOperationFilterInput
+  unit: StringOperationFilterInput
+  isChecked: BooleanOperationFilterInput
+  sortOrder: IntOperationFilterInput
+  shoppingList: ShoppingListFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input LocalDateOperationFilterInput {
+  eq: LocalDate @cost(weight: "10")
+  neq: LocalDate @cost(weight: "10")
+  in: [LocalDate] @cost(weight: "10")
+  nin: [LocalDate] @cost(weight: "10")
+  gt: LocalDate @cost(weight: "10")
+  ngt: LocalDate @cost(weight: "10")
+  gte: LocalDate @cost(weight: "10")
+  ngte: LocalDate @cost(weight: "10")
+  lt: LocalDate @cost(weight: "10")
+  nlt: LocalDate @cost(weight: "10")
+  lte: LocalDate @cost(weight: "10")
+  nlte: LocalDate @cost(weight: "10")
+}
+
+input LongOperationFilterInput {
+  eq: Long @cost(weight: "10")
+  neq: Long @cost(weight: "10")
+  in: [Long] @cost(weight: "10")
+  nin: [Long] @cost(weight: "10")
+  gt: Long @cost(weight: "10")
+  ngt: Long @cost(weight: "10")
+  gte: Long @cost(weight: "10")
+  ngte: Long @cost(weight: "10")
+  lt: Long @cost(weight: "10")
+  nlt: Long @cost(weight: "10")
+  lte: Long @cost(weight: "10")
+  nlte: Long @cost(weight: "10")
+}
+
+input PersonFilterInput {
+  and: [PersonFilterInput!]
+  or: [PersonFilterInput!]
+  spaceId: UuidOperationFilterInput
+  firstName: StringOperationFilterInput
+  lastName: StringOperationFilterInput
+  normalizedFullName: StringOperationFilterInput
+  notes: StringOperationFilterInput
+  space: SpaceFilterInput
+  contactMethods: ListFilterInputTypeOfContactMethodFilterInput
+  addresses: ListFilterInputTypeOfAddressFilterInput
+  importantDates: ListFilterInputTypeOfImportantDateFilterInput
+  attachments: ListFilterInputTypeOfAttachmentFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input PersonSortInput {
+  spaceId: SortEnumType @cost(weight: "10")
+  firstName: SortEnumType @cost(weight: "10")
+  lastName: SortEnumType @cost(weight: "10")
+  normalizedFullName: SortEnumType @cost(weight: "10")
+  notes: SortEnumType @cost(weight: "10")
+  space: SpaceSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input ProjectFilterInput {
+  and: [ProjectFilterInput!]
+  or: [ProjectFilterInput!]
+  spaceId: UuidOperationFilterInput
+  name: StringOperationFilterInput
+  normalizedName: StringOperationFilterInput
+  description: StringOperationFilterInput
+  space: SpaceFilterInput
+  taskItems: ListFilterInputTypeOfTaskItemFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input ProjectSortInput {
+  spaceId: SortEnumType @cost(weight: "10")
+  name: SortEnumType @cost(weight: "10")
+  normalizedName: SortEnumType @cost(weight: "10")
+  description: SortEnumType @cost(weight: "10")
+  space: SpaceSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input RecurrenceExceptionFilterInput {
+  and: [RecurrenceExceptionFilterInput!]
+  or: [RecurrenceExceptionFilterInput!]
+  calendarEventId: UuidOperationFilterInput
+  originalStartAt: DateTimeOperationFilterInput
+  isCancelled: BooleanOperationFilterInput
+  title: StringOperationFilterInput
+  description: StringOperationFilterInput
+  startAt: DateTimeOperationFilterInput
+  endAt: DateTimeOperationFilterInput
+  location: StringOperationFilterInput
+  calendarEvent: CalendarEventFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input ReminderMethodOperationFilterInput {
+  eq: ReminderMethod @cost(weight: "10")
+  neq: ReminderMethod @cost(weight: "10")
+  in: [ReminderMethod!] @cost(weight: "10")
+  nin: [ReminderMethod!] @cost(weight: "10")
+}
+
+input RemoveCategoryInput {
+  taskItemId: UUID!
+  categoryId: UUID!
+}
+
+input RemoveSpaceMemberInput {
+  spaceId: UUID!
+  userId: UUID!
+}
+
+input ShoppingListFilterInput {
+  and: [ShoppingListFilterInput!]
+  or: [ShoppingListFilterInput!]
+  spaceId: UuidOperationFilterInput
+  name: StringOperationFilterInput
+  normalizedName: StringOperationFilterInput
+  space: SpaceFilterInput
+  listItems: ListFilterInputTypeOfListItemFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input ShoppingListSortInput {
+  spaceId: SortEnumType @cost(weight: "10")
+  name: SortEnumType @cost(weight: "10")
+  normalizedName: SortEnumType @cost(weight: "10")
+  space: SpaceSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input SpaceFilterInput {
+  and: [SpaceFilterInput!]
+  or: [SpaceFilterInput!]
+  tenantId: UuidOperationFilterInput
+  name: StringOperationFilterInput
+  normalizedName: StringOperationFilterInput
+  spaceType: SpaceTypeOperationFilterInput
+  isSystem: BooleanOperationFilterInput
+  tenant: TenantFilterInput
+  memberships: ListFilterInputTypeOfSpaceMembershipFilterInput
+  calendars: ListFilterInputTypeOfCalendarFilterInput
+  people: ListFilterInputTypeOfPersonFilterInput
+  projects: ListFilterInputTypeOfProjectFilterInput
+  taskItems: ListFilterInputTypeOfTaskItemFilterInput
+  shoppingLists: ListFilterInputTypeOfShoppingListFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input SpaceMembershipFilterInput {
+  and: [SpaceMembershipFilterInput!]
+  or: [SpaceMembershipFilterInput!]
+  spaceId: UuidOperationFilterInput
+  userId: UuidOperationFilterInput
+  role: SpaceRoleOperationFilterInput
+  space: SpaceFilterInput
+  user: UserFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input SpaceMembershipSortInput {
+  spaceId: SortEnumType @cost(weight: "10")
+  userId: SortEnumType @cost(weight: "10")
+  role: SortEnumType @cost(weight: "10")
+  space: SpaceSortInput @cost(weight: "10")
+  user: UserSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input SpaceRoleOperationFilterInput {
+  eq: SpaceRole @cost(weight: "10")
+  neq: SpaceRole @cost(weight: "10")
+  in: [SpaceRole!] @cost(weight: "10")
+  nin: [SpaceRole!] @cost(weight: "10")
+}
+
+input SpaceSortInput {
+  tenantId: SortEnumType @cost(weight: "10")
+  name: SortEnumType @cost(weight: "10")
+  normalizedName: SortEnumType @cost(weight: "10")
+  spaceType: SortEnumType @cost(weight: "10")
+  isSystem: SortEnumType @cost(weight: "10")
+  tenant: TenantSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input SpaceTypeOperationFilterInput {
+  eq: SpaceType @cost(weight: "10")
+  neq: SpaceType @cost(weight: "10")
+  in: [SpaceType!] @cost(weight: "10")
+  nin: [SpaceType!] @cost(weight: "10")
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String @cost(weight: "10")
+  neq: String @cost(weight: "10")
+  contains: String @cost(weight: "20")
+  ncontains: String @cost(weight: "20")
+  in: [String] @cost(weight: "10")
+  nin: [String] @cost(weight: "10")
+  startsWith: String @cost(weight: "20")
+  nstartsWith: String @cost(weight: "20")
+  endsWith: String @cost(weight: "20")
+  nendsWith: String @cost(weight: "20")
+}
+
+input TaskCategoryFilterInput {
+  and: [TaskCategoryFilterInput!]
+  or: [TaskCategoryFilterInput!]
+  taskItemId: UuidOperationFilterInput
+  categoryId: UuidOperationFilterInput
+  taskItem: TaskItemFilterInput
+  category: CategoryFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input TaskItemFilterInput {
+  and: [TaskItemFilterInput!]
+  or: [TaskItemFilterInput!]
+  spaceId: UuidOperationFilterInput
+  projectId: UuidOperationFilterInput
+  title: StringOperationFilterInput
+  description: StringOperationFilterInput
+  status: TaskItemStatusOperationFilterInput
+  priority: TaskItemPriorityOperationFilterInput
+  dueAt: DateTimeOperationFilterInput
+  dueDate: LocalDateOperationFilterInput
+  recurrenceRule: StringOperationFilterInput
+  completedAt: DateTimeOperationFilterInput
+  space: SpaceFilterInput
+  project: ProjectFilterInput
+  taskCategories: ListFilterInputTypeOfTaskCategoryFilterInput
+  attachments: ListFilterInputTypeOfAttachmentFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input TaskItemPriorityOperationFilterInput {
+  eq: TaskItemPriority @cost(weight: "10")
+  neq: TaskItemPriority @cost(weight: "10")
+  in: [TaskItemPriority!] @cost(weight: "10")
+  nin: [TaskItemPriority!] @cost(weight: "10")
+}
+
+input TaskItemSortInput {
+  spaceId: SortEnumType @cost(weight: "10")
+  projectId: SortEnumType @cost(weight: "10")
+  title: SortEnumType @cost(weight: "10")
+  description: SortEnumType @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
+  priority: SortEnumType @cost(weight: "10")
+  dueAt: SortEnumType @cost(weight: "10")
+  dueDate: SortEnumType @cost(weight: "10")
+  recurrenceRule: SortEnumType @cost(weight: "10")
+  completedAt: SortEnumType @cost(weight: "10")
+  space: SpaceSortInput @cost(weight: "10")
+  project: ProjectSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input TaskItemStatusOperationFilterInput {
+  eq: TaskItemStatus @cost(weight: "10")
+  neq: TaskItemStatus @cost(weight: "10")
+  in: [TaskItemStatus!] @cost(weight: "10")
+  nin: [TaskItemStatus!] @cost(weight: "10")
+}
+
+input TenantFilterInput {
+  and: [TenantFilterInput!]
+  or: [TenantFilterInput!]
+  name: StringOperationFilterInput
+  slug: StringOperationFilterInput
+  users: ListFilterInputTypeOfUserFilterInput
+  spaces: ListFilterInputTypeOfSpaceFilterInput
+  eventTypes: ListFilterInputTypeOfEventTypeFilterInput
+  categories: ListFilterInputTypeOfCategoryFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input TenantSortInput {
+  name: SortEnumType @cost(weight: "10")
+  slug: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input UpdateAddressInput {
+  id: UUID!
+  label: String
+  street1: String
+  street2: String
+  city: String
+  state: String
+  postalCode: String
+  country: String
+  isPrimary: Boolean
+}
+
+input UpdateCalendarEventInput {
+  id: UUID!
+  title: String
+  description: String
+  isAllDay: Boolean
+  startAt: DateTime
+  endAt: DateTime
+  startDate: LocalDate
+  endDate: LocalDate
+  timezone: String
+  recurrenceRule: String
+  recurrenceEndAt: DateTime
+  location: String
+  eventTypeId: UUID
+}
+
+input UpdateCalendarInput {
+  id: UUID!
+  name: String
+  color: String
+  isDefault: Boolean
+}
+
+input UpdateContactMethodInput {
+  id: UUID!
+  type: ContactMethodType
+  value: String
+  label: String
+  isPrimary: Boolean
+}
+
+input UpdateDeviceInput {
+  id: UUID!
+  deviceName: String
+  fcmToken: String
+  lastSyncAt: DateTime
+}
+
+input UpdateImportantDateInput {
+  id: UUID!
+  label: String
+  dateValue: LocalDate
+  eventTypeId: UUID
+}
+
+input UpdateListItemInput {
+  id: UUID!
+  name: String
+  quantity: Decimal
+  unit: String
+  isChecked: Boolean
+  sortOrder: Int
+}
+
+input UpdatePersonInput {
+  id: UUID!
+  firstName: String
+  lastName: String
+  notes: String
+}
+
+input UpdateProjectInput {
+  id: UUID!
+  name: String
+  description: String
+}
+
+input UpdateShoppingListInput {
+  id: UUID!
+  name: String
+}
+
+input UpdateSpaceInput {
+  id: UUID!
+  name: String
+  spaceType: SpaceType
+}
+
+input UpdateSpaceMemberRoleInput {
+  spaceId: UUID!
+  userId: UUID!
+  newRole: SpaceRole!
+}
+
+input UpdateTaskItemInput {
+  id: UUID!
+  title: String
+  description: String
+  status: TaskItemStatus
+  priority: TaskItemPriority
+  projectId: UUID
+  dueAt: DateTime
+  dueDate: LocalDate
+  recurrenceRule: String
+}
+
+input UpdateTenantInput {
+  id: UUID!
+  name: String
+  slug: String
+}
+
+input UpdateUserInput {
+  id: UUID!
+  displayName: String
+  email: String
+  timezone: String
+  weekStart: WeekStart
+  locale: String
+}
+
+input UserFilterInput {
+  and: [UserFilterInput!]
+  or: [UserFilterInput!]
+  tenantId: UuidOperationFilterInput
+  displayName: StringOperationFilterInput
+  email: StringOperationFilterInput
+  timezone: StringOperationFilterInput
+  weekStart: WeekStartOperationFilterInput
+  locale: StringOperationFilterInput
+  tenant: TenantFilterInput
+  spaceMemberships: ListFilterInputTypeOfSpaceMembershipFilterInput
+  devices: ListFilterInputTypeOfDeviceFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input UserSortInput {
+  tenantId: SortEnumType @cost(weight: "10")
+  displayName: SortEnumType @cost(weight: "10")
+  email: SortEnumType @cost(weight: "10")
+  timezone: SortEnumType @cost(weight: "10")
+  weekStart: SortEnumType @cost(weight: "10")
+  locale: SortEnumType @cost(weight: "10")
+  tenant: TenantSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
+}
+
+input UuidOperationFilterInput {
+  eq: UUID @cost(weight: "10")
+  neq: UUID @cost(weight: "10")
+  in: [UUID] @cost(weight: "10")
+  nin: [UUID] @cost(weight: "10")
+  gt: UUID @cost(weight: "10")
+  ngt: UUID @cost(weight: "10")
+  gte: UUID @cost(weight: "10")
+  ngte: UUID @cost(weight: "10")
+  lt: UUID @cost(weight: "10")
+  nlt: UUID @cost(weight: "10")
+  lte: UUID @cost(weight: "10")
+  nlte: UUID @cost(weight: "10")
+}
+
+input WeekStartOperationFilterInput {
+  eq: WeekStart @cost(weight: "10")
+  neq: WeekStart @cost(weight: "10")
+  in: [WeekStart!] @cost(weight: "10")
+  nin: [WeekStart!] @cost(weight: "10")
+}
+
+enum ContactMethodType {
+  PHONE
+  EMAIL
+  OTHER
+}
+
+enum DevicePlatform {
+  ANDROID
+  IOS
+  WEB
+}
+
+enum ReminderMethod {
+  PUSH
+  EMAIL
+  IN_APP
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+enum SpaceRole {
+  VIEWER
+  EDITOR
+  OWNER
+}
+
+enum SpaceType {
+  PERSONAL
+  SHARED
+  SYSTEM
+}
+
+enum TaskItemPriority {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskItemStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum WeekStart {
+  SUNDAY
+  MONDAY
+  SATURDAY
+}
+
+"The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
+directive @cost("The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc." weight: String!) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM | INPUT_FIELD_DEFINITION
+
+"The purpose of the `@listSize` directive is to either inform the static analysis about the size of returned lists (if that information is statically available), or to point the analysis to where to find that information."
+directive @listSize("The `assumedSize` argument can be used to statically define the maximum length of a list returned by a field." assumedSize: Int "The `slicingArguments` argument can be used to define which of the field's arguments with numeric type are slicing arguments, so that their value determines the size of the list returned by that field. It may specify a list of multiple slicing arguments." slicingArguments: [String!] "The `slicingArgumentDefaultValue` argument can be used to define a default value for a slicing argument, which is used if the argument is not present in a query." slicingArgumentDefaultValue: Int "The `sizedFields` argument can be used to define that the value of the `assumedSize` argument or of a slicing argument does not affect the size of a list returned by a field itself, but that of a list returned by one of its sub-fields." sizedFields: [String!] "The `requireOneSlicingArgument` argument can be used to inform the static analysis that it should expect that exactly one of the defined slicing arguments is present in a query. If that is not the case (i.e., if none or multiple slicing arguments are present), the static analysis may throw an error." requireOneSlicingArgument: Boolean! = true) on FIELD_DEFINITION
+
+"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
+directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"The `Decimal` scalar type represents a decimal floating-point number."
+scalar Decimal
+
+"The `LocalDate` scalar type represents a ISO date string, represented as UTF-8 character sequences YYYY-MM-DD. The scalar follows the specification defined in RFC3339"
+scalar LocalDate
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")
