@@ -106,8 +106,8 @@ flowchart LR
   Android([Android Client])
 
   subgraph APIs
-    REST["REST API\n/api/v1/*\nURL-versioned"]
-    GQL["GraphQL API\n/graphql\nSchema-evolved"]
+    REST["REST API<br/>/api/v1/*<br/>URL-versioned"]
+    GQL["GraphQL API<br/>/graphql<br/>Schema-evolved"]
   end
 
   subgraph Shared["Shared Backend"]

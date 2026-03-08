@@ -7,10 +7,10 @@ For the original design plan and rationale, see [day-keeper-plan.md](day-keeper-
 
 ```mermaid
 flowchart BT
-  Domain["DayKeeper.Domain\n(Entities, Enums, Interfaces)"]
-  App["DayKeeper.Application\n(Service Interfaces, Validation, DTOs)"]
-  Infra["DayKeeper.Infrastructure\n(EF Core, Services, Jobs)"]
-  Api["DayKeeper.Api\n(Controllers, GraphQL, Middleware)"]
+  Domain["DayKeeper.Domain<br/>(Entities, Enums, Interfaces)"]
+  App["DayKeeper.Application<br/>(Service Interfaces, Validation, DTOs)"]
+  Infra["DayKeeper.Infrastructure<br/>(EF Core, Services, Jobs)"]
+  Api["DayKeeper.Api<br/>(Controllers, GraphQL, Middleware)"]
 
   App --> Domain
   Infra --> Domain
@@ -241,12 +241,12 @@ flowchart LR
 
   subgraph k3d["k3d Cluster (namespace: daykeeper)"]
     direction TB
-    Init["Init Container\n(efbundle migrations)"]
-    API["DayKeeper API\nASP.NET Core :8080"]
-    PG[(PostgreSQL\nStatefulSet)]
-    PVC_A[("PVC\nattachments")]
-    PVC_DB[("PVC\ndb data")]
-    FB["Firebase Credentials\n(K8s Secret)"]
+    Init["Init Container<br/>(efbundle migrations)"]
+    API["DayKeeper API<br/>ASP.NET Core :8080"]
+    PG[(PostgreSQL<br/>StatefulSet)]
+    PVC_A[("PVC<br/>attachments")]
+    PVC_DB[("PVC<br/>db data")]
+    FB["Firebase Credentials<br/>(K8s Secret)"]
 
     Init -->|runs before| API
     API --> PG
