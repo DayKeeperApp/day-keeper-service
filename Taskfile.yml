@@ -53,6 +53,12 @@ tasks:
         echo -e "    ${B}vuln${R}                 Check for vulnerable packages"
         echo -e "    ${B}outdated${R}             List outdated packages"
         echo ""
+        echo -e "  ${B}${C}📋 Schema${R}"
+        echo -e "  ${D}${HR}${R}"
+        echo -e "    ${B}schema${R}               Export all API schemas (OpenAPI + GraphQL)"
+        echo -e "    ${B}schema:openapi${R}       Export OpenAPI v1 spec to docs/api/"
+        echo -e "    ${B}schema:graphql${R}       Export GraphQL SDL to docs/api/"
+        echo ""
         echo -e "  ${B}${C}🐳 Docker${R}"
         echo -e "  ${D}${HR}${R}"
         echo -e "    ${B}docker:build${R}         Build Docker image"
@@ -188,6 +194,48 @@ tasks:
     desc: List outdated packages
     cmds:
       - dotnet list {{.SLN}} package --outdated
+
+  # ── Schema ──────────────────────────────────────────
+
+  schema:
+    desc: Export all API schemas (OpenAPI + GraphQL)
+    cmds:
+      - task: schema:openapi
+      - task: schema:graphql
+
+  schema:openapi:
+    desc: Export OpenAPI v1 specification to docs/api/openapi-v1.json
+    vars:
+      OPENAPI_OUT: "{{.ROOT_DIR}}/docs/api"
+      API_OBJ: src/DayKeeper.Api/obj
+    cmds:
+      - mkdir -p {{.OPENAPI_OUT}}
+      - rm -f {{.API_OBJ}}/DayKeeper.Api.OpenApiFiles.cache
+      - dotnet build {{.API_PROJECT}}
+        /p:OpenApiGenerateDocumentsOnBuild=true
+        "/p:OpenApiDocumentsDirectory={{.OPENAPI_OUT}}/"
+        --verbosity quiet
+      - |
+        if [ ! -f "{{.OPENAPI_OUT}}/DayKeeper.Api.json" ]; then
+          echo "ERROR: OpenAPI build did not produce {{.OPENAPI_OUT}}/DayKeeper.Api.json" >&2
+          exit 1
+        fi
+      - mv "{{.OPENAPI_OUT}}/DayKeeper.Api.json" "{{.OPENAPI_OUT}}/openapi-v1.json"
+      - echo "Exported docs/api/openapi-v1.json"
+
+  schema:graphql:
+    desc: Export GraphQL SDL schema to docs/api/schema.graphql
+    cmds:
+      - mkdir -p docs/api
+      - dotnet test {{.SLN}}
+        --filter "FullyQualifiedName~SchemaExportTests.ExportGraphQLSchema"
+        --verbosity quiet
+      - |
+        if [ ! -f docs/api/schema.graphql ]; then
+          echo "ERROR: Schema export test did not produce docs/api/schema.graphql" >&2
+          exit 1
+        fi
+      - echo "Exported docs/api/schema.graphql"
 
   # ── Docker ───────────────────────────────────────────
 

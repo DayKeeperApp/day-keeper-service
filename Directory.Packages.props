@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup Label="OpenAPI">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.3" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.12.46" />
   </ItemGroup>
   <ItemGroup Label="Validation">
