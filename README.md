@@ -6,148 +6,55 @@
 [![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen?logo=renovatebot)](https://github.com/DayKeeperApp/day-keeper-service/pulls?q=is%3Apr+author%3Arenovate)
 [![Link checker](https://github.com/DayKeeperApp/day-keeper-service/actions/workflows/links.yml/badge.svg)](https://github.com/DayKeeperApp/day-keeper-service/actions/workflows/links.yml)
 
-Backend API for Day Keeper, a personal life management app
-for calendar events, tasks, contacts, and shared lists.
-Built with ASP.NET Core using Clean Architecture.
+Backend API for Day Keeper, a personal life management app for calendar
+events, tasks, contacts, and shared lists. Built with ASP.NET Core (.NET 10)
+and PostgreSQL using Clean Architecture. Designed for offline-first sync with
+mobile clients.
 
-## Architecture
+## Quick Start
 
-```text
-┌─────────────────────────────────────────────────────┐
-│                  DayKeeper.Api                      │
-│         (Controllers, Middleware, DI)               │
-├──────────────────────┬──────────────────────────────┤
-│  DayKeeper.Application  │  DayKeeper.Infrastructure │
-│  (Interfaces, Services) │  (Implementations, Data)  │
-├──────────────────────┴──────────────────────────────┤
-│                DayKeeper.Domain                     │
-│            (Entities, Value Objects)                │
-└─────────────────────────────────────────────────────┘
-```
-
-**Dependency rule**: each layer only depends on the layers
-below it. Domain has zero dependencies.
-
-## Prerequisites
-
-- [.NET 10 SDK](https://dotnet.microsoft.com/download) (pinned in `global.json`)
-- [Task](https://taskfile.dev/) (task runner)
-- [Docker](https://docs.docker.com/get-docker/) (optional, for container builds)
-- [Lefthook](https://github.com/evilmartians/lefthook) (git hooks)
-- EF Core CLI tools (installed via `dotnet tool restore` / `task setup`)
-
-## Getting Started
+Requires [.NET 10 SDK](https://dotnet.microsoft.com/download),
+[Task](https://taskfile.dev/), and
+[Lefthook](https://github.com/evilmartians/lefthook).
+See the [Runbook](docs/RUNBOOK.md) for full setup including database,
+Docker, and Firebase.
 
 ```bash
-# Clone & setup
 git clone git@github.com:DayKeeperApp/day-keeper-service.git
 cd day-keeper-service
-task setup
-
-# Build & run
-task build
-task run
-
-# Run tests
-task test
+task setup   # restores packages, installs tools & git hooks
+task run     # starts API at http://localhost:5100
 ```
 
-### Firebase (Push Notifications)
+Run `task test` for tests, or `task` to list all commands.
+API docs are available at `/scalar/v1` in development.
 
-Push notifications use Firebase Cloud Messaging. This is **optional** for
-local development — the app starts and runs without it.
+## Tech Stack
 
-To enable locally:
+- .NET 10 / ASP.NET Core
+- Entity Framework Core + PostgreSQL
+- Clean Architecture (Domain / Application / Infrastructure / Api)
+- Firebase Cloud Messaging (push notifications)
+- Docker multi-stage builds
+- GitHub Actions CI/CD
+- Renovate (automated dependency updates)
 
-1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com/)
-2. Go to **Project settings > Service accounts > Generate new private key**
-3. Save the JSON file to `firebase-creds/` (gitignored)
-4. Set `Firebase:ProjectId` in `appsettings.Development.json`
-5. Dev credentials load via `launchSettings.json` automatically
+## Documentation
 
-The API starts at `http://localhost:5000` (or `https://localhost:5001`).
-Run `task` to see all available commands.
-
-## API Endpoints
-
-| Method | Path              | Description                     |
-| ------ | ----------------- | ------------------------------- |
-| GET    | `/api/helloworld` | Smoke test endpoint             |
-| GET    | `/health/live`    | Liveness probe (Kubernetes)     |
-| GET    | `/health/ready`   | Readiness probe (Kubernetes)    |
-| GET    | `/scalar/v1`      | Interactive API docs (dev only) |
-
-## Development
-
-### Setup
-
-```bash
-brew install go-task lefthook
-task setup
-```
-
-### What the hooks run
-
-| Hook       | Job          | Tools                                                                  | Runs on                           |
-| ---------- | ------------ | ---------------------------------------------------------------------- | --------------------------------- |
-| pre-commit | Format       | `dotnet format`, `prettier`                                            | `*.cs`, `*.yml`, `*.json`, `*.md` |
-| pre-commit | Lint         | `dotnet build`, `actionlint`, `markdownlint`, `shellcheck`, `hadolint` | Various                           |
-| pre-commit | Security     | `gitleaks`                                                             | All staged files                  |
-| commit-msg | Commitlint   | `commitlint`                                                           | Commit message                    |
-| pre-push   | Test & Build | `dotnet test`, `dotnet build -c Release`                               | Full solution                     |
-
-### Run tests with coverage
-
-```bash
-task test:coverage
-```
-
-Coverage reports (Cobertura XML) are written to `TestResults/`.
-
-### Code style
-
-Code style is enforced by `.editorconfig` and `task format`.
-The build treats all warnings as errors (`TreatWarningsAsErrors`),
-so code analysis violations fail the build.
-Run `task format:check` to verify without modifying files.
-
-### Database Migrations
-
-Migrations are managed via EF Core CLI, wrapped in Taskfile commands:
-
-```bash
-task db:migrate:add -- AddSpacesTable   # Create migration
-task db:migrate:apply                    # Apply to local DB
-task db:migrate:script                   # Generate SQL script
-```
-
-See [docs/MIGRATIONS.md](docs/MIGRATIONS.md) for the full workflow.
-
-## Docker
-
-```bash
-# Build & run
-task docker:build
-task docker:run
-
-# Verify
-curl http://localhost:8080/api/helloworld
-curl http://localhost:8080/health/live
-```
-
-## CI/CD
-
-GitHub Actions runs on every push to `main` and on all pull requests:
-
-| Workflow                | Description                                                      |
-| ----------------------- | ---------------------------------------------------------------- |
-| **Build & Test**        | Restore, build, format & vuln check, migrations, test + coverage |
-| **Lint**                | actionlint (workflow syntax), hadolint (Dockerfile)              |
-| **Docker Build & Push** | Build, push to GHCR, Trivy scan (main only)                      |
-| **Label PRs**           | Auto-label by changed file paths                                 |
-| **Stale**               | Mark inactive issues/PRs after 30 days, close after 37           |
-| **Lock threads**        | Lock closed issues/PRs after 60 days                             |
-| **Link checker**        | Weekly broken link scan across markdown files                    |
+| Document                                                    | Description                                                 |
+| ----------------------------------------------------------- | ----------------------------------------------------------- |
+| [Architecture](docs/ARCHITECTURE.md)                        | Clean Architecture layers, dependency rules, project layout |
+| [Runbook](docs/RUNBOOK.md)                                  | Local dev setup, Docker, Firebase, deployment, maintenance  |
+| [Migrations](docs/MIGRATIONS.md)                            | EF Core migration workflow and conventions                  |
+| [Troubleshooting](docs/TROUBLESHOOTING.md)                  | Common build, test, and runtime issues                      |
+| [Sync Protocol](docs/SYNC-PROTOCOL.md)                      | Offline-first sync protocol specification                   |
+| [Recurrence](docs/RECURRENCE.md)                            | Recurring events expansion strategy                         |
+| [API Versioning](docs/API-VERSIONING.md)                    | REST and GraphQL versioning policy                          |
+| [API Schemas](docs/api/)                                    | OpenAPI and GraphQL schema files                            |
+| [ADRs](docs/adr/index.md)                                   | Architecture Decision Records                               |
+| [Kong Gateway](docs/kong-requirements.md)                   | Kong gateway integration requirements                       |
+| [Cloudflare Tunnel](docs/cloudflare-tunnel-requirements.md) | Cloudflare tunnel setup for self-hosted access              |
+| [Design Plan](docs/day-keeper-plan.md)                      | Original architecture and data model plan                   |
 
 ## Project Structure
 
@@ -155,37 +62,21 @@ GitHub Actions runs on every push to `main` and on all pull requests:
 day-keeper-service/
 ├── src/
 │   ├── DayKeeper.Api/              # ASP.NET Core entry point
-│   │   ├── Controllers/            # REST controllers
-│   │   └── Middleware/             # Exception handling
 │   ├── DayKeeper.Application/      # Use cases, service interfaces
-│   │   └── Interfaces/
 │   ├── DayKeeper.Domain/           # Entities, domain logic
-│   │   └── Entities/
-│   └── DayKeeper.Infrastructure/   # Implementations, data access
-│       ├── Persistence/Migrations/ # EF Core migrations
-│       └── Services/
+│   └── DayKeeper.Infrastructure/   # EF Core, external services
 ├── tests/
 │   └── DayKeeper.Api.Tests/        # Unit + integration tests
-│       ├── Unit/
-│       └── Integration/
-├── .github/
-│   ├── workflows/ci.yml             # GitHub Actions pipeline
-│   └── renovate.json5               # Automated dependency updates
-├── Taskfile.yml                     # Task runner commands
-├── lefthook.yml                     # Git hooks configuration
-├── Directory.Build.props            # Shared build properties
-├── Directory.Packages.props         # Central NuGet version management
-├── Dockerfile                       # Multi-stage production build
-└── DayKeeper.slnx                   # .NET solution file
+├── docs/                           # Architecture & operations docs
+├── .github/workflows/              # CI/CD pipelines
+├── Taskfile.yml                    # Task runner commands
+├── lefthook.yml                    # Git hooks configuration
+├── Dockerfile                      # Multi-stage production build
+└── DayKeeper.slnx                  # .NET solution file
 ```
 
-## Dependency Management
+## Contributing
 
-[Renovate](https://docs.renovatebot.com/) keeps NuGet packages,
-Docker base images, and GitHub Actions versions up to date.
-Patch updates are auto-merged; minor and major updates create
-PRs for review.
-
-NuGet package versions are managed centrally in
-`Directory.Packages.props` — individual `.csproj` files
-reference packages without specifying versions.
+See the [Runbook](docs/RUNBOOK.md) for development environment setup.
+Git hooks (via Lefthook) enforce formatting, linting, and tests
+automatically on commit and push.

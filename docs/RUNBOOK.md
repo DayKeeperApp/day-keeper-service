@@ -41,6 +41,33 @@ task run      # Start API on https://localhost:5101 / http://localhost:5100
 task watch    # Start with hot reload
 ```
 
+### Firebase (Push Notifications)
+
+Push notifications use Firebase Cloud Messaging. This is **optional** for
+local development — the app starts and runs without it.
+
+To enable locally:
+
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com/)
+2. Go to **Project settings > Service accounts > Generate new private key**
+3. Save the JSON file to `firebase-creds/` (gitignored)
+4. Set `Firebase:ProjectId` in `appsettings.Development.json`
+5. Dev credentials load via `launchSettings.json` automatically
+
+### Docker
+
+```bash
+task docker:build
+task docker:run     # Starts on port 8080
+```
+
+Verify:
+
+```bash
+curl http://localhost:8080/api/helloworld
+curl http://localhost:8080/health/live
+```
+
 ## Deploy to k3d
 
 ### Dev Environment
