@@ -2,7 +2,7 @@
 
 # ADR-NNNN: [Short Title]
 
-**Status:** Proposed | Accepted | Deprecated | Superseded by [ADR-NNNN](NNNN-short-title.md)
+**Status:** Proposed | Accepted | Deprecated | Superseded by ADR-NNNN
 **Date:** YYYY-MM-DD
 
 ---
