@@ -1,4 +1,3 @@
-using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Infrastructure.Persistence;
 using HotChocolate.Data;
@@ -22,21 +21,22 @@ public sealed class UserQueries
     }
 
     /// <summary>Retrieves a single user by its unique identifier.</summary>
-    public Task<User?> GetUserById(
-        Guid id,
-        IUserService userService,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<User> GetUserById(Guid id, DayKeeperDbContext dbContext)
     {
-        return userService.GetUserAsync(id, cancellationToken);
+        return dbContext.Set<User>().Where(u => u.Id == id);
     }
 
     /// <summary>Retrieves a single user by email within a tenant.</summary>
-    public Task<User?> GetUserByEmail(
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<User> GetUserByEmail(
         Guid tenantId,
         string email,
-        IUserService userService,
-        CancellationToken cancellationToken)
+        DayKeeperDbContext dbContext)
     {
-        return userService.GetUserByEmailAsync(tenantId, email, cancellationToken);
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+        return dbContext.Set<User>().Where(u => u.TenantId == tenantId && u.Email == normalizedEmail);
     }
 }

@@ -31,12 +31,11 @@ public sealed class TaskItemQueries
     }
 
     /// <summary>Retrieves a single task item by its unique identifier.</summary>
-    public Task<TaskItem?> GetTaskItemById(
-        Guid id,
-        ITaskItemService taskItemService,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<TaskItem> GetTaskItemById(Guid id, DayKeeperDbContext dbContext)
     {
-        return taskItemService.GetTaskItemAsync(id, cancellationToken);
+        return dbContext.Set<TaskItem>().Where(t => t.Id == id);
     }
 
     /// <summary>Expands a recurring task's recurrence rule into concrete occurrence timestamps.</summary>

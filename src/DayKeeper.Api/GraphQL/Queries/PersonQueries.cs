@@ -1,4 +1,3 @@
-using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Infrastructure.Persistence;
 using HotChocolate.Data;
@@ -29,11 +28,10 @@ public sealed class PersonQueries
     }
 
     /// <summary>Retrieves a single person by its unique identifier.</summary>
-    public Task<Person?> GetPersonById(
-        Guid id,
-        IPersonService personService,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<Person> GetPersonById(Guid id, DayKeeperDbContext dbContext)
     {
-        return personService.GetPersonAsync(id, cancellationToken);
+        return dbContext.Set<Person>().Where(p => p.Id == id);
     }
 }

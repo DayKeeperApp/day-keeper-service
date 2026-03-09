@@ -2,7 +2,6 @@ using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Infrastructure.Persistence;
 using HotChocolate.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace DayKeeper.Api.GraphQL.Queries;
 
@@ -32,13 +31,11 @@ public sealed class CalendarEventQueries
     }
 
     /// <summary>Retrieves a single calendar event by its unique identifier.</summary>
-    public Task<CalendarEvent?> GetCalendarEventById(
-        Guid id,
-        DayKeeperDbContext dbContext,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<CalendarEvent> GetCalendarEventById(Guid id, DayKeeperDbContext dbContext)
     {
-        return dbContext.Set<CalendarEvent>()
-            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        return dbContext.Set<CalendarEvent>().Where(e => e.Id == id);
     }
 
     /// <summary>
