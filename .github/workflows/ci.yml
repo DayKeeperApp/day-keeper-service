@@ -92,6 +92,7 @@ jobs:
           --no-build
           -c Release
           --collect:"XPlat Code Coverage"
+          --settings tests/coverlet.runsettings
           --results-directory ./TestResults
 
       - name: Coverage report
