@@ -146,7 +146,9 @@ tasks:
   test:coverage:
     desc: Run tests with code coverage (Cobertura XML)
     cmds:
+      - rm -rf ./TestResults
       - dotnet test {{.SLN}} --collect:"XPlat Code Coverage"
+        --settings tests/coverlet.runsettings
         --results-directory ./TestResults --verbosity quiet
 
   test:coverage:report:
