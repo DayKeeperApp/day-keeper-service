@@ -1,4 +1,3 @@
-using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Infrastructure.Persistence;
 using HotChocolate.Data;
@@ -31,11 +30,10 @@ public sealed class ProjectQueries
     }
 
     /// <summary>Retrieves a single project by its unique identifier.</summary>
-    public Task<Project?> GetProjectById(
-        Guid id,
-        IProjectService projectService,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<Project> GetProjectById(Guid id, DayKeeperDbContext dbContext)
     {
-        return projectService.GetProjectAsync(id, cancellationToken);
+        return dbContext.Set<Project>().Where(p => p.Id == id);
     }
 }

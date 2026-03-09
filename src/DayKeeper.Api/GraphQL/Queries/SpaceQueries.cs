@@ -1,4 +1,3 @@
-using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Infrastructure.Persistence;
 using HotChocolate.Data;
@@ -22,11 +21,10 @@ public sealed class SpaceQueries
     }
 
     /// <summary>Retrieves a single space by its unique identifier.</summary>
-    public Task<Space?> GetSpaceById(
-        Guid id,
-        ISpaceService spaceService,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<Space> GetSpaceById(Guid id, DayKeeperDbContext dbContext)
     {
-        return spaceService.GetSpaceAsync(id, cancellationToken);
+        return dbContext.Set<Space>().Where(s => s.Id == id);
     }
 }

@@ -1,4 +1,3 @@
-using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Infrastructure.Persistence;
 using HotChocolate.Data;
@@ -22,20 +21,19 @@ public sealed class TenantQueries
     }
 
     /// <summary>Retrieves a single tenant by its unique identifier.</summary>
-    public Task<Tenant?> GetTenantById(
-        Guid id,
-        ITenantService tenantService,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<Tenant> GetTenantById(Guid id, DayKeeperDbContext dbContext)
     {
-        return tenantService.GetTenantAsync(id, cancellationToken);
+        return dbContext.Set<Tenant>().Where(t => t.Id == id);
     }
 
     /// <summary>Retrieves a single tenant by its unique slug.</summary>
-    public Task<Tenant?> GetTenantBySlug(
-        string slug,
-        ITenantService tenantService,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<Tenant> GetTenantBySlug(string slug, DayKeeperDbContext dbContext)
     {
-        return tenantService.GetTenantBySlugAsync(slug, cancellationToken);
+        var normalizedSlug = slug.Trim().ToLowerInvariant();
+        return dbContext.Set<Tenant>().Where(t => t.Slug == normalizedSlug);
     }
 }

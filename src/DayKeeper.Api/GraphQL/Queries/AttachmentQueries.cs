@@ -1,4 +1,3 @@
-using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Infrastructure.Persistence;
 using HotChocolate.Data;
@@ -43,11 +42,10 @@ public sealed class AttachmentQueries
     }
 
     /// <summary>Retrieves a single attachment by its unique identifier.</summary>
-    public Task<Attachment?> GetAttachmentById(
-        Guid id,
-        IAttachmentService attachmentService,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<Attachment> GetAttachmentById(Guid id, DayKeeperDbContext dbContext)
     {
-        return attachmentService.GetAttachmentAsync(id, cancellationToken);
+        return dbContext.Set<Attachment>().Where(a => a.Id == id);
     }
 }

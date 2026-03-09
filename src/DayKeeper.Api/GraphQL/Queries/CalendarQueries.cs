@@ -1,4 +1,3 @@
-using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Infrastructure.Persistence;
 using HotChocolate.Data;
@@ -31,11 +30,10 @@ public sealed class CalendarQueries
     }
 
     /// <summary>Retrieves a single calendar by its unique identifier.</summary>
-    public Task<Calendar?> GetCalendarById(
-        Guid id,
-        ICalendarService calendarService,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<Calendar> GetCalendarById(Guid id, DayKeeperDbContext dbContext)
     {
-        return calendarService.GetCalendarAsync(id, cancellationToken);
+        return dbContext.Set<Calendar>().Where(c => c.Id == id);
     }
 }

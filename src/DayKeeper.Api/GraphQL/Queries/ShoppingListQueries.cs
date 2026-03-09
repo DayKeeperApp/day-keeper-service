@@ -1,4 +1,3 @@
-using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Infrastructure.Persistence;
 using HotChocolate.Data;
@@ -29,11 +28,10 @@ public sealed class ShoppingListQueries
     }
 
     /// <summary>Retrieves a single shopping list by its unique identifier.</summary>
-    public Task<ShoppingList?> GetShoppingListById(
-        Guid id,
-        IShoppingListService shoppingListService,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<ShoppingList> GetShoppingListById(Guid id, DayKeeperDbContext dbContext)
     {
-        return shoppingListService.GetShoppingListAsync(id, cancellationToken);
+        return dbContext.Set<ShoppingList>().Where(sl => sl.Id == id);
     }
 }

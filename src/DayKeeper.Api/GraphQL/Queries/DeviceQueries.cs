@@ -1,4 +1,3 @@
-using DayKeeper.Application.Interfaces;
 using DayKeeper.Domain.Entities;
 using DayKeeper.Infrastructure.Persistence;
 using HotChocolate.Data;
@@ -29,11 +28,10 @@ public sealed class DeviceQueries
     }
 
     /// <summary>Retrieves a single device by its unique identifier.</summary>
-    public Task<Device?> GetDeviceById(
-        Guid id,
-        IDeviceService deviceService,
-        CancellationToken cancellationToken)
+    [UseFirstOrDefault]
+    [UseProjection]
+    public IQueryable<Device> GetDeviceById(Guid id, DayKeeperDbContext dbContext)
     {
-        return deviceService.GetDeviceAsync(id, cancellationToken);
+        return dbContext.Set<Device>().Where(d => d.Id == id);
     }
 }

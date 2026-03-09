@@ -18,17 +18,19 @@ public sealed class ErrorFilterGraphQLTests
     }
 
     [Fact]
-    public async Task SpaceById_WhenServiceThrowsUnexpectedException_ReturnsInternalErrorCode()
+    public async Task UpdateSpace_WhenServiceThrowsUnexpectedException_ReturnsInternalErrorCode()
     {
-        // Arrange: override ISpaceService so GetSpaceAsync throws an unexpected exception
+        // Arrange: override ISpaceService so UpdateSpaceAsync throws an unexpected exception
         var client = _factory.WithWebHostBuilder(builder =>
         {
             builder.ConfigureTestServices(services =>
             {
                 var faultingService = Substitute.For<ISpaceService>();
                 faultingService
-                    .When(s => s.GetSpaceAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()))
-                    .Do(_ => throw new InvalidOperationException("Internal state is corrupt"));
+                    .UpdateSpaceAsync(
+                        Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<Domain.Enums.SpaceType?>(),
+                        Arg.Any<CancellationToken>())
+                    .Returns<Space>(_ => throw new InvalidOperationException("Internal state is corrupt"));
 
                 services.AddScoped<ISpaceService>(_ => faultingService);
             });
@@ -37,10 +39,13 @@ public sealed class ErrorFilterGraphQLTests
         var query = new
         {
             query = $$"""
-                {
-                    spaceById(id: "{{Guid.NewGuid()}}") {
-                        id
-                        name
+                mutation {
+                    updateSpace(input: {
+                        id: "{{Guid.NewGuid()}}"
+                        name: "test"
+                    }) {
+                        space { id name }
+                        errors { __typename }
                     }
                 }
                 """,
@@ -60,9 +65,9 @@ public sealed class ErrorFilterGraphQLTests
     }
 
     [Fact]
-    public async Task SpaceById_WhenServiceThrowsEntityNotFoundException_ReturnsNotFoundCode()
+    public async Task UpdateSpace_WhenServiceThrowsEntityNotFoundException_ReturnsNotFoundCode()
     {
-        // Arrange: override ISpaceService so GetSpaceAsync throws EntityNotFoundException
+        // Arrange: override ISpaceService so UpdateSpaceAsync throws EntityNotFoundException
         var spaceId = Guid.NewGuid();
         var client = _factory.WithWebHostBuilder(builder =>
         {
@@ -70,8 +75,10 @@ public sealed class ErrorFilterGraphQLTests
             {
                 var faultingService = Substitute.For<ISpaceService>();
                 faultingService
-                    .When(s => s.GetSpaceAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()))
-                    .Do(_ => throw new Application.Exceptions.EntityNotFoundException("Space", spaceId));
+                    .UpdateSpaceAsync(
+                        Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<Domain.Enums.SpaceType?>(),
+                        Arg.Any<CancellationToken>())
+                    .Returns<Space>(_ => throw new Application.Exceptions.EntityNotFoundException("Space", spaceId));
 
                 services.AddScoped<ISpaceService>(_ => faultingService);
             });
@@ -80,10 +87,13 @@ public sealed class ErrorFilterGraphQLTests
         var query = new
         {
             query = $$"""
-                {
-                    spaceById(id: "{{spaceId}}") {
-                        id
-                        name
+                mutation {
+                    updateSpace(input: {
+                        id: "{{spaceId}}"
+                        name: "test"
+                    }) {
+                        space { id name }
+                        errors { __typename }
                     }
                 }
                 """,
@@ -93,9 +103,9 @@ public sealed class ErrorFilterGraphQLTests
         var response = await client.PostAsJsonAsync("/graphql", query);
         var content = await response.Content.ReadAsStringAsync();
 
-        // Assert
+        // Assert: HotChocolate mutation conventions surface the EntityNotFoundException
+        // as a typed error (EntityNotFoundError) via the [Error<>] attribute.
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("NOT_FOUND");
-        content.Should().Contain("Space");
+        content.Should().Contain("EntityNotFoundError");
     }
 }
