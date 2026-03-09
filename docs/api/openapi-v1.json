@@ -524,6 +524,7 @@
         "required": [
           "entityType",
           "entityId",
+          "reason",
           "clientTimestamp",
           "serverTimestamp"
         ],
@@ -536,15 +537,21 @@
             "type": "string",
             "format": "uuid"
           },
+          "reason": {
+            "$ref": "#/components/schemas/SyncConflictReason"
+          },
           "clientTimestamp": {
-            "type": "string",
+            "type": ["null", "string"],
             "format": "date-time"
           },
           "serverTimestamp": {
-            "type": "string",
+            "type": ["null", "string"],
             "format": "date-time"
           }
         }
+      },
+      "SyncConflictReason": {
+        "type": "integer"
       },
       "SyncPullRequest": {
         "required": ["cursor", "spaceId", "limit"],
