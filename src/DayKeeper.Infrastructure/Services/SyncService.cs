@@ -150,15 +150,22 @@ public sealed class SyncService(
                 conflicts.Add(new SyncConflict(
                     change.EntityType,
                     change.EntityId,
+                    SyncConflictReason.TimestampConflict,
                     change.Timestamp,
                     latestServerEntry.Timestamp));
                 rejected++;
                 continue;
             }
 
-            if (!await ApplyEntityChangeAsync(change, utcNow, cancellationToken)
+            var conflictsBefore = conflicts.Count;
+            if (!await ApplyEntityChangeAsync(change, utcNow, conflicts, cancellationToken)
                     .ConfigureAwait(false))
             {
+                if (conflicts.Count > conflictsBefore)
+                {
+                    rejected++;
+                }
+
                 continue;
             }
 
@@ -183,6 +190,7 @@ public sealed class SyncService(
     private async Task<bool> ApplyEntityChangeAsync(
         SyncPushEntry change,
         DateTime utcNow,
+        List<SyncConflict> conflicts,
         CancellationToken cancellationToken)
     {
         if (!ChangeLogEntityTypeMap.TryGetClrType(change.EntityType, out var clrType))
@@ -193,16 +201,8 @@ public sealed class SyncService(
         switch (change.Operation)
         {
             case ChangeOperation.Created:
-                {
-                    if (!HasData(change.Data))
-                    {
-                        return false;
-                    }
-
-                    var entity = _syncSerializer.Deserialize(change.Data!.Value, change.EntityType);
-                    _dbContext.Add(entity);
-                    return true;
-                }
+                return await ApplyCreateAsync(change, clrType, conflicts, cancellationToken)
+                    .ConfigureAwait(false);
 
             case ChangeOperation.Updated:
                 {
@@ -241,6 +241,37 @@ public sealed class SyncService(
             default:
                 return false;
         }
+    }
+
+    private async Task<bool> ApplyCreateAsync(
+        SyncPushEntry change,
+        Type clrType,
+        List<SyncConflict> conflicts,
+        CancellationToken cancellationToken)
+    {
+        if (!HasData(change.Data))
+        {
+            return false;
+        }
+
+        var existing = await LoadEntityByIdAsync(clrType, change.EntityId, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (existing is not null)
+        {
+            conflicts.Add(new SyncConflict(
+                change.EntityType,
+                change.EntityId,
+                SyncConflictReason.DuplicateEntity,
+                null,
+                null));
+            return false;
+        }
+
+        var entity = _syncSerializer.Deserialize(change.Data!.Value, change.EntityType);
+        entity.Id = change.EntityId;
+        _dbContext.Add(entity);
+        return true;
     }
 
     private static bool HasData(JsonElement? data) =>

@@ -405,8 +405,9 @@ public class SyncEndpointTests
         push.RejectedCount.Should().Be(1);
         push.Conflicts.Should().ContainSingle();
         push.Conflicts[0].EntityId.Should().Be(Guid.Parse(calendarId));
+        push.Conflicts[0].Reason.Should().Be(SyncConflictReason.TimestampConflict);
         push.Conflicts[0].ClientTimestamp.Should()
-            .BeBefore(push.Conflicts[0].ServerTimestamp);
+            .BeBefore(push.Conflicts[0].ServerTimestamp!.Value);
     }
 
     // ── Push create → GraphQL query ───────────────────────────────────
@@ -460,6 +461,105 @@ public class SyncEndpointTests
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain($"\"name\":\"{calendarName}\"");
         content.Should().Contain("\"color\":\"#123456\"");
+    }
+
+    // ── Push EntityId honoured when Data omits id ─────────────────────
+
+    [Fact]
+    public async Task PostPush_WithEntityIdNotInData_UsesEntityIdFromPushEntry()
+    {
+        var spaceId = await CreateSpaceAsync();
+        var newId = Guid.NewGuid();
+        var calendarName = $"NoIdCal-{Guid.NewGuid():N}";
+
+        var serializer = _factory.Services
+            .GetRequiredService<ISyncSerializer>();
+
+        // Serialize a calendar then strip the "id" property from the JSON.
+        var fullData = serializer.Serialize(new Calendar
+        {
+            Id = Guid.NewGuid(), // deliberately different from newId
+            SpaceId = Guid.Parse(spaceId),
+            Name = calendarName,
+            NormalizedName = calendarName.ToLowerInvariant(),
+            Color = "#AABBCC",
+            IsDefault = false,
+        });
+
+        // Remove "id" from the JSON payload so the service must use EntityId.
+        var dict = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(
+            fullData.GetRawText())!;
+        dict.Remove("id");
+        var strippedJson = JsonSerializer.SerializeToElement(dict);
+
+        var push = await PushAsync(
+        [
+            new SyncPushEntry(
+                ChangeLogEntityType.Calendar,
+                newId,
+                ChangeOperation.Created,
+                DateTime.UtcNow,
+                strippedJson),
+        ]);
+        push.AppliedCount.Should().Be(1);
+        push.RejectedCount.Should().Be(0);
+
+        // Verify the entity is queryable by the EntityId from the push entry.
+        var graphqlQuery = new
+        {
+            query = $$"""
+                {
+                    calendarById(id: "{{newId}}") {
+                        id
+                        name
+                    }
+                }
+                """
+        };
+        var response = await _client.PostAsJsonAsync("/graphql", graphqlQuery);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain($"\"name\":\"{calendarName}\"");
+    }
+
+    // ── Duplicate EntityId on Created ────────────────────────────────
+
+    [Fact]
+    public async Task PostPush_WithDuplicateEntityId_ReturnsDuplicateEntityConflict()
+    {
+        var spaceId = await CreateSpaceAsync();
+        var calendarId = await CreateCalendarAsync(spaceId);
+
+        var serializer = _factory.Services
+            .GetRequiredService<ISyncSerializer>();
+        var data = serializer.Serialize(new Calendar
+        {
+            Id = Guid.Parse(calendarId),
+            SpaceId = Guid.Parse(spaceId),
+            Name = "Duplicate Push",
+            NormalizedName = "duplicate push",
+            Color = "#FF0000",
+            IsDefault = false,
+        });
+
+        var push = await PushAsync(
+        [
+            new SyncPushEntry(
+                ChangeLogEntityType.Calendar,
+                Guid.Parse(calendarId),
+                ChangeOperation.Created,
+                DateTime.UtcNow.AddHours(1), // future timestamp to bypass LWW
+                data),
+        ]);
+
+        push.AppliedCount.Should().Be(0);
+        push.RejectedCount.Should().Be(1);
+        push.Conflicts.Should().ContainSingle();
+        push.Conflicts[0].EntityId.Should().Be(Guid.Parse(calendarId));
+        push.Conflicts[0].Reason.Should().Be(SyncConflictReason.DuplicateEntity);
+        push.Conflicts[0].ClientTimestamp.Should().BeNull();
+        push.Conflicts[0].ServerTimestamp.Should().BeNull();
     }
 
     // ── Helpers ────────────────────────────────────────────────────────
