@@ -48,8 +48,19 @@ public sealed class DeviceService(
             FcmToken = fcmToken,
         };
 
-        return await _deviceRepository.AddAsync(device, cancellationToken)
+        var preference = new DeviceNotificationPreference
+        {
+            TenantId = user.TenantId,
+            DeviceId = device.Id,
+        };
+
+        _dbContext.Set<Device>().Add(device);
+        _dbContext.Set<DeviceNotificationPreference>().Add(preference);
+
+        await _dbContext.SaveChangesAsync(cancellationToken)
             .ConfigureAwait(false);
+
+        return device;
     }
 
     /// <inheritdoc />

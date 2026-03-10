@@ -29,6 +29,7 @@ public sealed class ChangeLogEntityTypeMapTests
         { typeof(Attachment), ChangeLogEntityType.Attachment },
         { typeof(RecurrenceException), ChangeLogEntityType.RecurrenceException },
         { typeof(Device), ChangeLogEntityType.Device },
+        { typeof(DeviceNotificationPreference), ChangeLogEntityType.DeviceNotificationPreference },
     };
 
     [Theory]

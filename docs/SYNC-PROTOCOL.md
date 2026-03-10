@@ -403,33 +403,34 @@ sequenceDiagram
 
 ## 6. Entity Types and Sync Order
 
-The server tracks 21 entity types. Each is identified by a `ChangeLogEntityType` enum.
+The server tracks 22 entity types. Each is identified by a `ChangeLogEntityType` enum.
 
 ### Entity Type Reference
 
-| Enum Value | Name                  | Parent FK(s)                                                | Space-Scoped |
-| ---------- | --------------------- | ----------------------------------------------------------- | ------------ |
-| 0          | `tenant`              | --                                                          | No           |
-| 1          | `user`                | `tenantId`                                                  | No           |
-| 2          | `space`               | `tenantId` (nullable for system spaces)                     | Yes (self)   |
-| 3          | `spaceMembership`     | `spaceId`, `userId`                                         | Yes          |
-| 4          | `calendar`            | `spaceId`                                                   | Yes          |
-| 5          | `calendarEvent`       | `calendarId`, `eventTypeId` (optional)                      | No           |
-| 6          | `eventType`           | `tenantId` (nullable for system types)                      | No           |
-| 7          | `eventReminder`       | `calendarEventId`                                           | No           |
-| 8          | `taskItem`            | `spaceId`, `projectId` (optional)                           | Yes          |
-| 9          | `taskCategory`        | `taskItemId`, `categoryId`                                  | No           |
-| 10         | `category`            | `tenantId` (nullable for system cats)                       | No           |
-| 11         | `project`             | `spaceId`                                                   | Yes          |
-| 12         | `person`              | `spaceId`                                                   | Yes          |
-| 13         | `contactMethod`       | `personId`                                                  | No           |
-| 14         | `address`             | `personId`                                                  | No           |
-| 15         | `importantDate`       | `personId`, `eventTypeId` (optional)                        | No           |
-| 16         | `shoppingList`        | `spaceId`                                                   | Yes          |
-| 17         | `listItem`            | `shoppingListId`                                            | No           |
-| 18         | `attachment`          | `calendarEventId` / `taskItemId` / `personId` (exactly one) | No           |
-| 19         | `recurrenceException` | `calendarEventId`                                           | No           |
-| 20         | `device`              | `userId`                                                    | No           |
+| Enum Value | Name                           | Parent FK(s)                                                | Space-Scoped |
+| ---------- | ------------------------------ | ----------------------------------------------------------- | ------------ |
+| 0          | `tenant`                       | --                                                          | No           |
+| 1          | `user`                         | `tenantId`                                                  | No           |
+| 2          | `space`                        | `tenantId` (nullable for system spaces)                     | Yes (self)   |
+| 3          | `spaceMembership`              | `spaceId`, `userId`                                         | Yes          |
+| 4          | `calendar`                     | `spaceId`                                                   | Yes          |
+| 5          | `calendarEvent`                | `calendarId`, `eventTypeId` (optional)                      | No           |
+| 6          | `eventType`                    | `tenantId` (nullable for system types)                      | No           |
+| 7          | `eventReminder`                | `calendarEventId`                                           | No           |
+| 8          | `taskItem`                     | `spaceId`, `projectId` (optional)                           | Yes          |
+| 9          | `taskCategory`                 | `taskItemId`, `categoryId`                                  | No           |
+| 10         | `category`                     | `tenantId` (nullable for system cats)                       | No           |
+| 11         | `project`                      | `spaceId`                                                   | Yes          |
+| 12         | `person`                       | `spaceId`                                                   | Yes          |
+| 13         | `contactMethod`                | `personId`                                                  | No           |
+| 14         | `address`                      | `personId`                                                  | No           |
+| 15         | `importantDate`                | `personId`, `eventTypeId` (optional)                        | No           |
+| 16         | `shoppingList`                 | `spaceId`                                                   | Yes          |
+| 17         | `listItem`                     | `shoppingListId`                                            | No           |
+| 18         | `attachment`                   | `calendarEventId` / `taskItemId` / `personId` (exactly one) | No           |
+| 19         | `recurrenceException`          | `calendarEventId`                                           | No           |
+| 20         | `device`                       | `userId`                                                    | No           |
+| 21         | `deviceNotificationPreference` | `deviceId`                                                  | No           |
 
 ### Recommended Push Order
 
@@ -440,7 +441,7 @@ When pushing changes, group them by **phase** to prevent foreign key violations.
 | 1     | `tenant`, `eventType`, `category`                                                                               | Root/system-level. No FKs to other synced entities.                   |
 | 2     | `space`, `user`                                                                                                 | Depend only on `tenant`.                                              |
 | 3     | `spaceMembership`, `device`                                                                                     | Depend on `space` + `user` or `user`.                                 |
-| 4     | `calendar`, `project`, `person`, `shoppingList`                                                                 | Depend on `space`.                                                    |
+| 4     | `calendar`, `project`, `person`, `shoppingList`, `deviceNotificationPreference`                                 | Depend on `space` or `device`.                                        |
 | 5     | `calendarEvent`, `taskItem`                                                                                     | Depend on `calendar` or `space` + optional `project`.                 |
 | 6     | `eventReminder`, `recurrenceException`, `taskCategory`, `contactMethod`, `address`, `importantDate`, `listItem` | Depend on phase 4/5 entities.                                         |
 | 7     | `attachment`                                                                                                    | Can reference multiple parent types (event, task, person). Push last. |

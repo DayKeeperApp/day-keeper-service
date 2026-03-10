@@ -335,6 +335,28 @@ type Device {
   lastSyncAt: DateTime
   tenant: Tenant!
   user: User!
+  notificationPreference: DeviceNotificationPreference
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  isDeleted: Boolean!
+}
+
+type DeviceNotificationPreference {
+  tenantId: UUID!
+  deviceId: UUID!
+  dndEnabled: Boolean!
+  dndStartTime: LocalTime!
+  dndEndTime: LocalTime!
+  defaultReminderLeadTime: ReminderLeadTime!
+  notificationSound: NotificationSound!
+  notifyEvents: Boolean!
+  notifyTasks: Boolean!
+  notifyLists: Boolean!
+  notifyPeople: Boolean!
+  tenant: Tenant!
+  device: Device!
   id: UUID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -556,6 +578,7 @@ type Mutation {
   createDevice(input: CreateDeviceInput!): CreateDevicePayload! @cost(weight: "10")
   updateDevice(input: UpdateDeviceInput!): UpdateDevicePayload! @cost(weight: "10")
   deleteDevice(input: DeleteDeviceInput!): DeleteDevicePayload! @cost(weight: "10")
+  updateDeviceNotificationPreference(input: UpdateDeviceNotificationPreferenceInput!): UpdateDeviceNotificationPreferencePayload! @cost(weight: "10")
 }
 
 "Information about pagination in a connection."
@@ -671,6 +694,7 @@ type Query {
   attachmentById(id: UUID!): Attachment @cost(weight: "10")
   devices(userId: UUID "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: DeviceFilterInput @cost(weight: "10") order: [DeviceSortInput!] @cost(weight: "10")): DevicesConnection @listSize(assumedSize: 100, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 25, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   deviceById(id: UUID!): Device @cost(weight: "10")
+  deviceNotificationPreferenceByDeviceId(deviceId: UUID!): DeviceNotificationPreference @cost(weight: "10")
 }
 
 type RecurrenceException {
@@ -914,6 +938,11 @@ type UpdateContactMethodPayload {
   errors: [UpdateContactMethodError!]
 }
 
+type UpdateDeviceNotificationPreferencePayload {
+  deviceNotificationPreference: DeviceNotificationPreference
+  errors: [UpdateDeviceNotificationPreferenceError!]
+}
+
 type UpdateDevicePayload {
   device: Device
   errors: [UpdateDeviceError!]
@@ -1053,6 +1082,8 @@ union UpdateCalendarEventError = InputValidationError | EntityNotFoundError
 union UpdateContactMethodError = InputValidationError | EntityNotFoundError
 
 union UpdateDeviceError = InputValidationError | EntityNotFoundError | DuplicateFcmTokenError
+
+union UpdateDeviceNotificationPreferenceError = InputValidationError | EntityNotFoundError
 
 union UpdateImportantDateError = InputValidationError | EntityNotFoundError
 
@@ -1496,11 +1527,56 @@ input DeviceFilterInput {
   lastSyncAt: DateTimeOperationFilterInput
   tenant: TenantFilterInput
   user: UserFilterInput
+  notificationPreference: DeviceNotificationPreferenceFilterInput
   id: UuidOperationFilterInput
   createdAt: DateTimeOperationFilterInput
   updatedAt: DateTimeOperationFilterInput
   deletedAt: DateTimeOperationFilterInput
   isDeleted: BooleanOperationFilterInput
+}
+
+input DeviceNotificationPreferenceFilterInput {
+  and: [DeviceNotificationPreferenceFilterInput!]
+  or: [DeviceNotificationPreferenceFilterInput!]
+  tenantId: UuidOperationFilterInput
+  deviceId: UuidOperationFilterInput
+  dndEnabled: BooleanOperationFilterInput
+  dndStartTime: LocalTimeOperationFilterInput
+  dndEndTime: LocalTimeOperationFilterInput
+  defaultReminderLeadTime: ReminderLeadTimeOperationFilterInput
+  notificationSound: NotificationSoundOperationFilterInput
+  notifyEvents: BooleanOperationFilterInput
+  notifyTasks: BooleanOperationFilterInput
+  notifyLists: BooleanOperationFilterInput
+  notifyPeople: BooleanOperationFilterInput
+  tenant: TenantFilterInput
+  device: DeviceFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+  deletedAt: DateTimeOperationFilterInput
+  isDeleted: BooleanOperationFilterInput
+}
+
+input DeviceNotificationPreferenceSortInput {
+  tenantId: SortEnumType @cost(weight: "10")
+  deviceId: SortEnumType @cost(weight: "10")
+  dndEnabled: SortEnumType @cost(weight: "10")
+  dndStartTime: SortEnumType @cost(weight: "10")
+  dndEndTime: SortEnumType @cost(weight: "10")
+  defaultReminderLeadTime: SortEnumType @cost(weight: "10")
+  notificationSound: SortEnumType @cost(weight: "10")
+  notifyEvents: SortEnumType @cost(weight: "10")
+  notifyTasks: SortEnumType @cost(weight: "10")
+  notifyLists: SortEnumType @cost(weight: "10")
+  notifyPeople: SortEnumType @cost(weight: "10")
+  tenant: TenantSortInput @cost(weight: "10")
+  device: DeviceSortInput @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+  deletedAt: SortEnumType @cost(weight: "10")
+  isDeleted: SortEnumType @cost(weight: "10")
 }
 
 input DevicePlatformOperationFilterInput {
@@ -1519,6 +1595,7 @@ input DeviceSortInput {
   lastSyncAt: SortEnumType @cost(weight: "10")
   tenant: TenantSortInput @cost(weight: "10")
   user: UserSortInput @cost(weight: "10")
+  notificationPreference: DeviceNotificationPreferenceSortInput @cost(weight: "10")
   id: SortEnumType @cost(weight: "10")
   createdAt: SortEnumType @cost(weight: "10")
   updatedAt: SortEnumType @cost(weight: "10")
@@ -1776,6 +1853,21 @@ input LocalDateOperationFilterInput {
   nlte: LocalDate @cost(weight: "10")
 }
 
+input LocalTimeOperationFilterInput {
+  eq: LocalTime @cost(weight: "10")
+  neq: LocalTime @cost(weight: "10")
+  in: [LocalTime] @cost(weight: "10")
+  nin: [LocalTime] @cost(weight: "10")
+  gt: LocalTime @cost(weight: "10")
+  ngt: LocalTime @cost(weight: "10")
+  gte: LocalTime @cost(weight: "10")
+  ngte: LocalTime @cost(weight: "10")
+  lt: LocalTime @cost(weight: "10")
+  nlt: LocalTime @cost(weight: "10")
+  lte: LocalTime @cost(weight: "10")
+  nlte: LocalTime @cost(weight: "10")
+}
+
 input LongOperationFilterInput {
   eq: Long @cost(weight: "10")
   neq: Long @cost(weight: "10")
@@ -1789,6 +1881,13 @@ input LongOperationFilterInput {
   nlt: Long @cost(weight: "10")
   lte: Long @cost(weight: "10")
   nlte: Long @cost(weight: "10")
+}
+
+input NotificationSoundOperationFilterInput {
+  eq: NotificationSound @cost(weight: "10")
+  neq: NotificationSound @cost(weight: "10")
+  in: [NotificationSound!] @cost(weight: "10")
+  nin: [NotificationSound!] @cost(weight: "10")
 }
 
 input PersonFilterInput {
@@ -1871,6 +1970,13 @@ input RecurrenceExceptionFilterInput {
   updatedAt: DateTimeOperationFilterInput
   deletedAt: DateTimeOperationFilterInput
   isDeleted: BooleanOperationFilterInput
+}
+
+input ReminderLeadTimeOperationFilterInput {
+  eq: ReminderLeadTime @cost(weight: "10")
+  neq: ReminderLeadTime @cost(weight: "10")
+  in: [ReminderLeadTime!] @cost(weight: "10")
+  nin: [ReminderLeadTime!] @cost(weight: "10")
 }
 
 input ReminderMethodOperationFilterInput {
@@ -2158,6 +2264,19 @@ input UpdateDeviceInput {
   lastSyncAt: DateTime
 }
 
+input UpdateDeviceNotificationPreferenceInput {
+  deviceId: UUID!
+  dndEnabled: Boolean
+  dndStartTime: String
+  dndEndTime: String
+  defaultReminderLeadTime: ReminderLeadTime
+  notificationSound: NotificationSound
+  notifyEvents: Boolean
+  notifyTasks: Boolean
+  notifyLists: Boolean
+  notifyPeople: Boolean
+}
+
 input UpdateImportantDateInput {
   id: UUID!
   label: String
@@ -2299,6 +2418,21 @@ enum DevicePlatform {
   WEB
 }
 
+enum NotificationSound {
+  DEFAULT
+  SILENT
+  CUSTOM
+}
+
+enum ReminderLeadTime {
+  NONE
+  FIVE_MIN
+  FIFTEEN_MIN
+  THIRTY_MIN
+  ONE_HOUR
+  ONE_DAY
+}
+
 enum ReminderMethod {
   PUSH
   EMAIL
@@ -2360,6 +2494,9 @@ scalar Decimal
 
 "The `LocalDate` scalar type represents a ISO date string, represented as UTF-8 character sequences YYYY-MM-DD. The scalar follows the specification defined in RFC3339"
 scalar LocalDate
+
+"The LocalTime scalar type is a local time string (i.e., with no associated timezone) in 24-hr HH:mm:ss."
+scalar LocalTime
 
 "The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
 scalar Long

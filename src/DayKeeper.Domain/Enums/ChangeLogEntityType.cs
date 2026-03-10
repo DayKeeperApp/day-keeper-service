@@ -67,4 +67,7 @@ public enum ChangeLogEntityType
 
     /// <summary>A <see cref="Entities.Device"/> entity.</summary>
     Device = 20,
+
+    /// <summary>A <see cref="Entities.DeviceNotificationPreference"/> entity.</summary>
+    DeviceNotificationPreference = 21,
 }
