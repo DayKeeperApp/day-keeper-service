@@ -67,6 +67,7 @@ public sealed partial class ReminderNotificationJob(
                         .ThenInclude(s => s.Memberships)
                             .ThenInclude(m => m.User)
                                 .ThenInclude(u => u.Devices)
+                                    .ThenInclude(d => d.NotificationPreference)
             .FirstOrDefaultAsync(r => r.Id == reminderId)
             .ConfigureAwait(false);
     }
@@ -78,8 +79,11 @@ public sealed partial class ReminderNotificationJob(
         var calendarEvent = reminder.CalendarEvent;
         var space = calendarEvent.Calendar.Space;
 
+        var utcNow = TimeOnly.FromDateTime(DateTime.UtcNow);
+
         var fcmTokens = space.Memberships
             .SelectMany(m => m.User.Devices)
+            .Where(d => ShouldNotify(d, utcNow))
             .Select(d => d.FcmToken)
             .Distinct(StringComparer.Ordinal)
             .ToList();
@@ -110,6 +114,40 @@ public sealed partial class ReminderNotificationJob(
         }
 
         LogDispatchComplete(_logger, reminder.Id, result.SuccessCount, result.FailureCount);
+    }
+
+    private static bool ShouldNotify(Device device, TimeOnly utcNow)
+    {
+        var pref = device.NotificationPreference;
+
+        // No preferences means defaults apply (notify_events = true, DND disabled).
+        if (pref is null)
+        {
+            return true;
+        }
+
+        if (!pref.NotifyEvents)
+        {
+            return false;
+        }
+
+        if (pref.DndEnabled)
+        {
+            var start = pref.DndStartTime;
+            var end = pref.DndEndTime;
+
+            // Midnight-spanning: e.g. 22:00 → 07:00
+            bool inDndWindow = start > end
+                ? utcNow >= start || utcNow < end
+                : utcNow >= start && utcNow < end;
+
+            if (inDndWindow)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private async Task RemoveStaleDevicesAsync(IReadOnlyList<string> staleTokens)

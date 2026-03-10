@@ -51,6 +51,7 @@ public static class DependencyInjection
         services.AddScoped<IShoppingListService, ShoppingListService>();
         services.AddScoped<IAttachmentService, AttachmentService>();
         services.AddScoped<IDeviceService, DeviceService>();
+        services.AddScoped<IDeviceNotificationPreferenceService, DeviceNotificationPreferenceService>();
         services.AddScoped<IReminderSchedulerService, ReminderSchedulerService>();
         services.AddSingleton<INotificationSender, FcmNotificationSender>();
 

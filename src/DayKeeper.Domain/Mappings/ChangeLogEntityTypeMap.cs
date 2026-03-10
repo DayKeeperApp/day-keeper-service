@@ -34,6 +34,7 @@ public static class ChangeLogEntityTypeMap
             [typeof(Attachment)] = ChangeLogEntityType.Attachment,
             [typeof(RecurrenceException)] = ChangeLogEntityType.RecurrenceException,
             [typeof(Device)] = ChangeLogEntityType.Device,
+            [typeof(DeviceNotificationPreference)] = ChangeLogEntityType.DeviceNotificationPreference,
         }.ToFrozenDictionary();
 
     private static readonly FrozenDictionary<ChangeLogEntityType, Type> _enumToType =

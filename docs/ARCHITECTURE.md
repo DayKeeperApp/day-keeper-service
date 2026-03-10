@@ -30,10 +30,11 @@ Zero external dependencies. Contains:
   `SpaceMembership`, `Calendar`, `CalendarEvent`, `EventReminder`,
   `RecurrenceException`, `TaskItem`, `Project`, `Person`, `ContactMethod`,
   `Address`, `ImportantDate`, `ShoppingList`, `ListItem`, `Attachment`,
-  `Device`, `ChangeLog`.
+  `Device`, `DeviceNotificationPreference`, `ChangeLog`.
 - **Enums** &mdash; `SpaceRole`, `SpaceType`, `TaskItemStatus`,
   `TaskItemPriority`, `ReminderMethod`, `ContactMethodType`,
-  `DevicePlatform`, `WeekStart`, `ChangeLogEntityType`, `ChangeOperation`.
+  `DevicePlatform`, `WeekStart`, `ReminderLeadTime`, `NotificationSound`,
+  `ChangeLogEntityType`, `ChangeOperation`.
 - **Interfaces** &mdash; `ITenantScoped` (required TenantId),
   `IOptionalTenantScoped` (nullable TenantId for system spaces).
 
@@ -44,7 +45,8 @@ References Domain only. Contains:
 - **Service interfaces** &mdash; `ITenantService`, `IUserService`,
   `ISpaceService`, `ICalendarService`, `IEventService`, `ITaskItemService`,
   `IPersonService`, `IShoppingListService`, `IAttachmentService`,
-  `IDeviceService`, `ISyncService`, `IRecurrenceExpander`,
+  `IDeviceService`, `IDeviceNotificationPreferenceService`,
+  `ISyncService`, `IRecurrenceExpander`,
   `INotificationSender`, `IReminderSchedulerService`, `IDateTimeProvider`,
   `IAttachmentStorageService`, `IRepository<T>`.
 - **Validation** &mdash; FluentValidation command records
@@ -182,7 +184,8 @@ sequenceDiagram
 
   Note over Q,App: At scheduled time
   Q->>RJ: Execute job
-  RJ->>RJ: Load event, calendar,<br/>space members, devices
+  RJ->>RJ: Load event, calendar,<br/>space members, devices,<br/>notification preferences
+  RJ->>RJ: Filter by notify_events<br/>and DND window
   RJ->>FCM: SendAsync(tokens, title, body, data)
   FCM->>FB: MulticastMessage
   FB-->>App: Push notification
@@ -205,6 +208,7 @@ erDiagram
   Space ||--o{ SpaceMembership : has
   User ||--o{ SpaceMembership : joins
   User ||--o{ Device : registers
+  Device ||--|| DeviceNotificationPreference : has
 
   Space ||--o{ Calendar : contains
   Calendar ||--o{ CalendarEvent : contains

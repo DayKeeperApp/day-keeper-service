@@ -91,6 +91,8 @@ try
         .AddTypeExtension<AttachmentMutations>()
         .AddTypeExtension<DeviceQueries>()
         .AddTypeExtension<DeviceMutations>()
+        .AddTypeExtension<DeviceNotificationPreferenceQueries>()
+        .AddTypeExtension<DeviceNotificationPreferenceMutations>()
         .AddMutationConventions(new MutationConventionOptions
         {
             ApplyToAllMutations = true,

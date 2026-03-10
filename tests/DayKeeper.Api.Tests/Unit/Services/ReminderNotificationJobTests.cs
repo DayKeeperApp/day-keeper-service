@@ -211,6 +211,84 @@ public sealed class ReminderNotificationJobTests : IDisposable
         healthyDevice.DeletedAt.Should().BeNull();
     }
 
+    // ── Notification Preference Filtering ────────────────────────────
+
+    [Fact]
+    public async Task Execute_WhenNotifyEventsDisabled_SkipsDevice()
+    {
+        var (reminder, devices) = SeedReminderGraph(ReminderMethod.Push, deviceCount: 2);
+
+        // Disable event notifications on the first device.
+        _dbContext.Set<DeviceNotificationPreference>().Add(new DeviceNotificationPreference
+        {
+            TenantId = devices[0].TenantId,
+            DeviceId = devices[0].Id,
+            NotifyEvents = false,
+        });
+
+        // Leave the second device with default preferences (events enabled).
+        _dbContext.Set<DeviceNotificationPreference>().Add(new DeviceNotificationPreference
+        {
+            TenantId = devices[1].TenantId,
+            DeviceId = devices[1].Id,
+        });
+        _dbContext.SaveChanges();
+
+        _notificationSender
+            .SendAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<PushNotification>(), Arg.Any<CancellationToken>())
+            .Returns(new NotificationResult(1, 1, 0, []));
+
+        var context = CreateJobContext(reminder.Id.ToString());
+        await _sut.Execute(context);
+
+        await _notificationSender.Received(1)
+            .SendAsync(
+                Arg.Is<IReadOnlyList<string>>(tokens =>
+                    tokens.Count == 1
+                    && tokens.Contains(devices[1].FcmToken)),
+                Arg.Any<PushNotification>(),
+                Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Execute_WhenAllDevicesHaveNotifyEventsDisabled_SkipsNotification()
+    {
+        var (reminder, devices) = SeedReminderGraph(ReminderMethod.Push, deviceCount: 1);
+
+        _dbContext.Set<DeviceNotificationPreference>().Add(new DeviceNotificationPreference
+        {
+            TenantId = devices[0].TenantId,
+            DeviceId = devices[0].Id,
+            NotifyEvents = false,
+        });
+        _dbContext.SaveChanges();
+
+        var context = CreateJobContext(reminder.Id.ToString());
+        await _sut.Execute(context);
+
+        await _notificationSender.DidNotReceiveWithAnyArgs()
+            .SendAsync(default!, default!, default);
+    }
+
+    [Fact]
+    public async Task Execute_WhenDeviceHasNoPreference_SendsNotification()
+    {
+        // Device without a NotificationPreference row should still receive notifications.
+        var (reminder, _) = SeedReminderGraph(ReminderMethod.Push, deviceCount: 1);
+        _notificationSender
+            .SendAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<PushNotification>(), Arg.Any<CancellationToken>())
+            .Returns(new NotificationResult(1, 1, 0, []));
+
+        var context = CreateJobContext(reminder.Id.ToString());
+        await _sut.Execute(context);
+
+        await _notificationSender.Received(1)
+            .SendAsync(
+                Arg.Is<IReadOnlyList<string>>(tokens => tokens.Count == 1),
+                Arg.Any<PushNotification>(),
+                Arg.Any<CancellationToken>());
+    }
+
     // ── Token Uniqueness ────────────────────────────────────────────
     // Duplicate FCM tokens across users are prevented by the database unique
     // index on Device.FcmToken, so no deduplication test is needed here.

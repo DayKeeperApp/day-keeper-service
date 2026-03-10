@@ -35,4 +35,7 @@ public class Device : BaseEntity, ITenantScoped
 
     /// <summary>Navigation to the owning user.</summary>
     public User User { get; set; } = null!;
+
+    /// <summary>Navigation to the device's notification preferences.</summary>
+    public DeviceNotificationPreference? NotificationPreference { get; set; }
 }
