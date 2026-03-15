@@ -1,3 +1,4 @@
+using DayKeeper.Api.Telemetry;
 using Npgsql;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -89,6 +90,7 @@ public static class OpenTelemetryExtensions
             .AddRuntimeInstrumentation()
             .AddProcessInstrumentation()
             .AddNpgsqlInstrumentation()
+            .AddMeter(DayKeeperMetrics.MeterName)
             .AddOtlpExporter((exporterOpts, readerOpts) =>
             {
                 readerOpts.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = exportInterval;

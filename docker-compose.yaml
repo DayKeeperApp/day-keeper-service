@@ -29,6 +29,8 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - lgtm-data:/data
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./observability/grafana/provisioning/dashboards/dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/daykeeper.yaml
 
 volumes:
   postgres-data:

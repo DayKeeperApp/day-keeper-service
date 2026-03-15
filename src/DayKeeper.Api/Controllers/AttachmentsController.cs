@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using DayKeeper.Api.Telemetry;
 using DayKeeper.Application.Exceptions;
 using DayKeeper.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -13,15 +14,18 @@ public sealed partial class AttachmentsController : ControllerBase
     private readonly IAttachmentService _attachmentService;
     private readonly ITenantContext _tenantContext;
     private readonly ILogger<AttachmentsController> _logger;
+    private readonly DayKeeperMetrics _metrics;
 
     public AttachmentsController(
         IAttachmentService attachmentService,
         ITenantContext tenantContext,
-        ILogger<AttachmentsController> logger)
+        ILogger<AttachmentsController> logger,
+        DayKeeperMetrics metrics)
     {
         _attachmentService = attachmentService;
         _tenantContext = tenantContext;
         _logger = logger;
+        _metrics = metrics;
     }
 
     /// <summary>
@@ -65,6 +69,7 @@ public sealed partial class AttachmentsController : ControllerBase
                 cancellationToken).ConfigureAwait(false);
 
             LogAttachmentUploaded(_logger, attachment.Id, attachment.FileName);
+            _metrics.RecordAttachmentUpload(file.Length);
 
             return CreatedAtAction(
                 nameof(Download),

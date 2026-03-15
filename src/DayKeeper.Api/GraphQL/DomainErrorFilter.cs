@@ -1,3 +1,4 @@
+using DayKeeper.Api.Telemetry;
 using DayKeeper.Application.Exceptions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,15 +15,31 @@ public sealed partial class DomainErrorFilter : IErrorFilter
 {
     private readonly ILogger<DomainErrorFilter> _logger;
     private readonly IHostEnvironment _env;
+    private readonly DayKeeperMetrics _metrics;
 
-    public DomainErrorFilter(ILogger<DomainErrorFilter> logger, IHostEnvironment env)
+    public DomainErrorFilter(ILogger<DomainErrorFilter> logger, IHostEnvironment env, DayKeeperMetrics metrics)
     {
         _logger = logger;
         _env = env;
+        _metrics = metrics;
     }
 
     public IError OnError(IError error)
     {
+        var code = error.Exception switch
+        {
+            null => null,
+            EntityNotFoundException => "NOT_FOUND",
+            InputValidationException => "VALIDATION_ERROR",
+            BusinessRuleViolationException => "BUSINESS_RULE_VIOLATION",
+            _ when error.Exception.GetType().Name.StartsWith("Duplicate", StringComparison.Ordinal) => "CONFLICT",
+            _ => "INTERNAL_ERROR",
+        };
+        if (code is not null)
+        {
+            _metrics.RecordGraphQLError(code);
+        }
+
         return error.Exception switch
         {
             null => error,

@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using DayKeeper.Api.Telemetry;
 using DayKeeper.Application.DTOs.Sync;
 using DayKeeper.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,13 @@ public sealed partial class SyncController : ControllerBase
 {
     private readonly ISyncService _syncService;
     private readonly ILogger<SyncController> _logger;
+    private readonly DayKeeperMetrics _metrics;
 
-    public SyncController(ISyncService syncService, ILogger<SyncController> logger)
+    public SyncController(ISyncService syncService, ILogger<SyncController> logger, DayKeeperMetrics metrics)
     {
         _syncService = syncService;
         _logger = logger;
+        _metrics = metrics;
     }
 
     [HttpPost("pull")]
@@ -34,6 +37,8 @@ public sealed partial class SyncController : ControllerBase
             request.Limit,
             cancellationToken).ConfigureAwait(false);
 
+        _metrics.RecordSyncPull(response.Changes.Count);
+
         return Ok(response);
     }
 
@@ -49,6 +54,8 @@ public sealed partial class SyncController : ControllerBase
         var response = await _syncService.PushAsync(
             request.Changes,
             cancellationToken).ConfigureAwait(false);
+
+        _metrics.RecordSyncPush(request.Changes.Count, response.Conflicts.Count);
 
         return Ok(response);
     }

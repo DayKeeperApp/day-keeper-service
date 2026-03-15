@@ -7,6 +7,7 @@ using DayKeeper.Api.GraphQL.Queries;
 using DayKeeper.Api.GraphQL.Validation;
 using DayKeeper.Api.Middleware;
 using DayKeeper.Api.Services;
+using DayKeeper.Api.Telemetry;
 using DayKeeper.Application;
 using DayKeeper.Application.Interfaces;
 using DayKeeper.Infrastructure;
@@ -42,6 +43,7 @@ try
 
     // ── OpenTelemetry ──────────────────────────────────────────
     builder.Services.AddDayKeeperOpenTelemetry(builder.Configuration);
+    builder.Services.AddSingleton<DayKeeperMetrics>();
 
     // ── Controllers ──────────────────────────────────────────
     builder.Services.AddControllers();
@@ -101,6 +103,7 @@ try
             ApplyToAllMutations = true,
         })
         .AddErrorFilter<DomainErrorFilter>()
+        .AddDiagnosticEventListener<DayKeeperDiagnosticEventListener>()
         .TryAddTypeInterceptor<ValidationTypeInterceptor>()
         .AddFiltering()
         .AddSorting()
