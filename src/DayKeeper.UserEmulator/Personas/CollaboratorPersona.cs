@@ -4,7 +4,7 @@ namespace DayKeeper.UserEmulator.Personas;
 
 public sealed class CollaboratorPersona : IPersona
 {
-    private static readonly string[] _roleCycle = ["VIEWER", "EDITOR", "OWNER"];
+    private static readonly string[] _roleCycle = ["VIEWER", "EDITOR"];
 
     public string Name => "Collaborator";
 

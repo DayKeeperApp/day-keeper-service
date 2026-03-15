@@ -75,6 +75,11 @@ public sealed class MetricsCollector
 
     public IReadOnlyList<RequestRecord> GetRecords() => _records.ToArray();
 
+    public void Clear()
+    {
+        while (_records.TryDequeue(out _)) { }
+    }
+
     public double GetRequestsPerSecond()
     {
         var elapsed = (DateTime.UtcNow - _startTime).TotalSeconds;

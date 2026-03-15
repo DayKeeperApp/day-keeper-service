@@ -53,23 +53,61 @@ public sealed class EmulatorOrchestrator
         DisplayBanner();
         DisplayConfig();
 
-        await SetupAsync(ct).ConfigureAwait(false);
-
-        if (!_settings.NoSeed)
+        try
         {
-            await SeedAsync(ct).ConfigureAwait(false);
+            await SetupAsync(ct).ConfigureAwait(false);
+
+            if (!_settings.NoSeed)
+            {
+                await SeedAsync(ct).ConfigureAwait(false);
+            }
+
+            await RunMainPhaseAsync(ct).ConfigureAwait(false);
+
+            if (!_settings.NoValidate)
+            {
+                await ValidateAsync(ct).ConfigureAwait(false);
+            }
+
+            DisplayFinalReport();
+            _metrics.Clear();
         }
-
-        await RunMainPhaseAsync(ct).ConfigureAwait(false);
-
-        if (!_settings.NoValidate)
+        finally
         {
-            await ValidateAsync(ct).ConfigureAwait(false);
+            if (!_settings.NoCleanup && _coordinator.TenantId != Guid.Empty)
+            {
+                await CleanupAsync().ConfigureAwait(false);
+            }
         }
-
-        DisplayFinalReport();
 
         return 0;
+    }
+
+    private async Task CleanupAsync()
+    {
+        AnsiConsole.MarkupLine("[cyan]Cleaning up emulator data...[/]");
+
+        try
+        {
+            var cleanupClient = new DayKeeperApiClient(_settings.Url, _coordinator.TenantId);
+            var variables = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["input"] = new { id = _coordinator.TenantId },
+            };
+
+            await cleanupClient.GraphQLAsync(
+                "DeleteTenant", GraphQLOperations.DeleteTenant, variables,
+                _metrics, "cleanup", "cleanup", CancellationToken.None).ConfigureAwait(false);
+
+            AnsiConsole.MarkupLine("[green]Cleanup complete.[/]");
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine(string.Format(
+                CultureInfo.InvariantCulture,
+                "[yellow]Cleanup failed: {0}[/]",
+                ex.Message));
+        }
     }
 
     private static void DisplayBanner()
@@ -246,7 +284,10 @@ public sealed class EmulatorOrchestrator
     {
         var memberCount = _dataFactory.RandomInt(_config.MinMembersPerSpace, _config.MaxMembersPerSpace);
         var candidates = userRecords.Where(u => u.UserId != ownerId).ToList();
-        var selected = candidates.Take(Math.Min(memberCount, candidates.Count)).ToList();
+        var selected = candidates
+            .OrderBy(_ => _dataFactory.RandomInt(0, int.MaxValue))
+            .Take(Math.Min(memberCount, candidates.Count))
+            .ToList();
 
         foreach (var (userId, _, _) in selected)
         {
