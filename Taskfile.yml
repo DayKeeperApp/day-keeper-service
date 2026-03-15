@@ -6,6 +6,7 @@ vars:
   INFRA_PROJECT: src/DayKeeper.Infrastructure/DayKeeper.Infrastructure.csproj
   DOCKER_IMAGE: daykeeper-api
   K3D_CLUSTER: daykeeper
+  EMULATOR_PROJECT: src/DayKeeper.UserEmulator/DayKeeper.UserEmulator.csproj
 
 tasks:
   default:
@@ -64,6 +65,13 @@ tasks:
         echo -e "    ${B}schema${R}               Export all API schemas (OpenAPI + GraphQL)"
         echo -e "    ${B}schema:openapi${R}       Export OpenAPI v1 spec to docs/api/"
         echo -e "    ${B}schema:graphql${R}       Export GraphQL SDL to docs/api/"
+        echo ""
+        echo -e "  ${B}${C}🎭 Emulator${R}"
+        echo -e "  ${D}${HR}${R}"
+        echo -e "    ${B}emulator${R}             Run UserEmulator with custom args"
+        echo -e "    ${B}emulator:light${R}       Run UserEmulator (Light profile)"
+        echo -e "    ${B}emulator:medium${R}      Run UserEmulator (Medium profile)"
+        echo -e "    ${B}emulator:heavy${R}       Run UserEmulator (Heavy profile)"
         echo ""
         echo -e "  ${B}${C}🐳 Docker${R}"
         echo -e "  ${D}${HR}${R}"
@@ -269,6 +277,28 @@ tasks:
           exit 1
         fi
       - echo "Exported docs/api/schema.graphql"
+
+  # ── Emulator ─────────────────────────────────────────
+
+  emulator:
+    desc: Run the UserEmulator with custom args
+    cmds:
+      - dotnet run --project {{.EMULATOR_PROJECT}} -- {{.CLI_ARGS}}
+
+  emulator:light:
+    desc: Run UserEmulator with Light profile
+    cmds:
+      - dotnet run --project {{.EMULATOR_PROJECT}} -- --profile Light
+
+  emulator:medium:
+    desc: Run UserEmulator with Medium profile
+    cmds:
+      - dotnet run --project {{.EMULATOR_PROJECT}} -- --profile Medium
+
+  emulator:heavy:
+    desc: Run UserEmulator with Heavy profile
+    cmds:
+      - dotnet run --project {{.EMULATOR_PROJECT}} -- --profile Heavy
 
   # ── Docker ───────────────────────────────────────────
 

@@ -8,4 +8,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/DayKeeper.Api.Tests/DayKeeper.Api.Tests.csproj" />
   </Folder>
+  <Folder Name="/tools/">
+    <Project Path="src/DayKeeper.UserEmulator/DayKeeper.UserEmulator.csproj" />
+  </Folder>
 </Solution>
