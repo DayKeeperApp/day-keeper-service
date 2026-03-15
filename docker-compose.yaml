@@ -1,0 +1,35 @@
+# Local development stack: PostgreSQL + Grafana LGTM (observability)
+# Usage: task local:up / task local:down / task local:status
+services:
+  postgres:
+    image: postgres:17
+    container_name: daykeeper-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: daykeeper
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  lgtm:
+    image: grafana/otel-lgtm:0.8.1
+    container_name: daykeeper-lgtm
+    ports:
+      - "3000:3000" # Grafana UI
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP HTTP receiver
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - lgtm-data:/data
+
+volumes:
+  postgres-data:
+  lgtm-data:

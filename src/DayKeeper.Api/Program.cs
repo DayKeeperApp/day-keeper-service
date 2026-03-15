@@ -40,6 +40,9 @@ try
     builder.Services.AddApplicationServices();
     builder.Services.AddInfrastructureServices(builder.Configuration);
 
+    // ── OpenTelemetry ──────────────────────────────────────────
+    builder.Services.AddDayKeeperOpenTelemetry(builder.Configuration);
+
     // ── Controllers ──────────────────────────────────────────
     builder.Services.AddControllers();
 

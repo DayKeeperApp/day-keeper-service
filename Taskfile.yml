@@ -31,6 +31,12 @@ tasks:
         echo -e "    ${B}publish${R}              Publish the API project (Release)"
         echo -e "    ${B}clean${R}                Clean build outputs and test results"
         echo ""
+        echo -e "  ${B}${C}🏠 Local Dev${R}"
+        echo -e "  ${D}${HR}${R}"
+        echo -e "    ${B}local:up${R}             Start local stack (Postgres + Grafana LGTM)"
+        echo -e "    ${B}local:status${R}         Show local stack status"
+        echo -e "    ${B}local:down${R}           Stop local stack and remove containers"
+        echo ""
         echo -e "  ${B}${C}🚀 Run${R}"
         echo -e "  ${D}${HR}${R}"
         echo -e "    ${B}run${R}                  Run the API locally"
@@ -111,6 +117,31 @@ tasks:
     cmds:
       - dotnet clean {{.SLN}} --verbosity quiet
       - rm -rf TestResults
+
+  # ── Local Dev ───────────────────────────────────────
+
+  local:up:
+    desc: Start local stack (Postgres + Grafana LGTM) and apply migrations
+    cmds:
+      - docker compose up -d --wait
+      - task: db:migrate:apply
+      - |
+        echo ""
+        echo "Postgres   localhost:5432 (postgres/postgres)"
+        echo "Grafana    http://localhost:3000 (admin/admin)"
+        echo "OTLP gRPC  localhost:4317"
+        echo ""
+        echo "Run 'task run' to start the API."
+
+  local:status:
+    desc: Show local stack status
+    cmds:
+      - docker compose ps
+
+  local:down:
+    desc: Stop local stack and remove containers
+    cmds:
+      - docker compose down
 
   # ── Run ──────────────────────────────────────────────
 
