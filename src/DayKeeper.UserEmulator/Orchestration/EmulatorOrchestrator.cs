@@ -14,13 +14,13 @@ namespace DayKeeper.UserEmulator.Orchestration;
 
 public sealed class EmulatorOrchestrator
 {
-    private static readonly string[] PersonaNames =
+    private static readonly string[] _personaNames =
     [
         "TaskManager", "CalendarPowerUser", "ListMaker",
         "ContactManager", "Collaborator", "MobileSyncer",
     ];
 
-    private static readonly (BehaviorArchetype Archetype, double Weight)[] ArchetypeWeights =
+    private static readonly (BehaviorArchetype Archetype, double Weight)[] _archetypeWeights =
     [
         (BehaviorArchetype.Browser, 0.25),
         (BehaviorArchetype.ActivePlanner, 0.30),
@@ -336,14 +336,14 @@ public sealed class EmulatorOrchestrator
 
     private BehaviorArchetype AssignArchetype(int userIndex)
     {
-        if (userIndex < ArchetypeWeights.Length)
+        if (userIndex < _archetypeWeights.Length)
         {
-            return ArchetypeWeights[userIndex].Archetype;
+            return _archetypeWeights[userIndex].Archetype;
         }
 
         var roll = _dataFactory.RandomInt(0, 99) / 100.0;
         var cumulative = 0.0;
-        foreach (var (archetype, weight) in ArchetypeWeights)
+        foreach (var (archetype, weight) in _archetypeWeights)
         {
             cumulative += weight;
             if (roll < cumulative)

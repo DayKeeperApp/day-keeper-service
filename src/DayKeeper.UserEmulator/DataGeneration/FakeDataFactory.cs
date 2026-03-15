@@ -9,26 +9,26 @@ public sealed class FakeDataFactory
         "Weekend Warriors", "Book Club", "Travel Crew", "Fitness Buddies", "Home Team",
     ];
 
-    private static readonly string[] WeekStarts = ["SUNDAY", "MONDAY"];
+    private static readonly string[] _weekStarts = ["SUNDAY", "MONDAY"];
 
-    private static readonly string?[] Locales = [null, "en-US", "en-GB", "fr-FR", "de-DE", "es-ES", "ja-JP"];
+    private static readonly string?[] _locales = [null, "en-US", "en-GB", "fr-FR", "de-DE", "es-ES", "ja-JP"];
 
-    private static readonly string[] TaskStatuses = ["OPEN", "IN_PROGRESS", "COMPLETED", "CANCELLED"];
+    private static readonly string[] _taskStatuses = ["OPEN", "IN_PROGRESS", "COMPLETED", "CANCELLED"];
 
-    private static readonly string[] TaskPriorities = ["NONE", "LOW", "MEDIUM", "HIGH", "URGENT"];
+    private static readonly string[] _taskPriorities = ["NONE", "LOW", "MEDIUM", "HIGH", "URGENT"];
 
-    private static readonly string[] ContactMethodTypes = ["PHONE", "EMAIL", "OTHER"];
+    private static readonly string[] _contactMethodTypes = ["PHONE", "EMAIL", "OTHER"];
 
     private static readonly string[] ContactMethodLabels = ["Mobile", "Home", "Work", "Personal", "Other"];
 
     private static readonly string[] AddressLabels = ["Home", "Work", "Billing", "Shipping", "Other"];
 
-    private static readonly string[] ImportantDateLabels = [
+    private static readonly string[] _importantDateLabels = [
         "Birthday", "Anniversary", "Hire Date", "Graduation", "Memorial Day",
         "Wedding", "Due Date", "Founding Date", "First Met",
     ];
 
-    private static readonly string[] DeviceNames = [
+    private static readonly string[] _deviceNames = [
         "iPhone 15 Pro", "iPhone 14", "iPhone 13 Mini", "iPhone SE",
         "Galaxy S24", "Galaxy S23 Ultra", "Pixel 8 Pro", "Pixel 7",
         "Chrome Browser", "Firefox Browser", "Safari Browser", "Edge Browser",
@@ -51,8 +51,8 @@ public sealed class FakeDataFactory
         var displayName = $"{firstName} {lastName}";
         var email = _faker.Internet.Email(firstName, lastName);
         var timezone = _faker.PickRandom(EventTemplates.Timezones);
-        var weekStart = _faker.PickRandom(WeekStarts);
-        var locale = _faker.PickRandom(Locales);
+        var weekStart = _faker.PickRandom(_weekStarts);
+        var locale = _faker.PickRandom(_locales);
 
         return (displayName, email, timezone, weekStart, locale);
     }
@@ -92,8 +92,8 @@ public sealed class FakeDataFactory
         }
 
         var description = _faker.Random.Bool(0.4f) ? _faker.Lorem.Sentence() : null;
-        var status = _faker.PickRandom(TaskStatuses);
-        var priority = _faker.PickRandom(TaskPriorities);
+        var status = _faker.PickRandom(_taskStatuses);
+        var priority = _faker.PickRandom(_taskPriorities);
 
         DateTime? dueAt = null;
         DateOnly? dueDate = null;
@@ -199,7 +199,7 @@ public sealed class FakeDataFactory
 
     public (string Type, string Value, string? Label, bool IsPrimary) GenerateContactMethod()
     {
-        var type = _faker.PickRandom(ContactMethodTypes);
+        var type = _faker.PickRandom(_contactMethodTypes);
         var value = type switch
         {
             "PHONE" => _faker.Phone.PhoneNumber("(###) ###-####"),
@@ -226,14 +226,14 @@ public sealed class FakeDataFactory
 
     public (string Label, DateOnly DateValue) GenerateImportantDate()
     {
-        var label = _faker.PickRandom(ImportantDateLabels);
+        var label = _faker.PickRandom(_importantDateLabels);
         var date = DateOnly.FromDateTime(_faker.Date.Past(40));
         return (label, date);
     }
 
     public (string DeviceName, string Platform, string FcmToken) GenerateDevice()
     {
-        var deviceName = _faker.PickRandom(DeviceNames);
+        var deviceName = _faker.PickRandom(_deviceNames);
         var platform = deviceName switch
         {
             var n when n.Contains("iPhone", StringComparison.Ordinal) || n.Contains("iPad", StringComparison.Ordinal) => "IOS",

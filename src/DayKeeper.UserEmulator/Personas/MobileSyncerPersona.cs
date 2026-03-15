@@ -5,18 +5,18 @@ namespace DayKeeper.UserEmulator.Personas;
 
 public sealed class MobileSyncerPersona : IPersona
 {
-    private static readonly string[] ContentTypes =
+    private static readonly string[] _contentTypes =
     [
         "image/jpeg", "image/png", "application/pdf", "text/plain", "image/gif",
     ];
 
-    private static readonly string[] FileExtensions =
+    private static readonly string[] _fileExtensions =
     [
         "jpg", "png", "pdf", "txt", "gif",
     ];
 
     // ChangeLogEntityType integer values matching the server enum
-    private static readonly int[] SyncEntityTypes =
+    private static readonly int[] _syncEntityTypes =
     [
         8,  // TaskItem
         5,  // CalendarEvent
@@ -26,7 +26,7 @@ public sealed class MobileSyncerPersona : IPersona
     ];
 
     // ChangeOperation integer values matching the server enum
-    private static readonly int[] SyncOperations =
+    private static readonly int[] _syncOperations =
     [
         0, // Created
         1, // Updated
@@ -167,8 +167,8 @@ public sealed class MobileSyncerPersona : IPersona
 
     private static SyncPushEntry BuildSingleSyncEntry(PersonaContext ctx)
     {
-        var entityType = ctx.DataFactory.PickRandom(SyncEntityTypes);
-        var operation = ctx.DataFactory.PickRandom(SyncOperations);
+        var entityType = ctx.DataFactory.PickRandom(_syncEntityTypes);
+        var operation = ctx.DataFactory.PickRandom(_syncOperations);
         var entityId = ResolveEntityIdForSync(ctx, entityType);
         return new SyncPushEntry(entityType, entityId, operation, DateTime.UtcNow, (JsonElement?)null);
     }
@@ -189,9 +189,9 @@ public sealed class MobileSyncerPersona : IPersona
     private static async Task AttachmentUploadAsync(PersonaContext ctx, CancellationToken ct)
     {
         var fileContent = ctx.DataFactory.RandomBytes(1024, 102400);
-        var extIndex = ctx.DataFactory.RandomInt(0, FileExtensions.Length - 1);
-        var fileName = $"attachment_{Guid.NewGuid():N}.{FileExtensions[extIndex]}";
-        var contentType = ContentTypes[extIndex];
+        var extIndex = ctx.DataFactory.RandomInt(0, _fileExtensions.Length - 1);
+        var fileName = $"attachment_{Guid.NewGuid():N}.{_fileExtensions[extIndex]}";
+        var contentType = _contentTypes[extIndex];
         var taskItemId = ctx.TaskItemIds.IsEmpty ? (Guid?)null : ctx.DataFactory.PickRandom([.. ctx.TaskItemIds]);
         var response = await ctx.AttachmentClient.UploadAsync(fileContent, fileName, contentType, taskItemId, null, null, ctx.PersonaName, ctx.ArchetypeName, ct).ConfigureAwait(false);
         ctx.AttachmentIds.Add(response.Id);

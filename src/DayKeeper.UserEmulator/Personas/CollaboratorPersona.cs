@@ -4,7 +4,7 @@ namespace DayKeeper.UserEmulator.Personas;
 
 public sealed class CollaboratorPersona : IPersona
 {
-    private static readonly string[] RoleCycle = ["VIEWER", "EDITOR", "OWNER"];
+    private static readonly string[] _roleCycle = ["VIEWER", "EDITOR", "OWNER"];
 
     public string Name => "Collaborator";
 
@@ -165,7 +165,7 @@ public sealed class CollaboratorPersona : IPersona
         }
 
         var userId = userIds[ctx.DataFactory.RandomInt(0, userIds.Count - 1)];
-        var role = RoleCycle[ctx.DataFactory.RandomInt(0, RoleCycle.Length - 1)];
+        var role = _roleCycle[ctx.DataFactory.RandomInt(0, _roleCycle.Length - 1)];
         await ctx.ApiClient.GraphQLAsync(
             "UpdateSpaceMemberRole",
             GraphQLOperations.UpdateSpaceMemberRole,

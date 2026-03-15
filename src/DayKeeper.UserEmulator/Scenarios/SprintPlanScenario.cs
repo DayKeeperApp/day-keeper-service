@@ -5,7 +5,7 @@ namespace DayKeeper.UserEmulator.Scenarios;
 
 public sealed class SprintPlanScenario : IScenarioPack
 {
-    private static readonly string[] SprintCeremonies =
+    private static readonly string[] _sprintCeremonies =
     [
         "Sprint Planning", "Daily Standup", "Sprint Review", "Sprint Retrospective", "Backlog Refinement",
     ];
@@ -21,7 +21,7 @@ public sealed class SprintPlanScenario : IScenarioPack
         await CreateSprintTasksAsync(ctx, spaceId, projectId, taskCount, ct).ConfigureAwait(false);
         await CreateCeremonyEventsAsync(ctx, calendarId, ct).ConfigureAwait(false);
 
-        return 1 + 1 + taskCount + SprintCeremonies.Length;
+        return 1 + 1 + taskCount + _sprintCeremonies.Length;
     }
 
     private static async Task<Guid> CreateProjectAsync(PersonaContext ctx, Guid spaceId, CancellationToken ct)
@@ -82,7 +82,7 @@ public sealed class SprintPlanScenario : IScenarioPack
     {
         var baseDate = DateTime.UtcNow.Date;
 
-        for (var i = 0; i < SprintCeremonies.Length; i++)
+        for (var i = 0; i < _sprintCeremonies.Length; i++)
         {
             var startAt = baseDate.AddDays(i).AddHours(10);
             var endAt = startAt.AddHours(1);
@@ -91,7 +91,7 @@ public sealed class SprintPlanScenario : IScenarioPack
                 ["input"] = new
                 {
                     id = Guid.NewGuid(),
-                    title = SprintCeremonies[i],
+                    title = _sprintCeremonies[i],
                     isAllDay = false,
                     startAt,
                     endAt,
