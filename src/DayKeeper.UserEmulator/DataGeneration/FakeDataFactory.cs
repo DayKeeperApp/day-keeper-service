@@ -4,7 +4,7 @@ namespace DayKeeper.UserEmulator.DataGeneration;
 
 public sealed class FakeDataFactory
 {
-    private static readonly string[] SpaceNames = [
+    private static readonly string[] _spaceNames = [
         "Family", "Work Team", "Roommates", "Study Group", "Project Alpha",
         "Weekend Warriors", "Book Club", "Travel Crew", "Fitness Buddies", "Home Team",
     ];
@@ -19,9 +19,9 @@ public sealed class FakeDataFactory
 
     private static readonly string[] _contactMethodTypes = ["PHONE", "EMAIL", "OTHER"];
 
-    private static readonly string[] ContactMethodLabels = ["Mobile", "Home", "Work", "Personal", "Other"];
+    private static readonly string[] _contactMethodLabels = ["Mobile", "Home", "Work", "Personal", "Other"];
 
-    private static readonly string[] AddressLabels = ["Home", "Work", "Billing", "Shipping", "Other"];
+    private static readonly string[] _addressLabels = ["Home", "Work", "Billing", "Shipping", "Other"];
 
     private static readonly string[] _importantDateLabels = [
         "Birthday", "Anniversary", "Hire Date", "Graduation", "Memorial Day",
@@ -57,7 +57,7 @@ public sealed class FakeDataFactory
         return (displayName, email, timezone, weekStart, locale);
     }
 
-    public string GenerateSpaceName() => _faker.PickRandom(SpaceNames);
+    public string GenerateSpaceName() => _faker.PickRandom(_spaceNames);
 
     public (string Name, string? Description) GenerateProject()
     {
@@ -206,14 +206,14 @@ public sealed class FakeDataFactory
             "EMAIL" => _faker.Internet.Email(),
             _ => _faker.Internet.Url(),
         };
-        var label = _faker.Random.Bool(0.6f) ? _faker.PickRandom(ContactMethodLabels) : null;
+        var label = _faker.Random.Bool(0.6f) ? _faker.PickRandom(_contactMethodLabels) : null;
         var isPrimary = _faker.Random.Bool(0.3f);
         return (type, value, label, isPrimary);
     }
 
     public (string? Label, string Street1, string? Street2, string City, string? State, string? PostalCode, string Country, bool IsPrimary) GenerateAddress()
     {
-        var label = _faker.Random.Bool(0.5f) ? _faker.PickRandom(AddressLabels) : null;
+        var label = _faker.Random.Bool(0.5f) ? _faker.PickRandom(_addressLabels) : null;
         var street1 = _faker.Address.StreetAddress();
         var street2 = _faker.Random.Bool(0.2f) ? _faker.Address.SecondaryAddress() : null;
         var city = _faker.Address.City();

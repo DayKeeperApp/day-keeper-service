@@ -7,7 +7,7 @@ namespace DayKeeper.UserEmulator.Client;
 
 public sealed class DayKeeperApiClient
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
@@ -52,7 +52,7 @@ public sealed class DayKeeperApiClient
 
         try
         {
-            var response = await HttpClient.PostAsJsonAsync("graphql", body, JsonOptions, ct).ConfigureAwait(false);
+            var response = await HttpClient.PostAsJsonAsync("graphql", body, _jsonOptions, ct).ConfigureAwait(false);
             stopwatch.Stop();
             statusCode = (int)response.StatusCode;
 

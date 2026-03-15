@@ -7,7 +7,7 @@ namespace DayKeeper.UserEmulator.Client;
 
 public sealed class AttachmentClient
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
@@ -78,7 +78,7 @@ public sealed class AttachmentClient
             stopwatch.Stop();
             statusCode = (int)response.StatusCode;
             response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadFromJsonAsync<AttachmentResponse>(JsonOptions, ct).ConfigureAwait(false)
+            var result = await response.Content.ReadFromJsonAsync<AttachmentResponse>(_jsonOptions, ct).ConfigureAwait(false)
                 ?? throw new InvalidOperationException("Null response from attachments/metadata");
             RecordMetric("attachments/metadata", statusCode, stopwatch.ElapsedMilliseconds, personaName, archetypeName, isError: false);
             return result;
@@ -164,7 +164,7 @@ public sealed class AttachmentClient
             stopwatch.Stop();
             statusCode = (int)response.StatusCode;
             response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadFromJsonAsync<AttachmentResponse>(JsonOptions, ct).ConfigureAwait(false)
+            var result = await response.Content.ReadFromJsonAsync<AttachmentResponse>(_jsonOptions, ct).ConfigureAwait(false)
                 ?? throw new InvalidOperationException($"Null response from {endpoint}");
             RecordMetric(endpoint, statusCode, stopwatch.ElapsedMilliseconds, personaName, archetypeName, isError: false);
             return result;

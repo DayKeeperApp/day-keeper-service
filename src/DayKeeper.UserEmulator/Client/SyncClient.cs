@@ -7,7 +7,7 @@ namespace DayKeeper.UserEmulator.Client;
 
 public sealed class SyncClient
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
@@ -35,12 +35,12 @@ public sealed class SyncClient
 
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("api/v1/sync/pull", request, JsonOptions, ct).ConfigureAwait(false);
+            var response = await _httpClient.PostAsJsonAsync("api/v1/sync/pull", request, _jsonOptions, ct).ConfigureAwait(false);
             stopwatch.Stop();
             statusCode = (int)response.StatusCode;
             response.EnsureSuccessStatusCode();
 
-            var result = await response.Content.ReadFromJsonAsync<SyncPullResponse>(JsonOptions, ct).ConfigureAwait(false)
+            var result = await response.Content.ReadFromJsonAsync<SyncPullResponse>(_jsonOptions, ct).ConfigureAwait(false)
                 ?? throw new InvalidOperationException("Null response from sync/pull");
 
             RecordMetric("sync/pull", statusCode, stopwatch.ElapsedMilliseconds, personaName, archetypeName, isError: false);
@@ -66,12 +66,12 @@ public sealed class SyncClient
 
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("api/v1/sync/push", request, JsonOptions, ct).ConfigureAwait(false);
+            var response = await _httpClient.PostAsJsonAsync("api/v1/sync/push", request, _jsonOptions, ct).ConfigureAwait(false);
             stopwatch.Stop();
             statusCode = (int)response.StatusCode;
             response.EnsureSuccessStatusCode();
 
-            var result = await response.Content.ReadFromJsonAsync<SyncPushResponse>(JsonOptions, ct).ConfigureAwait(false)
+            var result = await response.Content.ReadFromJsonAsync<SyncPushResponse>(_jsonOptions, ct).ConfigureAwait(false)
                 ?? throw new InvalidOperationException("Null response from sync/push");
 
             RecordMetric("sync/push", statusCode, stopwatch.ElapsedMilliseconds, personaName, archetypeName, isError: false);
