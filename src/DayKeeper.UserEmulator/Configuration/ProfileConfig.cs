@@ -1,0 +1,25 @@
+namespace DayKeeper.UserEmulator.Configuration;
+
+public sealed record ProfileConfig(
+    int TotalUsers,
+    int SoloUsers,
+    int GroupUsers,
+    int SharedSpaceCount,
+    int MinMembersPerSpace,
+    int MaxMembersPerSpace,
+    int DurationMinutes,
+    int BrowserIntervalMinMs,
+    int BrowserIntervalMaxMs,
+    int ActivePlannerIntervalMinMs,
+    int ActivePlannerIntervalMaxMs,
+    int RapidMutatorIntervalMinMs,
+    int RapidMutatorIntervalMaxMs,
+    int BulkCreatorIntervalMinMs,
+    int BulkCreatorIntervalMaxMs,
+    int SpikeDormantMinMs,
+    int SpikeDormantMaxMs,
+    int SpikeBurstMinSize,
+    int SpikeBurstMaxSize,
+    double BurstChance,
+    int ScenarioIntervalSeconds,
+    int MaxConcurrentScenarios);

@@ -12,3 +12,7 @@ data:
   AttachmentStorage__MaxFileSizeBytes: "10485760"
   Firebase__ProjectId: "day-keeper-dev"
   GOOGLE_APPLICATION_CREDENTIALS: "/etc/firebase/credentials.json"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.observability.svc.cluster.local:4317"
+  OTEL_SERVICE_NAME: "daykeeper-api"
+  OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=dev"
+  Serilog__WriteTo__1__Args__Endpoint: "http://otel-collector.observability.svc.cluster.local:4317"

@@ -1,4 +1,6 @@
+using System.Diagnostics.Metrics;
 using DayKeeper.Api.GraphQL;
+using DayKeeper.Api.Telemetry;
 using DayKeeper.Application.Exceptions;
 using HotChocolate;
 using Microsoft.Extensions.Hosting;
@@ -16,7 +18,14 @@ public sealed class DomainErrorFilterTests
         _env.EnvironmentName.Returns(Environments.Production);
     }
 
-    private DomainErrorFilter CreateFilter() => new(_logger, _env);
+    private static DayKeeperMetrics CreateMetrics()
+    {
+        var meterFactory = Substitute.For<IMeterFactory>();
+        meterFactory.Create(Arg.Any<MeterOptions>()).Returns(new Meter("DayKeeper.Api.Tests"));
+        return new DayKeeperMetrics(meterFactory);
+    }
+
+    private DomainErrorFilter CreateFilter() => new(_logger, _env, CreateMetrics());
 
     private static Error CreateErrorWithException(Exception ex) =>
         new(ex.Message, exception: ex);
