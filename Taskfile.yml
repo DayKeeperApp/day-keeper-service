@@ -18,84 +18,87 @@ tasks:
         D="\033[2m"
         R="\033[0m"
         C="\033[36m"
-        HR="───────────────────────────────────────────────────────────────────"
+        HR="─────────────────────────────────────────────────────────────────────────────"
         echo ""
         echo -e "  ${D}╭${HR}╮${R}"
-        echo -e "  ${D}│${R}  ${B}📦 DayKeeper Service${R}$(printf '%45s')${D}│${R}"
+        echo -e "  ${D}│${R}  ${B}📦 DayKeeper Service${R}$(printf '%55s')${D}│${R}"
         echo -e "  ${D}╰${HR}╯${R}"
         echo ""
         echo -e "  ${B}${C}🔨 Build${R}"
         echo -e "  ${D}${HR}${R}"
-        echo -e "    ${B}restore${R}              Restore NuGet packages"
-        echo -e "    ${B}build${R}                Build the solution (Debug)"
-        echo -e "    ${B}build:release${R}        Build the solution (Release)"
-        echo -e "    ${B}publish${R}              Publish the API project (Release)"
-        echo -e "    ${B}clean${R}                Clean build outputs and test results"
+        echo -e "    ${B}restore${R}                    Restore NuGet packages"
+        echo -e "    ${B}build${R}                      Build the solution (Debug)"
+        echo -e "    ${B}build:release${R}              Build the solution (Release)"
+        echo -e "    ${B}publish${R}                    Publish the API project (Release)"
+        echo -e "    ${B}clean${R}                      Clean build outputs and test results"
         echo ""
         echo -e "  ${B}${C}🏠 Local Dev${R}"
         echo -e "  ${D}${HR}${R}"
-        echo -e "    ${B}local:up${R}             Start local stack (Postgres + Grafana LGTM)"
-        echo -e "    ${B}local:status${R}         Show local stack status"
-        echo -e "    ${B}local:down${R}           Stop local stack and remove containers"
+        echo -e "    ${B}local:up${R}                   Start local stack (Postgres + Grafana LGTM)"
+        echo -e "    ${B}local:status${R}               Show local stack status"
+        echo -e "    ${B}local:down${R}                 Stop local stack and remove containers"
         echo ""
         echo -e "  ${B}${C}🚀 Run${R}"
         echo -e "  ${D}${HR}${R}"
-        echo -e "    ${B}run${R}                  Run the API locally"
-        echo -e "    ${B}watch${R}                Run the API with hot reload"
+        echo -e "    ${B}run${R}                        Run the API locally"
+        echo -e "    ${B}watch${R}                      Run the API with hot reload"
         echo ""
         echo -e "  ${B}${C}🧪 Test${R}"
         echo -e "  ${D}${HR}${R}"
-        echo -e "    ${B}test${R}                 Run all tests"
-        echo -e "    ${B}test:unit${R}            Run unit tests only"
-        echo -e "    ${B}test:integration${R}     Run integration tests only"
-        echo -e "    ${B}test:coverage${R}        Run tests with code coverage (Cobertura XML)"
-        echo -e "    ${B}test:coverage:report${R} Generate and open HTML coverage report"
+        echo -e "    ${B}test${R}                       Run all tests"
+        echo -e "    ${B}test:unit${R}                  Run unit tests only"
+        echo -e "    ${B}test:integration${R}           Run integration tests only"
+        echo -e "    ${B}test:coverage${R}              Run tests with code coverage (Cobertura XML)"
+        echo -e "    ${B}test:coverage:report${R}       Generate and open HTML coverage report"
         echo ""
         echo -e "  ${B}${C}✨ Code Quality${R}"
         echo -e "  ${D}${HR}${R}"
-        echo -e "    ${B}format${R}               Auto-format all C# files"
-        echo -e "    ${B}format:check${R}         Verify formatting without changes"
-        echo -e "    ${B}lint${R}                 Run lefthook pre-commit checks"
-        echo -e "    ${B}lint:all${R}             Run lefthook pre-commit checks on all files"
-        echo -e "    ${B}vuln${R}                 Check for vulnerable packages"
-        echo -e "    ${B}outdated${R}             List outdated packages"
+        echo -e "    ${B}format${R}                     Auto-format all C# files"
+        echo -e "    ${B}format:check${R}               Verify formatting without changes"
+        echo -e "    ${B}lint${R}                       Run lefthook pre-commit checks"
+        echo -e "    ${B}lint:all${R}                   Run lefthook pre-commit checks on all files"
+        echo -e "    ${B}vuln${R}                       Check for vulnerable packages"
+        echo -e "    ${B}outdated${R}                   List outdated packages"
         echo ""
         echo -e "  ${B}${C}📋 Schema${R}"
         echo -e "  ${D}${HR}${R}"
-        echo -e "    ${B}schema${R}               Export all API schemas (OpenAPI + GraphQL)"
-        echo -e "    ${B}schema:openapi${R}       Export OpenAPI v1 spec to docs/api/"
-        echo -e "    ${B}schema:graphql${R}       Export GraphQL SDL to docs/api/"
+        echo -e "    ${B}schema${R}                     Export all API schemas (OpenAPI + GraphQL)"
+        echo -e "    ${B}schema:openapi${R}             Export OpenAPI v1 spec to docs/api/"
+        echo -e "    ${B}schema:graphql${R}             Export GraphQL SDL to docs/api/"
         echo ""
         echo -e "  ${B}${C}🎭 Emulator${R}"
         echo -e "  ${D}${HR}${R}"
-        echo -e "    ${B}emulator${R}             Run UserEmulator with custom args"
-        echo -e "    ${B}emulator:light${R}       Run UserEmulator (Light profile)"
-        echo -e "    ${B}emulator:medium${R}      Run UserEmulator (Medium profile)"
-        echo -e "    ${B}emulator:heavy${R}       Run UserEmulator (Heavy profile)"
+        echo -e "    ${B}emulator${R}                   Run UserEmulator with custom args"
+        echo -e "    ${B}emulator:light${R}             Run UserEmulator (Light profile)"
+        echo -e "    ${B}emulator:medium${R}            Run UserEmulator (Medium profile)"
+        echo -e "    ${B}emulator:heavy${R}             Run UserEmulator (Heavy profile)"
         echo ""
         echo -e "  ${B}${C}🐳 Docker${R}"
         echo -e "  ${D}${HR}${R}"
-        echo -e "    ${B}docker:build${R}         Build Docker image"
-        echo -e "    ${B}docker:run${R}           Run Docker container"
+        echo -e "    ${B}docker:build${R}               Build Docker image"
+        echo -e "    ${B}docker:run${R}                 Run Docker container"
         echo ""
         echo -e "  ${B}${C}☸  Deploy${R}"
         echo -e "  ${D}${HR}${R}"
-        echo -e "    ${B}deploy:dev${R}           Deploy to local k3d cluster (dev)"
-        echo -e "    ${B}deploy:prod${R}          Deploy to local k3d cluster (prod)"
-        echo -e "    ${B}deploy:status${R}        Show deployment status"
-        echo -e "    ${B}deploy:logs${R}          Tail API logs"
-        echo -e "    ${B}deploy:teardown${R}      Delete k3d cluster"
+        echo -e "    ${B}deploy:dev${R}                 Deploy to local k3d cluster (dev)"
+        echo -e "    ${B}deploy:prod${R}                Deploy to local k3d cluster (prod)"
+        echo -e "    ${B}deploy:status${R}              Show deployment status"
+        echo -e "    ${B}deploy:logs${R}                Tail API logs"
+        echo -e "    ${B}deploy:teardown${R}            Delete k3d cluster"
+        echo -e "    ${B}deploy:db-backup${R}           Trigger an on-demand database backup"
+        echo -e "    ${B}deploy:db-restore${R}          Restore database from backup (-- filename)"
+        echo -e "    ${B}deploy:db-restore:latest${R}   Restore database from latest backup"
         echo ""
         echo -e "  ${B}${C}🗄️  Database${R}"
         echo -e "  ${D}${HR}${R}"
-        echo -e "    ${B}db:migrate:add${R}       Create a new migration (-- MigrationName)"
-        echo -e "    ${B}db:migrate:apply${R}     Apply pending migrations"
-        echo -e "    ${B}db:migrate:script${R}    Generate idempotent SQL migration script"
-        echo -e "    ${B}db:migrate:bundle${R}    Create self-contained migration bundle"
+        echo -e "    ${B}db:migrate:add${R}             Create a new migration (-- MigrationName)"
+        echo -e "    ${B}db:migrate:apply${R}           Apply pending migrations"
+        echo -e "    ${B}db:migrate:script${R}          Generate idempotent SQL migration script"
+        echo -e "    ${B}db:migrate:bundle${R}          Create self-contained migration bundle"
         echo ""
         echo -e "  ${B}${C}⚙️  Setup${R}"
         echo -e "  ${D}${HR}${R}"
-        echo -e "    ${B}setup${R}                Set up local development environment"
+        echo -e "    ${B}setup${R}                      Set up local development environment"
         echo ""
 
   # ── Build ────────────────────────────────────────────
@@ -382,6 +385,7 @@ tasks:
     cmds:
       - k3d cluster create {{.K3D_CLUSTER}}
         --port "8080:8080@loadbalancer"
+        --volume "/var/backups/daykeeper:/var/backups/daykeeper"
         --wait
 
   deploy:import:
@@ -421,6 +425,40 @@ tasks:
     desc: Delete k3d cluster
     cmds:
       - k3d cluster delete {{.K3D_CLUSTER}}
+
+  deploy:db-backup:
+    desc: Trigger an on-demand database backup
+    cmds:
+      - kubectl create job postgres-backup-manual --from=cronjob/postgres-backup -n daykeeper
+      - kubectl -n daykeeper wait --for=condition=complete job/postgres-backup-manual --timeout=300s
+      - kubectl -n daykeeper logs job/postgres-backup-manual
+      - kubectl delete job postgres-backup-manual -n daykeeper
+
+  deploy:db-restore:
+    desc: "Restore database from backup (usage: task deploy:db-restore -- filename.dump)"
+    cmds:
+      - |
+        BACKUP_FILE="{{.CLI_ARGS}}"
+        JOB_YAML="deploy/k8s/base/jobs/backup-restore-job.yaml"
+        if [ -z "$BACKUP_FILE" ]; then
+          BACKUP_FILE=$(./deploy/scripts/select-backup.sh) || exit 0
+        fi
+        kubectl delete job postgres-restore -n daykeeper --ignore-not-found > /dev/null 2>&1
+        sed "s/__BACKUP_FILE__/$BACKUP_FILE/" "$JOB_YAML" | kubectl apply -f - > /dev/null
+        kubectl -n daykeeper wait --for=condition=complete job/postgres-restore --timeout=300s
+        kubectl -n daykeeper logs job/postgres-restore
+        kubectl delete job postgres-restore -n daykeeper --ignore-not-found > /dev/null 2>&1
+
+  deploy:db-restore:latest:
+    desc: Restore database from the latest backup
+    cmds:
+      - |
+        JOB_YAML="deploy/k8s/base/jobs/backup-restore-job.yaml"
+        kubectl delete job postgres-restore -n daykeeper --ignore-not-found > /dev/null 2>&1
+        sed 's/__BACKUP_FILE__/__LATEST__/' "$JOB_YAML" | kubectl apply -f -
+        kubectl -n daykeeper wait --for=condition=complete job/postgres-restore --timeout=300s
+        kubectl -n daykeeper logs job/postgres-restore
+        kubectl delete job postgres-restore -n daykeeper --ignore-not-found > /dev/null 2>&1
 
   # ── Setup ────────────────────────────────────────────
 

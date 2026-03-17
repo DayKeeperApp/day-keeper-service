@@ -69,10 +69,81 @@ spec:
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: daykeeper-api
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgres-backup
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgres-restore
       ports:
         - port: 5432
           protocol: TCP
   egress:
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-backup
+  namespace: daykeeper
+  labels:
+    app.kubernetes.io/name: postgres-backup
+    app.kubernetes.io/component: database
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-backup
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgres
+      ports:
+        - port: 5432
+          protocol: TCP
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-restore
+  namespace: daykeeper
+  labels:
+    app.kubernetes.io/name: postgres-restore
+    app.kubernetes.io/component: database
+  annotations:
+    # Restore pods only exist during on-demand restore jobs
+    kube-score/ignore: networkpolicy-targets-pod
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-restore
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgres
+      ports:
+        - port: 5432
+          protocol: TCP
     - to:
         - namespaceSelector: {}
       ports:

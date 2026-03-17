@@ -1,0 +1,154 @@
+## Usage:
+##
+## 1. Set the BACKUP_FILE value to a specific dump filename or "__LATEST__"
+##    to automatically restore the most recent backup.
+##
+## 2. Apply the job:
+##    kubectl apply -f deploy/k8s/base/jobs/backup-restore-job.yaml
+##
+## 3. Monitor progress:
+##    kubectl -n daykeeper logs -f job/postgres-restore
+##
+## 4. Clean up after restore:
+##    kubectl delete job postgres-restore -n daykeeper
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-restore
+  namespace: daykeeper
+  labels:
+    app.kubernetes.io/name: postgres-restore
+    app.kubernetes.io/component: database
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres-restore
+      annotations:
+        # postgres-alpine image runs as UID 70 (hardcoded)
+        kube-score/ignore: container-security-context-user-group-id
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70
+        runAsGroup: 70
+        fsGroup: 70
+        seccompProfile:
+          type: RuntimeDefault
+      restartPolicy: Never
+      initContainers:
+        - name: init-permissions
+          image: postgres:18-alpine
+          imagePullPolicy: Always
+          command: ["chown", "70:70", "/backups"]
+          securityContext:
+            runAsUser: 0
+            runAsNonRoot: false
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+              add: ["CHOWN"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+              ephemeral-storage: 8Mi
+            limits:
+              cpu: 50m
+              memory: 32Mi
+              ephemeral-storage: 16Mi
+          volumeMounts:
+            - name: backups
+              mountPath: /backups
+      containers:
+        - name: pg-restore
+          image: postgres:18-alpine
+          imagePullPolicy: Always
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              BACKUP_DIR=/backups
+
+              if [ -z "$BACKUP_FILE" ]; then
+                echo "BACKUP_FILE not set. Available backups:"
+                ls -lht "$BACKUP_DIR"/daykeeper_*.dump
+                echo ""
+                echo "Set the BACKUP_FILE env var to the filename you want to restore."
+                exit 1
+              fi
+
+              if [ "$BACKUP_FILE" = "__LATEST__" ]; then
+                BACKUP_FILE=$(ls -t "$BACKUP_DIR"/daykeeper_*.dump 2>/dev/null | head -1 | xargs -r basename)
+                if [ -z "$BACKUP_FILE" ]; then
+                  echo "No backups found in $BACKUP_DIR"
+                  exit 1
+                fi
+                echo "Latest backup: $BACKUP_FILE"
+              fi
+
+              FULL_PATH="${BACKUP_DIR}/${BACKUP_FILE}"
+              if [ ! -f "$FULL_PATH" ]; then
+                echo "Backup file not found: $FULL_PATH"
+                echo "Available backups:"
+                ls -lht "$BACKUP_DIR"/daykeeper_*.dump
+                exit 1
+              fi
+
+              echo "Restoring from: $FULL_PATH"
+              pg_restore \
+                -h postgres \
+                -U "$POSTGRES_USER" \
+                -d "$POSTGRES_DB" \
+                --clean \
+                --if-exists \
+                "$FULL_PATH"
+              echo "Restore complete."
+          env:
+            - name: BACKUP_FILE
+              value: "__BACKUP_FILE__"
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_USER
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_DB
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+              ephemeral-storage: 32Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+              ephemeral-storage: 128Mi
+          volumeMounts:
+            - name: backups
+              mountPath: /backups
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: backups
+          hostPath:
+            path: /var/backups/daykeeper
+            type: Directory
+        - name: tmp
+          emptyDir: {}

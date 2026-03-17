@@ -248,20 +248,29 @@ flowchart LR
     Init["Init Container<br/>(efbundle migrations)"]
     API["DayKeeper API<br/>ASP.NET Core :8080"]
     PG[(PostgreSQL<br/>StatefulSet)]
+    Backup["Backup CronJob<br/>(daily pg_dump)"]
     PVC_A[("PVC<br/>attachments")]
     PVC_DB[("PVC<br/>db data")]
     FB["Firebase Credentials<br/>(K8s Secret)"]
 
     Init -->|runs before| API
     API --> PG
+    Backup -->|pg_dump| PG
     API --- PVC_A
     API --- FB
     PG --- PVC_DB
   end
 
+  Host[("/var/backups/daykeeper<br/>(host volume)")]
+  Backup --- Host
   CF --> Kong --> API
 ```
 
 The API container runs as non-root (UID 10654) with a read-only root
 filesystem. Liveness (`/health/live`), readiness (`/health/ready`), and
 startup probes ensure rolling updates are safe.
+
+A CronJob runs `pg_dump` daily at 2 AM, storing compressed backups on the
+host filesystem via a `hostPath` volume mount. This ensures backups survive
+cluster deletion. See the [Runbook](RUNBOOK.md#backup) for backup and restore
+procedures.
