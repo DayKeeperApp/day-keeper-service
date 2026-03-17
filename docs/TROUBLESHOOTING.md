@@ -236,6 +236,64 @@ kubectl -n daykeeper get events --sort-by='.lastTimestamp'
 - Init container failing (see [efbundle failure](#efbundle-failure-in-init-container)).
 - Resource limits too low (OOMKilled).
 
+## Backup & Restore
+
+### Backup job Permission denied
+
+**Symptom:** Backup job logs show `can't create /backups/...: Permission denied`.
+
+**Cause:** The `hostPath` directory was created by the kubelet as root. The
+init container that fixes ownership may not have run (e.g. the CronJob spec
+was applied without the init container).
+
+**Fix:** Redeploy the CronJob and trigger a new backup:
+
+```bash
+kubectl apply -k deploy/k8s/overlays/dev/
+task deploy:db-backup
+```
+
+### Backup completes instantly with tiny file
+
+**Symptom:** Backup job succeeds but the dump file is unexpectedly small.
+
+**Cause:** The database may be empty (e.g. after a fresh deployment before
+any data is created).
+
+**Fix:** Verify the database has data:
+
+```bash
+kubectl -n daykeeper exec -it postgres-0 -- \
+  psql -U daykeeper -d daykeeper -c "SELECT count(*) FROM \"__EFMigrationsHistory\";"
+```
+
+### No backups found on host
+
+**Symptom:** `ls /var/backups/daykeeper/` shows nothing or the directory
+doesn't exist.
+
+**Cause:** With k3d, `hostPath` volumes only map to the host if the cluster
+was created with `--volume "/var/backups/daykeeper:/var/backups/daykeeper"`.
+The `deploy:cluster` task includes this flag, but clusters created before this
+change need to be recreated.
+
+**Fix:**
+
+```bash
+task deploy:teardown && task deploy:dev
+```
+
+### Restore job fails with "No backups found"
+
+**Symptom:** `task deploy:db-restore:latest` fails with no backups found.
+
+**Fix:** Run a manual backup first, then retry:
+
+```bash
+task deploy:db-backup
+task deploy:db-restore:latest
+```
+
 ## Health Checks
 
 ### Readiness probe failing

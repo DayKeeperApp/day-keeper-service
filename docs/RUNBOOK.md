@@ -188,18 +188,40 @@ kubectl -n daykeeper exec -it postgres-0 -- \
 
 ### Backup
 
+A CronJob runs `pg_dump` daily at 2 AM and stores compressed backups on the
+host at `/var/backups/daykeeper/`. Backups older than 7 days are pruned
+automatically.
+
+To trigger a backup outside the schedule:
+
 ```bash
-kubectl -n daykeeper exec -it postgres-0 -- \
-  pg_dump -U daykeeper -d daykeeper --format=custom \
-  > daykeeper-backup-$(date +%Y%m%d).dump
+task deploy:db-backup
+```
+
+To list backups on the host:
+
+```bash
+ls -lht /var/backups/daykeeper/
 ```
 
 ### Restore
 
+Interactive restore (displays a numbered list of backups to choose from):
+
 ```bash
-kubectl -n daykeeper exec -i postgres-0 -- \
-  pg_restore -U daykeeper -d daykeeper --clean --if-exists \
-  < daykeeper-backup-20260308.dump
+task deploy:db-restore
+```
+
+Restore a specific file:
+
+```bash
+task deploy:db-restore -- daykeeper_20260316_020000.dump
+```
+
+Restore the most recent backup:
+
+```bash
+task deploy:db-restore:latest
 ```
 
 ### Apply Migrations Manually
@@ -343,6 +365,9 @@ task lint               # Run pre-commit hooks
 task vuln               # Check vulnerable packages
 task outdated           # Check outdated packages
 task schema             # Export OpenAPI + GraphQL schemas
+task deploy:db-backup   # Trigger on-demand database backup
+task deploy:db-restore  # Restore database from backup (interactive)
+task deploy:db-restore:latest  # Restore from latest backup
 ```
 
 ### kubectl Quick Reference

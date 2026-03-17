@@ -24,6 +24,11 @@ pre-commit:
             run: npx --yes --quiet prettier --list-different --write {staged_files}
             stage_fixed: true
 
+          - name: shfmt
+            glob: "*.{sh,bash,ksh,dash}"
+            run: uvx --from shfmt-py shfmt -w {staged_files}
+            stage_fixed: true
+
     # === Job 2: Lint ===
     # Check formatted code for issues
     - name: lint
@@ -45,7 +50,7 @@ pre-commit:
 
           - name: shellcheck
             glob: "*.sh"
-            run: uvx shellcheck-py {staged_files}
+            run: uvx --from shellcheck-py shellcheck {staged_files}
 
           - name: hadolint
             glob: "Dockerfile*"

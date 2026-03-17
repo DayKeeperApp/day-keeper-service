@@ -12,6 +12,7 @@ COPY src/DayKeeper.Domain/DayKeeper.Domain.csproj src/DayKeeper.Domain/
 COPY src/DayKeeper.Application/DayKeeper.Application.csproj src/DayKeeper.Application/
 COPY src/DayKeeper.Infrastructure/DayKeeper.Infrastructure.csproj src/DayKeeper.Infrastructure/
 COPY src/DayKeeper.Api/DayKeeper.Api.csproj src/DayKeeper.Api/
+COPY src/DayKeeper.UserEmulator/DayKeeper.UserEmulator.csproj src/DayKeeper.UserEmulator/
 COPY tests/DayKeeper.Api.Tests/DayKeeper.Api.Tests.csproj tests/DayKeeper.Api.Tests/
 
 RUN dotnet restore DayKeeper.slnx

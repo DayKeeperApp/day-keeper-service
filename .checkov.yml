@@ -11,3 +11,5 @@ skip-check:
   - CKV_K8S_40 # Containers should run as a high UID to avoid host conflict
   # Postgres official image requires env vars; .NET IConfiguration reads env vars by design
   - CKV_K8S_35 # Prefer using secrets as files over secrets as environment variables
+  # Backup/restore init container needs CHOWN to fix hostPath ownership for postgres UID 70
+  - CKV_K8S_25 # Minimize the admission of containers with added capability
